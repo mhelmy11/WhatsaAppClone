@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhatsappClone.API", "WhatsappClone.API\WhatsappClone.API.csproj", "{15ECE0EF-DB05-4184-8F9A-FF515CB3A389}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatsappClone.Data", "WhatsappClone.Data\WhatsappClone.Data.csproj", "{AE170AD4-7172-44BC-A681-161077C474D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatsappClone.Infrastructure", "WhatsappClone.Infrastructure\WhatsappClone.Infrastructure.csproj", "{1A0DAECB-FE51-48B0-8302-B5723C422749}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatsappClone.Core", "WhatsappClone.Core\WhatsappClone.Core.csproj", "{84FBD8B6-B9A9-4312-955C-B9E5DC265744}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatsappClone.Service", "WhatsappClone.Service\WhatsappClone.Service.csproj", "{DC0313E6-26FA-4496-A34D-E12B0ABEF097}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{15ECE0EF-DB05-4184-8F9A-FF515CB3A389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15ECE0EF-DB05-4184-8F9A-FF515CB3A389}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15ECE0EF-DB05-4184-8F9A-FF515CB3A389}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15ECE0EF-DB05-4184-8F9A-FF515CB3A389}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE170AD4-7172-44BC-A681-161077C474D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE170AD4-7172-44BC-A681-161077C474D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE170AD4-7172-44BC-A681-161077C474D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE170AD4-7172-44BC-A681-161077C474D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A0DAECB-FE51-48B0-8302-B5723C422749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A0DAECB-FE51-48B0-8302-B5723C422749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A0DAECB-FE51-48B0-8302-B5723C422749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A0DAECB-FE51-48B0-8302-B5723C422749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84FBD8B6-B9A9-4312-955C-B9E5DC265744}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84FBD8B6-B9A9-4312-955C-B9E5DC265744}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84FBD8B6-B9A9-4312-955C-B9E5DC265744}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84FBD8B6-B9A9-4312-955C-B9E5DC265744}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC0313E6-26FA-4496-A34D-E12B0ABEF097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC0313E6-26FA-4496-A34D-E12B0ABEF097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC0313E6-26FA-4496-A34D-E12B0ABEF097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC0313E6-26FA-4496-A34D-E12B0ABEF097}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6BE506B-0D7B-4FAD-9FC6-DE7D29A79A87}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WhatsappClone.Data\WhatsappClone.Data.csproj" />
+    <ProjectReference Include="..\WhatsappClone.Infrastructure\WhatsappClone.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
