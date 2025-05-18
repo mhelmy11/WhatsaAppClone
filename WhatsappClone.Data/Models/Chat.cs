@@ -11,8 +11,8 @@ namespace WhatsappClone.Data.Models
 
 
         public int Id { get; set; }
-        public int SenderId { get; set; }
-        public int ReceiverId { get; set; }
+        public string SenderId { get; set; }
+        public string ReceiverId { get; set; }
         public string LastMessageContent { get; set; }
         public DateTime LastMessageTime { get; set; }
         public bool IsStarted { get; set; } // Indicates if the chat has started

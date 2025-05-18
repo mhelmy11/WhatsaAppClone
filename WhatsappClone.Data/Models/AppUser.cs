@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WhatsappClone.Data.Models
 {
-    public class AppUser
+    public class AppUser : IdentityUser
     {
         public bool IsActive { get; set; } = false;
         public DateTime activeAt { get; set; } = DateTime.Now;
@@ -24,7 +25,8 @@ namespace WhatsappClone.Data.Models
 
 
 
-        public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>(); //all chats
+        public virtual ICollection<Chat> ReceiverChats { get; set; } = new List<Chat>(); //all chats
+        public virtual ICollection<Chat> SenderChats { get; set; } = new List<Chat>(); //all chats
         #region oldNav
         //public virtual ICollection<Chat> ChatReceivers { get; set; } = new List<Chat>();
 
@@ -33,6 +35,8 @@ namespace WhatsappClone.Data.Models
 
 
         public virtual ICollection<Message> Messages { get; set; } = new List<Message>(); //all messages
+        public virtual ICollection<Message> SenderMessages { get; set; } = new List<Message>(); //all messages
+        public virtual ICollection<Message> ReceiverMessages { get; set; } = new List<Message>(); //all messages
 
 
 
