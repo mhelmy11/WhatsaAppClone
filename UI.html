@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Web Clone</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --whatsapp-green: #128C7E;
+            --whatsapp-light-green: #25D366;
+            --whatsapp-teal: #075E54;
+            --chat-bg: #E5DDD5;
+            --sent-message-bg: #DCF8C6;
+            --received-message-bg: #FFFFFF;
+            --sidebar-bg: #FFFFFF;
+            --sidebar-header-bg: #F0F2F5;
+            --chat-header-bg: #F0F2F5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Main container */
+        #whatsapp-container {
+            height: 100vh;
+            display: flex;
+            background-color: #F0F2F5;
+        }
+
+        /* Sidebar styles */
+        #sidebar {
+            width: 30%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #D1D7DB;
+            background-color: var(--sidebar-bg);
+        }
+
+        #sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background-color: var(--sidebar-header-bg);
+        }
+
+        #user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        #sidebar-icons {
+            display: flex;
+            gap: 24px;
+            color: #54656F;
+        }
+
+        #sidebar-icons i {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #search-container {
+            padding: 8px 12px;
+            background-color: var(--sidebar-bg);
+        }
+
+        #search-box {
+            display: flex;
+            align-items: center;
+            background-color: #F0F2F5;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        #search-box i {
+            color: #54656F;
+            margin-right: 30px;
+        }
+
+        #search-input {
+            border: none;
+            background-color: transparent;
+            width: 100%;
+            outline: none;
+        }
+
+        #filter-button {
+            color: #54656F;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #chat-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            padding: 12px 16px;
+            border-bottom: 1px solid #F0F2F5;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .chat-item:hover {
+            background-color: #F5F6F6;
+        }
+
+        .chat-item.active {
+            background-color: #F0F2F5;
+        }
+
+        .chat-avatar {
+            width: 49px;
+            height: 49px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .chat-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+        }
+
+        .chat-name {
+            font-weight: 500;
+            font-size: 17px;
+            color: #111B21;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: #667781;
+        }
+
+        .chat-message {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #667781;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px;
+        }
+
+        .message-preview {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .message-status {
+            display: flex;
+            align-items: center;
+        }
+
+        .unread-count {
+            background-color: var(--whatsapp-light-green);
+            color: white;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        /* Chat area styles */
+        #chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+            background-image: url('https://web.whatsapp.com/img/bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png');
+            background-repeat: repeat;
+            position: relative;
+        }
+
+        #chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background-color: var(--chat-header-bg);
+            border-left: 1px solid #D1D7DB;
+        }
+
+        #chat-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #chat-profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        #chat-profile-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-profile-name {
+            font-weight: 500;
+            font-size: 16px;
+            color: #111B21;
+        }
+
+        #chat-profile-status {
+            font-size: 13px;
+            color: #667781;
+        }
+
+        #chat-header-icons {
+            display: flex;
+            gap: 24px;
+            color: #54656F;
+        }
+
+        #chat-header-icons i {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .day-separator {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .day-separator span {
+            background-color: #E1F2FB;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 12.5px;
+            color: #54656F;
+        }
+
+        .message-wrapper {
+            display: flex;
+            margin-bottom: 12px;
+        }
+
+        .message-wrapper.sent {
+            justify-content: flex-end;
+        }
+
+        .message-wrapper.received {
+            justify-content: flex-start;
+        }
+
+        .message {
+            max-width: 65%;
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            position: relative;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+        }
+
+        .message.sent {
+            background-color: var(--sent-message-bg);
+            margin-right: 10px;
+        }
+
+        .message.received {
+            background-color: var(--received-message-bg);
+            margin-left: 10px;
+        }
+
+        .message-content {
+            font-size: 14.2px;
+            color: #111B21;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .message-meta {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 11px;
+            color: #667781;
+        }
+
+        .message-time {
+            margin-right: 4px;
+        }
+
+        .message-status i {
+            font-size: 14px;
+            color: #53BDEB;
+        }
+
+        /* Input area styles */
+        #input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            background-color: #F0F2F5;
+        }
+
+        #input-tools {
+            display: flex;
+            gap: 16px;
+            color: #54656F;
+            margin-right: 10px;
+        }
+
+        #input-tools i {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        #message-input-container {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 9px 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        #message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            min-height: 20px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        #voice-record-button {
+            color: #54656F;
+            font-size: 24px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        /* Welcome screen */
+        #welcome-screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #F0F2F5;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #welcome-image {
+            width: 250px;
+            margin-bottom: 30px;
+        }
+
+        #welcome-title {
+            font-size: 32px;
+            font-weight: 300;
+            color: #41525D;
+            margin-bottom: 18px;
+        }
+
+        #welcome-subtitle {
+            font-size: 14px;
+            color: #667781;
+            max-width: 560px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        #encryption-notice {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8696A0;
+            font-size: 14px;
+        }
+
+        #encryption-notice i {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+
+        /* Profile sidebar */
+        #profile-sidebar {
+            width: 30%;
+            height: 100%;
+            background-color: #FFFFFF;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #profile-sidebar.active {
+            transform: translateX(0);
+        }
+
+        #profile-header {
+            padding: 60px 20px 20px;
+            background-color: var(--whatsapp-teal);
+            color: white;
+        }
+
+        #profile-back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        #profile-title {
+            font-size: 19px;
+            margin-bottom: 20px;
+        }
+
+        #profile-picture-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #profile-picture {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+        }
+
+        #profile-info {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .profile-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #F0F2F5;
+        }
+
+        .profile-section-title {
+            font-size: 14px;
+            color: var(--whatsapp-teal);
+            margin-bottom: 10px;
+        }
+
+        .profile-section-content {
+            font-size: 17px;
+            color: #111B21;
+        }
+
+        .danger {
+            color: #EB5757 !important;
+        }
+
+        /* Status view */
+        #status-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #status-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        #status-content {
+            width: 100%;
+            max-width: 400px;
+            height: 70vh;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #status-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #status-progress {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            padding: 0 10px;
+            gap: 5px;
+        }
+
+        .status-bar {
+            height: 3px;
+            background-color: rgba(255, 255, 255, 0.3);
+            flex: 1;
+            border-radius: 3px;
+        }
+
+        .status-bar-fill {
+            height: 100%;
+            width: 0;
+            background-color: white;
+            border-radius: 3px;
+        }
+
+        #status-user {
+            position: absolute;
+            top: 20px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
+        #status-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        #status-user-name {
+            font-size: 16px;
+        }
+
+        #status-timestamp {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Call interface */
+        #call-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--whatsapp-teal);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 40px 20px;
+        }
+
+        #call-header {
+            text-align: center;
+            color: white;
+        }
+
+        #call-status {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        #call-name {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        #call-info {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        #call-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 20px 0;
+        }
+
+        #call-actions {
+            display: flex;
+            gap: 30px;
+        }
+
+        .call-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .call-button.end-call {
+            background-color: #FF0000;
+        }
+
+        .call-button.toggle-video {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .call-button.toggle-mic {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* New chat modal */
+        #new-chat-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 30%;
+            height: 100%;
+            background-color: white;
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #new-chat-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--whatsapp-teal);
+            color: white;
+        }
+
+        #new-chat-back {
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        #new-chat-title {
+            font-size: 19px;
+        }
+
+        #new-chat-search {
+            padding: 10px;
+        }
+
+        #new-chat-search-input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #F0F2F5;
+        }
+
+        #new-chat-contacts {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .new-chat-contact {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #F0F2F5;
+        }
+
+        .new-chat-contact:hover {
+            background-color: #F5F6F6;
+        }
+
+        .new-chat-avatar {
+            width: 49px;
+            height: 49px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .new-chat-name {
+            font-size: 17px;
+            color: #111B21;
+        }
+
+        /* Settings modal */
+        #settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 30%;
+            height: 100%;
+            background-color: white;
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #settings-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--whatsapp-teal);
+            color: white;
+        }
+
+        #settings-back {
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        #settings-title {
+            font-size: 19px;
+        }
+
+        #settings-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .settings-section {
+            padding: 20px;
+            border-bottom: 1px solid #F0F2F5;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .settings-section:hover {
+            background-color: #F5F6F6;
+        }
+
+        .settings-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #128C7E;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .settings-info {
+            flex: 1;
+        }
+
+        .settings-name {
+            font-size: 17px;
+            color: #111B21;
+            margin-bottom: 5px;
+        }
+
+        .settings-description {
+            font-size: 14px;
+            color: #667781;
+        }
+
+        /* Login and Registration Styles */
+        #auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #F0F2F5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .auth-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            width: 80px;
+            margin-bottom: 15px;
+        }
+
+        .auth-title {
+            font-size: 24px;
+            color: #41525D;
+            margin-bottom: 10px;
+        }
+
+        .auth-subtitle {
+            font-size: 14px;
+            color: #667781;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #41525D;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #D1D7DB;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        .form-input:focus {
+            border-color: var(--whatsapp-green);
+            outline: none;
+        }
+
+        .auth-button {
+            background-color: var(--whatsapp-green);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .auth-button:hover {
+            background-color: var(--whatsapp-teal);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #667781;
+        }
+
+        .auth-link {
+            color: var(--whatsapp-green);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .auth-error {
+            background-color: #FFEBEE;
+            color: #D32F2F;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .qr-code-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background-color: #F0F2F5;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .qr-code img {
+            width: 180px;
+            height: 180px;
+        }
+
+        .qr-code-text {
+            font-size: 14px;
+            color: #667781;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        /* Media responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 100%;
+                display: block;
+            }
+            
+            #chat-area {
+                display: none;
+            }
+            
+            #chat-area.active {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 20;
+            }
+            
+            #sidebar.hidden {
+                display: none;
+            }
+            
+            #profile-sidebar {
+                width: 100%;
+            }
+            
+            #new-chat-modal, #settings-modal {
+                width: 100%;
+            }
+
+            .auth-card {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+        /* Dark mode */
+        .dark-mode {
+            --whatsapp-green: #00A884;
+            --whatsapp-light-green: #00A884;
+            --whatsapp-teal: #008069;
+            --chat-bg: #0B141A;
+            --sent-message-bg: #005C4B;
+            --received-message-bg: #202C33;
+            --sidebar-bg: #111B21;
+            --sidebar-header-bg: #202C33;
+            --chat-header-bg: #202C33;
+        }
+
+        .dark-mode body {
+            color: #E9EDEF;
+            background-color: #111B21;
+        }
+
+        .dark-mode #search-box {
+            background-color: #202C33;
+        }
+
+        .dark-mode #search-input {
+            color: #E9EDEF;
+        }
+
+        .dark-mode .chat-item {
+            border-bottom-color: #222E35;
+        }
+
+        .dark-mode .chat-item:hover {
+            background-color: #202C33;
+        }
+
+        .dark-mode .chat-name {
+            color: #E9EDEF;
+        }
+
+        .dark-mode .chat-message {
+            color: #8696A0;
+        }
+
+        .dark-mode #message-input-container {
+            color: #2A3942;
+        }
+
+        .dark-mode #message-input {
+            color: #E9EDEF;
+        }
+
+        .dark-mode #input-area {
+            background-color: #202C33;
+        }
+
+        .dark-mode #welcome-screen {
+            background-color: #222E35;
+        }
+
+        .dark-mode #welcome-title {
+            color: #E9EDEF;
+        }
+
+        .dark-mode #welcome-subtitle {
+            color: #8696A0;
+        }
+
+        .dark-mode .profile-section {
+            border-bottom-color: #222E35;
+        }
+
+        .dark-mode .profile-section-content {
+            color: #E9EDEF;
+        }
+
+        .dark-mode .settings-section {
+            border-bottom-color: #222E35;
+        }
+
+        .dark-mode .settings-name {
+            color: #E9EDEF;
+        }
+    </style>
+</head>
+<body>
+     <div id="auth-container">
+        <!-- Login Card -->
+        <div class="auth-card" id="login-card">
+            <div class="auth-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="WhatsApp Logo" class="auth-logo">
+                <h1 class="auth-title">WhatsApp Web</h1>
+                <p class="auth-subtitle">Sign in to your account</p>
+            </div>
+            <div class="auth-error" id="login-error">
+                Invalid email or password. Please try again.
+            </div>
+            <form class="auth-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-email" class="form-label">Email</label>
+                    <input type="email" id="login-email" class="form-input" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="auth-button" id="login-button">Sign In</button>
+            </form>
+            <div class="auth-footer">
+                Don't have an account? <a class="auth-link" id="show-register">Register</a>
+            </div>
+            <div class="auth-footer">
+                Or sign in with <a class="auth-link" id="show-qr">QR Code</a>
+            </div>
+        </div>
+
+        <!-- Registration Card -->
+        <div class="auth-card" id="register-card" style="display: none;">
+            <div class="auth-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="WhatsApp Logo" class="auth-logo">
+                <h1 class="auth-title">Create Account</h1>
+                <p class="auth-subtitle">Sign up for WhatsApp Web</p>
+            </div>
+            <div class="auth-error" id="register-error">
+                Registration failed. Please try again.
+            </div>
+            <form class="auth-form" id="register-form">
+                <div class="form-group">
+                    <label for="register-name" class="form-label">Full Name</label>
+                    <input type="text" id="register-name" class="form-input" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email" class="form-label">Email</label>
+                    <input type="email" id="register-email" class="form-input" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password" class="form-label">Password</label>
+                    <input type="password" id="register-password" class="form-input" placeholder="Create a password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password" class="form-label">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" class="form-input" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="auth-button" id="register-button">Register</button>
+            </form>
+            <div class="auth-footer">
+                Already have an account? <a class="auth-link" id="show-login">Sign In</a>
+            </div>
+        </div>
+
+        <!-- QR Code Card -->
+        <div class="auth-card" id="qr-card" style="display: none;">
+            <div class="auth-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="WhatsApp Logo" class="auth-logo">
+                <h1 class="auth-title">WhatsApp Web</h1>
+                <p class="auth-subtitle">To use WhatsApp on your computer:</p>
+            </div>
+            <div class="qr-code-container">
+                <div class="qr-code">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=WhatsAppWebLogin" alt="QR Code">
+                </div>
+                <p class="qr-code-text">
+                    1. Open WhatsApp on your phone<br>
+                    2. Tap Menu or Settings and select WhatsApp Web<br>
+                    3. Point your phone to this screen to capture the code
+                </p>
+            </div>
+            <div class="auth-footer">
+                <a class="auth-link" id="back-to-login">Back to login</a>
+            </div>
+        </div>
+    </div>
+    <div id="whatsapp-container">
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <!-- Sidebar Header -->
+            <div id="sidebar-header">
+                <img id="user-avatar" src="https://randomuser.me/api/portraits/men/1.jpg" alt="User Avatar">
+                <div id="sidebar-icons">
+                    <i class="fas fa-circle-notch" id="status-icon" title="Status"></i>
+                    <i class="fas fa-message" id="new-chat-icon" title="New chat"></i>
+                    <i class="fas fa-ellipsis-vertical" id="menu-icon" title="Menu"></i>
+                </div>
+            </div>
+
+            <!-- Search Box -->
+            <div id="search-container">
+                <div id="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search or start new chat">
+                </div>
+                <i class="fas fa-filter" id="filter-button"></i>
+            </div>
+
+            <!-- Chat List -->
+            <div id="chat-list">
+                <!-- Chat Item 1 -->
+                <div class="chat-item active" data-chat-id="1">
+                    <img class="chat-avatar" src="https://randomuser.me/api/portraits/women/1.jpg" alt="Contact Avatar">
+                    <div class="chat-details">
+                        <div class="chat-header">
+                            <span class="chat-name">Sarah Johnson</span>
+                            <span class="chat-time">10:42 AM</span>
+                        </div>
+                        <div class="chat-message">
+                            <span class="message-preview">Hey, how are you doing today?</span>
+                            <div class="message-status">
+                                <span class="unread-count">3</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Item 2 -->
+                <div class="chat-item" data-chat-id="2">
+                    <img class="chat-avatar" src="https://randomuser.me/api/portraits/men/2.jpg" alt="Contact Avatar">
+                    <div class="chat-details">
+                        <div class="chat-header">
+                            <span class="chat-name">John Smith</span>
+                            <span class="chat-time">Yesterday</span>
+                        </div>
+                        <div class="chat-message">
+                            <span class="message-preview">Let's meet for coffee tomorrow</span>
+                            <div class="message-status">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Item 3 -->
+                <div class="chat-item" data-chat-id="3">
+                    <img class="chat-avatar" src="https://randomuser.me/api/portraits/women/3.jpg" alt="Contact Avatar">
+                    <div class="chat-details">
+                        <div class="chat-header">
+                            <span class="chat-name">Emily Davis</span>
+                            <span class="chat-time">5/15/25</span>
+                        </div>
+                        <div class="chat-message">
+                            <span class="message-preview">Thanks for the help with the project!</span>
+                            <div class="message-status">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Item 4 -->
+                <div class="chat-item" data-chat-id="4">
+                    <img class="chat-avatar" src="https://randomuser.me/api/portraits/men/4.jpg" alt="Contact Avatar">
+                    <div class="chat-details">
+                        <div class="chat-header">
+                            <span class="chat-name">Michael Brown</span>
+                            <span class="chat-time">5/14/25</span>
+                        </div>
+                        <div class="chat-message">
+                            <span class="message-preview">Did you see the game last night?</span>
+                            <div class="message-status">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Item 5 -->
+                <div class="chat-item" data-chat-id="5">
+                    <img class="chat-avatar" src="https://randomuser.me/api/portraits/women/5.jpg" alt="Contact Avatar">
+                    <div class="chat-details">
+                        <div class="chat-header">
+                            <span class="chat-name">Jessica Wilson</span>
+                            <span class="chat-time">5/12/25</span>
+                        </div>
+                        <div class="chat-message">
+                            <span class="message-preview">Can you send me the files we discussed?</span>
+                            <div class="message-status">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Item 6 -->
+                <div class="chat-item" data-chat-id="6">
+                    <img class="chat-avatar" src="https://randomuser.me/api/portraits/men/6.jpg" alt="Contact Avatar">
+                    <div class="chat-details">
+                        <div class="chat-header">
+                            <span class="chat-name">David Taylor</span>
+                            <span class="chat-time">5/10/25</span>
+                        </div>
+                        <div class="chat-message">
+                            <span class="message-preview">I'll be there in 10 minutes</span>
+                            <div class="message-status">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-area">
+            <!-- Chat Header -->
+            <div id="chat-header">
+                <div id="chat-profile">
+                    <img id="chat-profile-pic" src="https://randomuser.me/api/portraits/women/1.jpg" alt="Contact Avatar">
+                    <div id="chat-profile-details">
+                        <span id="chat-profile-name">Sarah Johnson</span>
+                        <span id="chat-profile-status">Online</span>
+                    </div>
+                </div>
+                <div id="chat-header-icons">
+                    <i class="fas fa-video" id="video-call-button"></i>
+                    <i class="fas fa-phone" id="voice-call-button"></i>
+                    <i class="fas fa-search" id="search-chat-button"></i>
+                    <i class="fas fa-ellipsis-vertical" id="chat-menu-button"></i>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="messages-container">
+                <!-- Day Separator -->
+                <div class="day-separator">
+                    <span>TODAY</span>
+                </div>
+
+                <!-- Received Message -->
+                <div class="message-wrapper received">
+                    <div class="message received">
+                        <div class="message-content">Hey, how are you doing today?</div>
+                        <div class="message-meta">
+                            <span class="message-time">10:30 AM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sent Message -->
+                <div class="message-wrapper sent">
+                    <div class="message sent">
+                        <div class="message-content">I'm doing great! Just finished a big project at work.</div>
+                        <div class="message-meta">
+                            <span class="message-time">10:32 AM</span>
+                            <span class="message-status"><i class="fas fa-check-double"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Received Message -->
+                <div class="message-wrapper received">
+                    <div class="message received">
+                        <div class="message-content">That's awesome! Congratulations 🎉</div>
+                        <div class="message-meta">
+                            <span class="message-time">10:33 AM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Received Message -->
+                <div class="message-wrapper received">
+                    <div class="message received">
+                        <div class="message-content">Are you free for lunch today? We could celebrate.</div>
+                        <div class="message-meta">
+                            <span class="message-time">10:34 AM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sent Message -->
+                <div class="message-wrapper sent">
+                    <div class="message sent">
+                        <div class="message-content">That sounds great! How about that new Italian place downtown?</div>
+                        <div class="message-meta">
+                            <span class="message-time">10:36 AM</span>
+                            <span class="message-status"><i class="fas fa-check-double"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Received Message -->
+                <div class="message-wrapper received">
+                    <div class="message received">
+                        <div class="message-content">Perfect! Let's meet there at 12:30?</div>
+                        <div class="message-meta">
+                            <span class="message-time">10:38 AM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sent Message -->
+                <div class="message-wrapper sent">
+                    <div class="message sent">
+                        <div class="message-content">Sounds good to me. See you then!</div>
+                        <div class="message-meta">
+                            <span class="message-time">10:40 AM</span>
+                            <span class="message-status"><i class="fas fa-check-double"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Received Message -->
+                <div class="message-wrapper received">
+                    <div class="message received">
+                        <div class="message-content">Great! By the way, do you want me to bring those books I borrowed from you?</div>
+                        <div class="message-meta">
+                            <span class="message-time">10:42 AM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div id="input-area">
+                <div id="input-tools">
+                    <i class="far fa-smile" id="emoji-button"></i>
+                    <i class="fas fa-paperclip" id="attachment-button"></i>
+                </div>
+                <div id="message-input-container">
+                    <input type="text" id="message-input" placeholder="Type a message">
+                </div>
+                <i class="fas fa-microphone" id="voice-record-button"></i>
+            </div>
+        </div>
+
+        <![-- Welcome Screen ](shown when no chat is selected) -->
+        <div id="welcome-screen">
+            <img id="welcome-image" src="https://web.whatsapp.com/img/intro-connection-light_c98cc75f2aa905314d74375a975d2cf2.jpg" alt="WhatsApp Web">
+            <h1 id="welcome-title">WhatsApp Web</h1>
+            <p id="welcome-subtitle">Send and receive messages without keeping your phone online.<br>Use WhatsApp on up to 4 linked devices and 1 phone at the same time.</p>
+            <div id="encryption-notice">
+                <i class="fas fa-lock"></i>
+                <span>End-to-end encrypted</span>
+            </div>
+        </div>
+
+        <!-- Profile Sidebar -->
+        <div id="profile-sidebar">
+            <div id="profile-header">
+                <i class="fas fa-arrow-left" id="profile-back-button"></i>
+                <h2 id="profile-title">Contact Info</h2>
+            </div>
+            <div id="profile-picture-container">
+                <img id="profile-picture" src="https://randomuser.me/api/portraits/women/1.jpg" alt="Contact Profile">
+            </div>
+            <div id="profile-info">
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Name</h3>
+                    <p class="profile-section-content">Sarah Johnson</p>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">About</h3>
+                    <p class="profile-section-content">Living life one day at a time</p>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Phone</h3>
+                    <p class="profile-section-content">+1 (555) 123-4567</p>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Media, Links, and Docs</h3>
+                    <div class="profile-media-preview">
+                        <!-- Media previews would go here -->
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Mute Notifications</h3>
+                    <div class="profile-toggle">
+                        <input type="checkbox" id="mute-toggle">
+                        <label for="mute-toggle">Mute notifications</label>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Starred Messages</h3>
+                    <p class="profile-section-content">None</p>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Disappearing Messages</h3>
+                    <p class="profile-section-content">Off</p>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Encryption</h3>
+                    <p class="profile-section-content">Messages and calls are end-to-end encrypted. Tap to verify.</p>
+                    
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title danger">Block Sarah Johnson</h3>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title danger">Report Sarah Johnson</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status View -->
+        <div id="status-view">
+            <i class="fas fa-times" id="status-close"></i>
+            <div id="status-content">
+                <div id="status-progress">
+                    <div class="status-bar">
+                        <div class="status-bar-fill"></div>
+                    </div>
+                </div>
+                <div id="status-user">
+                    <img id="status-user-avatar" src="https://randomuser.me/api/portraits/women/1.jpg" alt="Status User">
+                    <div>
+                        <div id="status-user-name">Sarah Johnson</div>
+                        <div id="status-timestamp">Today, 9:30 AM</div>
+                    </div>
+                </div>
+                <img id="status-image" src="https://source.unsplash.com/random/800x1200/?nature" alt="Status Image">
+            </div>
+        </div>
+
+        <!-- Call Interface -->
+        <div id="call-interface">
+            <div id="call-header">
+                <div id="call-status">Calling...</div>
+                <div id="call-name">Sarah Johnson</div>
+                <div id="call-info">WhatsApp voice call</div>
+            </div>
+            <img id="call-avatar" src="https://randomuser.me/api/portraits/women/1.jpg" alt="Call Avatar">
+            <div id="call-actions">
+                <div class="call-button toggle-speaker">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+                <div class="call-button toggle-video">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="call-button toggle-mic">
+                    <i class="fas fa-microphone-slash"></i>
+                </div>
+                <div class="call-button end-call">
+                    <i class="fas fa-phone-slash"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Chat Modal -->
+        <div id="new-chat-modal">
+            <div id="new-chat-header">
+                <i class="fas fa-arrow-left" id="new-chat-back"></i>
+                <div id="new-chat-title">New chat</div>
+            </div>
+            <div id="new-chat-search">
+                <input type="text" id="new-chat-search-input" placeholder="Search contacts">
+            </div>
+            <div id="new-chat-contacts">
+                <div class="new-chat-contact">
+                    <img class="new-chat-avatar" src="https://randomuser.me/api/portraits/men/7.jpg" alt="Contact">
+                    <div class="new-chat-name">Robert Wilson</div>
+                </div>
+                <div class="new-chat-contact">
+                    <img class="new-chat-avatar" src="https://randomuser.me/api/portraits/women/7.jpg" alt="Contact">
+                    <div class="new-chat-name">Amanda Clark</div>
+                </div>
+                <div class="new-chat-contact">
+                    <img class="new-chat-avatar" src="https://randomuser.me/api/portraits/men/8.jpg" alt="Contact">
+                    <div class="new-chat-name">Thomas Lee</div>
+                </div>
+                <div class="new-chat-contact">
+                    <img class="new-chat-avatar" src="https://randomuser.me/api/portraits/women/8.jpg" alt="Contact">
+                    <div class="new-chat-name">Jennifer White</div>
+                </div>
+                <div class="new-chat-contact">
+                    <img class="new-chat-avatar" src="https://randomuser.me/api/portraits/men/9.jpg" alt="Contact">
+                    <div class="new-chat-name">Richard Harris</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal">
+            <div id="settings-header">
+                <i class="fas fa-arrow-left" id="settings-back"></i>
+                <div id="settings-title">Settings</div>
+            </div>
+            <div id="settings-content">
+                <div class="settings-section">
+                    <div class="settings-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="settings-info">
+                        <div class="settings-name">Profile</div>
+                        <div class="settings-description">Edit your personal information</div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="settings-info">
+                        <div class="settings-name">Notifications</div>
+                        <div class="settings-description">Message, group & call tones</div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="settings-info">
+                        <div class="settings-name">Privacy</div>
+                        <div class="settings-description">Block contacts, disappearing messages</div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-icon">
+                        <i class="fas fa-circle-half-stroke"></i>
+                    </div>
+                    <div class="settings-info">
+                        <div class="settings-name">Theme</div>
+                        <div class="settings-description">Change app appearance</div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="settings-info">
+                        <div class="settings-name">Chat Wallpaper</div>
+                        <div class="settings-description">Change your chat background</div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-icon">
+                        <i class="fas fa-circle-info"></i>
+                    </div>
+                    <div class="settings-info">
+                        <div class="settings-name">Help</div>
+                        <div class="settings-description">Help center, contact us, privacy policy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Main JavaScript -->
+    <script>
+        document.getElementById("auth-container").style.display = 'none';
+        $(document).ready(function() {
+            // Send message function
+            function sendMessage() {
+                const messageInput = $('#message-input');
+                const messageText = messageInput.val().trim();
+                
+                if (messageText !== '') {
+                    // Create new message element
+                    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const newMessage = `
+                        <div class="message-wrapper sent">
+                            <div class="message sent">
+                                <div class="message-content">${messageText}</div>
+                                <div class="message-meta">
+                                    <span class="message-time">${currentTime}</span>
+                                    <span class="message-status"><i class="fas fa-check"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add message to container
+                    $('#messages-container').append(newMessage);
+                    
+                    // Clear input
+                    messageInput.val('');
+                    
+                    // Scroll to bottom
+                    scrollToBottom();
+                    
+                    // Simulate reply after 2 seconds
+                    setTimeout(simulateReply, 2000);
+                }
+            }
+            
+            // Simulate reply
+            function simulateReply() {
+                const replies = [
+                    "Sure, that works for me!",
+                    "I'll get back to you on that.",
+                    "Thanks for letting me know.",
+                    "Can we discuss this later?",
+                    "That's great news!",
+                    "I was just thinking the same thing.",
+                    "Let me check and get back to you."
+                ];
+                
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                const replyMessage = `
+                    <div class="message-wrapper received">
+                        <div class="message received">
+                            <div class="message-content">${randomReply}</div>
+                            <div class="message-meta">
+                                <span class="message-time">${currentTime}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                $('#messages-container').append(replyMessage);
+                scrollToBottom();
+            }
+            
+            // Scroll messages to bottom
+            function scrollToBottom() {
+                const messagesContainer = document.getElementById('messages-container');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // Send message on button click or Enter key
+            $('#message-input').keypress(function(e) {
+                if (e.which === 13) {
+                    sendMessage();
+                    return false;
+                }
+            });
+            
+            $('#voice-record-button').click(function() {
+                // Toggle between microphone and send button
+                if ($(this).hasClass('fa-microphone')) {
+                    if ($('#message-input').val().trim() !== '') {
+                        $(this).removeClass('fa-microphone').addClass('fa-paper-plane');
+                    }
+                } else {
+                    sendMessage();
+                    $(this).removeClass('fa-paper-plane').addClass('fa-microphone');
+                }
+            });
+            
+            // Monitor input for switching between mic and send button
+            $('#message-input').on('input', function() {
+                if ($(this).val().trim() !== '') {
+                    $('#voice-record-button').removeClass('fa-microphone').addClass('fa-paper-plane');
+                } else {
+                    $('#voice-record-button').removeClass('fa-paper-plane').addClass('fa-microphone');
+                }
+            });
+            
+            // Chat item click
+            $('.chat-item').click(function() {
+                $('.chat-item').removeClass('active');
+                $(this).addClass('active');
+                
+                // Update chat header with selected contact
+                const contactName = $(this).find('.chat-name').text();
+                const contactAvatar = $(this).find('.chat-avatar').attr('src');
+                
+                $('#chat-profile-name').text(contactName);
+                $('#chat-profile-pic').attr('src', contactAvatar);
+                
+                // On mobile, show chat area and hide sidebar
+                if (window.innerWidth <= 768) {
+                    $('#sidebar').addClass('hidden');
+                    $('#chat-area').addClass('active');
+                }
+                
+                // Remove unread count
+                $(this).find('.unread-count').remove();
+                
+                // Scroll to bottom of messages
+                scrollToBottom();
+            });
+            
+            // Profile click - show profile sidebar
+            $('#chat-profile').click(function() {
+                const contactName = $('#chat-profile-name').text();
+                const contactAvatar = $('#chat-profile-pic').attr('src');
+                
+                $('#profile-picture').attr('src', contactAvatar);
+                $('#profile-title').text('Contact Info');
+                $('.profile-section-content').first().text(contactName);
+                
+                $('#profile-sidebar').addClass('active');
+            });
+            
+            // Close profile sidebar
+            $('#profile-back-button').click(function() {
+                $('#profile-sidebar').removeClass('active');
+            });
+            
+            // Status icon click
+            $('#status-icon').click(function() {
+                $('#status-view').css('display', 'flex');
+                animateStatusBar();
+            });
+            
+            // Close status view
+            $('#status-close').click(function() {
+                $('#status-view').css('display', 'none');
+            });
+            
+            // Animate status bar
+            function animateStatusBar() {
+                $('.status-bar-fill').css('width', '0%');
+                $('.status-bar-fill').animate({
+                    width: '100%'
+                }, 5000, function() {
+                    $('#status-view').css('display', 'none');
+                });
+            }
+            
+            // Voice call button
+            $('#voice-call-button').click(function() {
+                const contactName = $('#chat-profile-name').text();
+                const contactAvatar = $('#chat-profile-pic').attr('src');
+                
+                $('#call-name').text(contactName);
+                $('#call-avatar').attr('src', contactAvatar);
+                $('#call-info').text('WhatsApp voice call');
+                
+                $('#call-interface').css('display', 'flex');
+                
+                // Auto end call after 5 seconds
+                setTimeout(function() {
+                    $('#call-status').text('Call ended');
+                    setTimeout(function() {
+                        $('#call-interface').css('display', 'none');
+                    }, 1500);
+                }, 5000);
+            });
+            
+            // End call button
+            $('.end-call').click(function() {
+                $('#call-status').text('Call ended');
+                setTimeout(function() {
+                    $('#call-interface').css('display', 'none');
+                }, 1000);
+            });
+            
+            // New chat button
+            $('#new-chat-icon').click(function() {
+                $('#new-chat-modal').css('display', 'flex');
+            });
+            
+            // Close new chat modal
+            $('#new-chat-back').click(function() {
+                $('#new-chat-modal').css('display', 'none');
+            });
+            
+            // New chat contact click
+            $('.new-chat-contact').click(function() {
+                const contactName = $(this).find('.new-chat-name').text();
+                const contactAvatar = $(this).find('.new-chat-avatar').attr('src');
+                
+                // Create new chat item
+                const newChatItem = `
+                    <div class="chat-item" data-chat-id="new">
+                        <img class="chat-avatar" src="${contactAvatar}" alt="Contact Avatar">
+                        <div class="chat-details">
+                            <div class="chat-header">
+                                <span class="chat-name">${contactName}</span>
+                                <span class="chat-time">Just now</span>
+                            </div>
+                            <div class="chat-message">
+                                <span class="message-preview">Start a new conversation</span>
+                                <div class="message-status">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add to chat list
+                $('#chat-list').prepend(newChatItem);
+                
+                // Close modal
+                $('#new-chat-modal').css('display', 'none');
+                
+                // Trigger click on new chat
+                $('.chat-item[data-chat-id="new"]').click();
+            });
+            
+            // Menu button
+            $('#menu-icon').click(function() {
+                $('#settings-modal').css('display', 'flex');
+            });
+            
+            // Close settings modal
+            $('#settings-back').click(function() {
+                $('#settings-modal').css('display', 'none');
+            });
+            
+            // Theme toggle
+            $('.settings-section:contains("Theme")').click(function() {
+                $('body').toggleClass('dark-mode');
+            });
+            
+            // Mobile back button
+            $('#chat-header').dblclick(function() {
+                if (window.innerWidth <= 768) {
+                    $('#sidebar').removeClass('hidden');
+                    $('#chat-area').removeClass('active');
+                }
+            });
+            
+            // Initialize
+            scrollToBottom();
+        });
+    </script>
+</body>
+</html>

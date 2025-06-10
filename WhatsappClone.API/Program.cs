@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MoMediatoR;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 
@@ -21,12 +22,11 @@ namespace WhatsappClone.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSignalR();
-
+            builder.Services.AddMoMediatoR(typeof(Program).Assembly);
             builder.Services.AddDbContext<Context>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("whatsapp"));
             });
-
 
             builder.Services.AddIdentity<AppUser, IdentityRole>(
 

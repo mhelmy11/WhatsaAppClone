@@ -1,7 +1,9 @@
 ﻿namespace WhatsappClone.Core
 {
-    public class Class1
+    public class ModuleCoreDependencies
     {
+
+
 
     }
 }
