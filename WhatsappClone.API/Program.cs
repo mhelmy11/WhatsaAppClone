@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MoMediatoR;
+using WhatsappClone.Core;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
+using WhatsappClone.Service;
 
 namespace WhatsappClone.API
 {
@@ -22,7 +24,7 @@ namespace WhatsappClone.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSignalR();
-            builder.Services.AddMoMediatoR(typeof(Program).Assembly);
+            builder.Services.AddCoreDependencies();
             builder.Services.AddDbContext<Context>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("whatsapp"));
@@ -43,6 +45,8 @@ namespace WhatsappClone.API
                 ).AddEntityFrameworkStores<Context>();
 
             //builder.Services.AddScoped<UnitOfWork>();
+            builder.Services.AddModuleInfrastructureDependencies();
+            builder.Services.AddModuleServiceDependencies();
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "default";
@@ -89,9 +93,18 @@ namespace WhatsappClone.API
 
             builder.Services.Configure<HostOptions>(options =>
             {
-                options.ShutdownTimeout = TimeSpan.FromSeconds(60); // 30 ثانية
+                options.ShutdownTimeout = TimeSpan.FromSeconds(60);
             });
+
             //builder.Services.AddScoped<UserRepo>();
+
+
+
+
+
+
+
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -102,7 +115,7 @@ namespace WhatsappClone.API
 
             app.UseStaticFiles();
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -116,7 +129,7 @@ namespace WhatsappClone.API
                 context.Database.ExecuteSqlRaw("DELETE FROM UserConnections");
                 Console.WriteLine("Table UserConnections cleared before shutdown.");
             });
-            app.Run("https://0.0.0.0:7047");
+            app.Run();
         }
     }
 }

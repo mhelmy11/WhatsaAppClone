@@ -11,4 +11,58 @@
 		<ProjectReference Include="..\WhatsappClone.Service\WhatsappClone.Service.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Folder Include="Features\Attachments\Commands\Handler\" />
+		<Folder Include="Features\Attachments\Commands\Models\" />
+		<Folder Include="Features\Attachments\Commands\Validation\" />
+		<Folder Include="Features\Attachments\Queries\Handler\" />
+		<Folder Include="Features\Attachments\Queries\Models\" />
+		<Folder Include="Features\Attachments\Queries\Results\" />
+		<Folder Include="Features\Attachments\Queries\Validation\" />
+		<Folder Include="Features\Blacklists\Commands\Handler\" />
+		<Folder Include="Features\Blacklists\Commands\Models\" />
+		<Folder Include="Features\Blacklists\Commands\Validation\" />
+		<Folder Include="Features\Blacklists\Queries\Handler\" />
+		<Folder Include="Features\Blacklists\Queries\Models\" />
+		<Folder Include="Features\Blacklists\Queries\Results\" />
+		<Folder Include="Features\Blacklists\Queries\Validation\" />
+		<Folder Include="Features\Groups\Commands\Handler\" />
+		<Folder Include="Features\Groups\Commands\Models\" />
+		<Folder Include="Features\Groups\Commands\Validation\" />
+		<Folder Include="Features\Groups\Queries\Handler\" />
+		<Folder Include="Features\Groups\Queries\Models\" />
+		<Folder Include="Features\Groups\Queries\Results\" />
+		<Folder Include="Features\Groups\Queries\Validation\" />
+		<Folder Include="Features\Messages\Queries\Results\" />
+		<Folder Include="Features\UserContacts\Commands\Handler\" />
+		<Folder Include="Features\UserContacts\Commands\Models\" />
+		<Folder Include="Features\UserContacts\Commands\Validation\" />
+		<Folder Include="Features\UserContacts\Queries\Handler\" />
+		<Folder Include="Features\UserContacts\Queries\Models\" />
+		<Folder Include="Features\UserContacts\Queries\Results\" />
+		<Folder Include="Features\UserContacts\Queries\Validation\" />
+		<Folder Include="Features\UserGroups\Commands\Handler\" />
+		<Folder Include="Features\UserGroups\Commands\Models\" />
+		<Folder Include="Features\UserGroups\Commands\Validation\" />
+		<Folder Include="Features\UserGroups\Queries\Handler\" />
+		<Folder Include="Features\UserGroups\Queries\Models\" />
+		<Folder Include="Features\UserGroups\Queries\Results\" />
+		<Folder Include="Features\UserGroups\Queries\Validation\" />
+		<Folder Include="Features\Messages\Commands\Handler\" />
+		<Folder Include="Features\Messages\Commands\Models\" />
+		<Folder Include="Features\Messages\Commands\Validation\" />
+		<Folder Include="Features\Messages\Queries\Handler\" />
+		<Folder Include="Features\Messages\Queries\Models\" />
+		<Folder Include="Features\Messages\Queries\Validation\" />
+		<Folder Include="Features\Chats\Commands\Handler\" />
+		<Folder Include="Features\Chats\Commands\Models\" />
+		<Folder Include="Features\Chats\Commands\Validation\" />
+		<Folder Include="Mapping\Chat\CommandMapping\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="MoMediator" Version="2.0.3" />
+	</ItemGroup>
+
 </Project>
