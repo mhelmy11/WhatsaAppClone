@@ -47,10 +47,7 @@
 		<Folder Include="Features\Messages\Queries\Handler\" />
 		<Folder Include="Features\Messages\Queries\Models\" />
 		<Folder Include="Features\Messages\Queries\Validation\" />
-		<Folder Include="Features\Chats\Commands\Handler\" />
-		<Folder Include="Features\Chats\Commands\Models\" />
 		<Folder Include="Features\Chats\Commands\Validation\" />
-		<Folder Include="Mapping\Chat\CommandMapping\" />
 	</ItemGroup>
 
 	<ItemGroup>

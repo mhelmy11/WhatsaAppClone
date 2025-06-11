@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Models;
 
-namespace WhatsappClone.Core.Features.Chats.Results
+namespace WhatsappClone.Core.Features.Chats.Queries.Results
 {
     public class GetChatsResponse
     {

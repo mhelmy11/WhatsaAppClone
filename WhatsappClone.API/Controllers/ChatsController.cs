@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 //using MoMediatoR;
 using WhatsappClone.Core.Features.Chats.Queries.Models;
-using WhatsappClone.Core.Features.Chats.Results;
 
 namespace WhatsappClone.API.Controllers
 {
@@ -28,16 +27,11 @@ namespace WhatsappClone.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetChatById(int id)
         {
-            try
-            {
-                var chat = await mediator.Send(new GetChatByIdQuery(id));
 
-                return Ok(chat);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new { Message = ex.Message });
-            }
+            var chat = await mediator.Send(new GetChatByIdQuery(id));
+
+            return Ok(chat);
+
         }
     }
 
