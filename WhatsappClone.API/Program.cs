@@ -8,6 +8,7 @@ using System.Reflection;
 using WhatsappClone.Core;
 using WhatsappClone.Core.Features.Chats.Queries.Handler;
 using WhatsappClone.Core.Features.Chats.Queries.Models;
+using WhatsappClone.Core.Filters;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Service;
@@ -22,7 +23,11 @@ namespace WhatsappClone.API
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(opt =>
+            {
+                opt.Filters.Add<ValidationExceptionFilter>();
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
