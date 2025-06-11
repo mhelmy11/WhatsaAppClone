@@ -12,13 +12,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Features\Attachments\Commands\Handler\" />
-		<Folder Include="Features\Attachments\Commands\Models\" />
-		<Folder Include="Features\Attachments\Commands\Validation\" />
-		<Folder Include="Features\Attachments\Queries\Handler\" />
-		<Folder Include="Features\Attachments\Queries\Models\" />
-		<Folder Include="Features\Attachments\Queries\Results\" />
-		<Folder Include="Features\Attachments\Queries\Validation\" />
 		<Folder Include="Features\Blacklists\Commands\Handler\" />
 		<Folder Include="Features\Blacklists\Commands\Models\" />
 		<Folder Include="Features\Blacklists\Commands\Validation\" />
@@ -62,6 +55,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="MediatR" Version="12.5.0" />
 		<PackageReference Include="MoMediator" Version="2.0.3" />
 	</ItemGroup>
 

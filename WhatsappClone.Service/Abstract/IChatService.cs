@@ -11,5 +11,6 @@ namespace WhatsappClone.Service.Abstract
     public interface IChatService
     {
         public Task<List<Chat>> GetChatsAsync();
+        public Task<Chat> GetChatByIdAsync(int chatId);
     }
 }

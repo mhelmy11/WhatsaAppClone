@@ -7,18 +7,14 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Chats.Results;
 using WhatsappClone.Data.Models;
 
-
-
 namespace WhatsappClone.Core.Mapping;
 
-public partial class ChatProfile : Profile
+public partial class ChatProfile
 {
-    public ChatProfile()
+    public void GetChatByIdMapping()
     {
-        //Mapping configuration for Chats
-        GetChatsMapping();
-        GetChatByIdMapping();
-
+        CreateMap<Chat, GetChatByIdResponse>(MemberList.Destination)
+        .ForMember(dest => dest.ReceiverProfilePic, opt => opt.MapFrom(src => src.Receiver.PicUrl));
 
     }
 

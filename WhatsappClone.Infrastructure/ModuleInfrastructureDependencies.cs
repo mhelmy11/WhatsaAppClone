@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Models;
+using WhatsappClone.Infrastructure.Bases;
 using WhatsappClone.Infrastructure.Interfaces;
 using WhatsappClone.Infrastructure.Repositories;
 
@@ -15,7 +16,9 @@ namespace WhatsappClone.Infrastructure
 
         public static IServiceCollection AddModuleInfrastructureDependencies(this IServiceCollection services)
         {
-            services.AddScoped<IChat, ChatRepo>();
+            services.AddScoped<ChatRepo>();
+            services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
+
 
 
             return services;

@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MoMediatoR;
+using System.Reflection;
 using WhatsappClone.Core;
+using WhatsappClone.Core.Features.Chats.Queries.Handler;
+using WhatsappClone.Core.Features.Chats.Queries.Models;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Service;
@@ -24,7 +27,6 @@ namespace WhatsappClone.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSignalR();
-            builder.Services.AddCoreDependencies();
             builder.Services.AddDbContext<Context>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("whatsapp"));
@@ -45,6 +47,8 @@ namespace WhatsappClone.API
                 ).AddEntityFrameworkStores<Context>();
 
             //builder.Services.AddScoped<UnitOfWork>();
+            builder.Services.AddCoreDependencies();
+            builder.Services.AddScoped<ChatsQueryHandler>();
             builder.Services.AddModuleInfrastructureDependencies();
             builder.Services.AddModuleServiceDependencies();
             builder.Services.AddAuthentication(options =>

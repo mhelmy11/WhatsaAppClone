@@ -10,7 +10,10 @@ namespace WhatsappClone.Core
         public static IServiceCollection AddCoreDependencies(this IServiceCollection services)
         {
             // Register MediatR
-            services.AddMoMediatoR(Assembly.GetExecutingAssembly());
+
+
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
+
 
             // Register AutoMapper
             services.AddAutoMapper(Assembly.GetExecutingAssembly());

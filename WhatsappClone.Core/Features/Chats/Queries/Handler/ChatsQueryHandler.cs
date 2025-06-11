@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using MoMediatoR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,23 +6,26 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Chats.Queries.Models;
 using WhatsappClone.Core.Features.Chats.Results;
-using WhatsappClone.Core.Responses;
+using WhatsappClone.Core.Bases;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
+using MediatR;
 
 namespace WhatsappClone.Core.Features.Chats.Queries.Handler
 {
-    public class GetChatsQueryHandler : ResponseHandler, IRequestHandler<GetChatsQuery, Response<List<GetChatsResponse>>>
+    public class ChatsQueryHandler : ResponseHandler, IRequestHandler<GetChatsQuery, Response<List<GetChatsResponse>>>
+                                                    , IRequestHandler<GetChatByIdQuery, Response<GetChatByIdResponse>>
     {
         private readonly IChatService chatService;
         private readonly IMapper mapper;
 
-        public GetChatsQueryHandler(IChatService chatService, IMapper mapper)
+        public ChatsQueryHandler(IChatService chatService, IMapper mapper)
         {
             this.chatService = chatService;
             this.mapper = mapper;
         }
+        #region GetChatsListQuery
         public async Task<Response<List<GetChatsResponse>>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
         {
             var Chats = await chatService.GetChatsAsync();
@@ -32,5 +34,23 @@ namespace WhatsappClone.Core.Features.Chats.Queries.Handler
 
 
         }
+        #endregion
+
+
+
+        #region GetChatByIdQuery
+        public async Task<Response<GetChatByIdResponse>> Handle(GetChatByIdQuery request, CancellationToken cancellationToken)
+        {
+
+            var Chat = await chatService.GetChatByIdAsync(request.Id);
+            if (Chat == null)
+            {
+                return NotFound<GetChatByIdResponse>("Chat not found");
+            }
+            var MappedResult = mapper.Map<GetChatByIdResponse>(Chat);
+            return Success(MappedResult);
+
+        }
+        #endregion
     }
 }
