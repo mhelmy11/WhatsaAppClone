@@ -9,8 +9,8 @@ namespace WhatsappClone.Data.Enums
     public enum ChatOrderingEnum
     {
         ChatId = 0,
-        LastMessageTime = 1,
-        Name = 2,
+        Name = 1,
+        LastMessageTime = 2,
 
     }
 }

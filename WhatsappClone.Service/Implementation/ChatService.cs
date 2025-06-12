@@ -51,8 +51,8 @@ namespace WhatsappClone.Service.Implementation
                 case ChatOrderingEnum.Name:
                     querable = querable.OrderBy(x => x.Receiver.UserName);
                     break;
-                default:
-                    querable.OrderBy(x => x.LastMessageTime);
+                case ChatOrderingEnum.LastMessageTime:
+                    querable = querable.OrderByDescending(x => x.LastMessageTime);
                     return querable;
             }
 
