@@ -26,12 +26,18 @@ namespace WhatsappClone.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetChatById(int id)
         {
-            throw new ValidationException(new List<ValidationFailure>() { });
 
             var chat = await mediator.Send(new GetChatByIdQuery(id));
 
             return ResponseResult(chat);
 
+        }
+
+        [HttpGet("Paginated")]
+        public async Task<IActionResult> GetPaginatedChats([FromQuery] GetPaginatedChatsQuery query)
+        {
+            var paginatedChats = await mediator.Send(query);
+            return ResponseResult(paginatedChats);
         }
     }
 

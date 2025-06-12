@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace WhatsappClone.Core.Behaviours
 
                 // بنجمع كل الأخطاء اللي طلعت من كل الفحوصات
                 var failures = validationResults
-                    .Where(r => r.Errors.Any()) // بنختار بس اللي فيها أخطاء
+                    .Where(r => r.Errors.Any())
                     .SelectMany(r => r.Errors) // بنخلي الأخطاء كلها في قائمة واحدة
                     .ToList();
 
@@ -42,6 +43,9 @@ namespace WhatsappClone.Core.Behaviours
                 {
                     // بنرمي استثناء (Exception) اسمه ValidationException
                     // الاستثناء ده هيتلقف في طبقة الـ Web API عشان يتعامل معاه صح
+                    failures = failures
+                        .Select(f => new ValidationFailure(f.PropertyName, f.ErrorMessage))
+                        .ToList();
                     throw new ValidationException(failures);
                 }
             }

@@ -11,11 +11,16 @@ using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
 using MediatR;
 using WhatsappClone.Core.Features.Chats.Queries.Results;
+using WhatsappClone.Core.Wrapper;
+using System.Linq.Expressions;
+using WhatsappClone.Core.Wrappers;
 
 namespace WhatsappClone.Core.Features.Chats.Queries.Handler
 {
     public class ChatsQueryHandler : ResponseHandler, IRequestHandler<GetChatsQuery, Response<List<GetChatsResponse>>>
                                                     , IRequestHandler<GetChatByIdQuery, Response<GetChatByIdResponse>>
+                                                    , IRequestHandler<GetPaginatedChatsQuery, PaginatedResult<GetPaginatedChatsResponse>>
+
     {
         private readonly IChatService chatService;
         private readonly IMapper mapper;
@@ -49,6 +54,18 @@ namespace WhatsappClone.Core.Features.Chats.Queries.Handler
             }
             var MappedResult = mapper.Map<GetChatByIdResponse>(Chat);
             return Success(MappedResult);
+
+        }
+
+        public async Task<PaginatedResult<GetPaginatedChatsResponse>> Handle(GetPaginatedChatsQuery request, CancellationToken cancellationToken)
+        {
+
+
+            var FilterQuery = chatService.FilterChatPaginatedQueryable(request.orderBy, request.search);
+            var PaginatedList = await mapper.ProjectTo<GetPaginatedChatsResponse>(FilterQuery)
+                                            .ToPaginatedListAsync(request.pageNumber, request.pageSize);
+
+            return PaginatedList;
 
         }
         #endregion

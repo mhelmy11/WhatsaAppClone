@@ -18,6 +18,7 @@ public partial class ChatProfile : Profile
         GetChatsMapping();
         GetChatByIdMapping();
         CreateChatCommandMapping();
+        GetChatsPaginatedMapping();
 
     }
 
