@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WhatsappClone.API.Base;
+using WhatsappClone.Core.Filters;
 
 //using MoMediatoR;
 using WhatsappClone.Core.Features.Chats.Queries.Models;
@@ -17,6 +19,7 @@ namespace WhatsappClone.API.Controllers
 
 
         [HttpGet]
+        [AuthFilter]
         public async Task<IActionResult> GetChats()
         {
             var chats = await mediator.Send(new GetChatsQuery());

@@ -23,10 +23,7 @@ namespace WhatsappClone.API
 
             // Add services to the container.
 
-            builder.Services.AddControllers(opt =>
-            {
-                opt.Filters.Add<ValidationExceptionFilter>();
-            });
+            builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -107,6 +104,8 @@ namespace WhatsappClone.API
 
             //builder.Services.AddScoped<UserRepo>();
 
+            //builder.Services.AddTransient<AuthFilter>();
+
 
 
 
@@ -138,6 +137,7 @@ namespace WhatsappClone.API
                 context.Database.ExecuteSqlRaw("DELETE FROM UserConnections");
                 Console.WriteLine("Table UserConnections cleared before shutdown.");
             });
+            app.UseMiddleware<ErrorHandlerMiddleware>();
             app.Run();
         }
     }

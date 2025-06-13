@@ -16,12 +16,11 @@ namespace WhatsappClone.Service.Implementation
 {
     public class ChatService : IChatService
     {
-        private readonly ChatRepo chatRepo;
+        private readonly IChat chatRepo;
 
-        public ChatService(ChatRepo chatRepo)
+        public ChatService(IChat chatRepo)
         {
             this.chatRepo = chatRepo;
-
         }
 
         public Task<Chat> GetChatByIdAsync(int chatId)

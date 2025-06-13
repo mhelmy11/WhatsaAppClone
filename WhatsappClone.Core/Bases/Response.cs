@@ -66,7 +66,7 @@ public class ResponseHandler
             Data = entity,
             StatusCode = HttpStatusCode.OK,
             Succeeded = true,
-            Message = "Added Successfully",
+            Message = "Retrieved Successfully",
             Meta = Meta
         };
     }

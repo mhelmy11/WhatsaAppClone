@@ -16,7 +16,7 @@ namespace WhatsappClone.Infrastructure
 
         public static IServiceCollection AddModuleInfrastructureDependencies(this IServiceCollection services)
         {
-            services.AddScoped<ChatRepo>();
+            services.AddScoped<IChat, ChatRepo>();
             services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
 
 
