@@ -29,29 +29,11 @@ namespace WhatsappClone.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSignalR();
-            builder.Services.AddDbContext<Context>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("whatsapp"));
-            });
 
-            builder.Services.AddIdentity<AppUser, IdentityRole>(
-
-                options =>
-                {
-                    options.User.RequireUniqueEmail = true;
-                    options.Password.RequiredLength = 4;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Lockout.MaxFailedAccessAttempts = 3;
-                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
-                }
-
-                ).AddEntityFrameworkStores<Context>();
 
             //builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddCoreDependencies();
-            builder.Services.AddScoped<ChatsQueryHandler>();
-            builder.Services.AddModuleInfrastructureDependencies();
+            builder.Services.AddModuleInfrastructureDependencies(builder.Configuration);
             builder.Services.AddModuleServiceDependencies();
             builder.Services.AddAuthentication(options =>
             {

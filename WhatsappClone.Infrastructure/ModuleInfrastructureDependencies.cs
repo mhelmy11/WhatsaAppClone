@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +17,35 @@ namespace WhatsappClone.Infrastructure
     public static class ModuleInfrastructureDependencies
     {
 
-        public static IServiceCollection AddModuleInfrastructureDependencies(this IServiceCollection services)
+        public static IServiceCollection AddModuleInfrastructureDependencies(this IServiceCollection services, IConfiguration configuration)
         {
+            #region CustomServices
             services.AddScoped<IChat, ChatRepo>();
             services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
 
+            #endregion
+
+            #region Identity And DB
+            services.AddDbContext<Context>(options =>
+             {
+                 options.UseSqlServer(configuration.GetConnectionString("whatsapp"));
+             });
+
+            services.AddIdentity<AppUser, IdentityRole>(
+
+                options =>
+                {
+                    options.User.RequireUniqueEmail = false;
+                    options.Password.RequiredLength = 4;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Lockout.MaxFailedAccessAttempts = 3;
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
+                }
+
+                ).AddEntityFrameworkStores<Context>();
+
+            #endregion
 
 
             return services;

@@ -27,13 +27,9 @@
 		<Folder Include="Features\Groups\Queries\Results\" />
 		<Folder Include="Features\Groups\Queries\Validation\" />
 		<Folder Include="Features\Messages\Queries\Results\" />
-		<Folder Include="Features\UserContacts\Commands\Handler\" />
-		<Folder Include="Features\UserContacts\Commands\Models\" />
-		<Folder Include="Features\UserContacts\Commands\Validation\" />
-		<Folder Include="Features\UserContacts\Queries\Handler\" />
-		<Folder Include="Features\UserContacts\Queries\Models\" />
-		<Folder Include="Features\UserContacts\Queries\Results\" />
-		<Folder Include="Features\UserContacts\Queries\Validation\" />
+		<Folder Include="Features\Users\Queries\Handler\" />
+		<Folder Include="Features\Users\Queries\Models\" />
+		<Folder Include="Features\Users\Queries\Results\" />
 		<Folder Include="Features\UserGroups\Commands\Handler\" />
 		<Folder Include="Features\UserGroups\Commands\Models\" />
 		<Folder Include="Features\UserGroups\Commands\Validation\" />
@@ -47,6 +43,7 @@
 		<Folder Include="Features\Messages\Queries\Handler\" />
 		<Folder Include="Features\Messages\Queries\Models\" />
 		<Folder Include="Features\Messages\Queries\Validation\" />
+		<Folder Include="Mapping\User\QueryMapping\" />
 	</ItemGroup>
 
 	<ItemGroup>

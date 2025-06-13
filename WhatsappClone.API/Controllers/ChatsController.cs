@@ -19,7 +19,7 @@ namespace WhatsappClone.API.Controllers
 
 
         [HttpGet]
-        [AuthFilter]
+        //[AuthFilter]
         public async Task<IActionResult> GetChats()
         {
             var chats = await mediator.Send(new GetChatsQuery());

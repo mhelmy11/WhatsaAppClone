@@ -17,6 +17,8 @@ namespace WhatsappClone.Service
         public static IServiceCollection AddModuleServiceDependencies(this IServiceCollection services)
         {
             services.AddScoped<IChatService, ChatService>();
+            services.AddScoped<IFileService, FileService>();
+
 
 
             return services;
