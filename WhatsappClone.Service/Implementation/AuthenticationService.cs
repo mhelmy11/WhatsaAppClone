@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -16,12 +17,14 @@ namespace WhatsappClone.Service.Implementation
     public class AuthenticationService : IAuthenticationService
     {
         private readonly JwtSettings jwtSettings;
+        private ConcurrentDictionary<string, RefreshToken> refreshTokensDic;
 
         public AuthenticationService(JwtSettings jwtSettings)
         {
             this.jwtSettings = jwtSettings;
+            refreshTokensDic = new ConcurrentDictionary<string, RefreshToken>();
         }
-        public async Task<string> GetToken(AppUser user)
+        public async Task<JWTResult> GetToken(AppUser user)
         {
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
             var hashing = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
@@ -44,8 +47,25 @@ namespace WhatsappClone.Service.Implementation
                 );
 
             var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var refreshToken = GenerateRefreshToken();
+            refreshToken.PhoneNumber = user.PhoneNumber;
 
-            return token;
+            refreshTokensDic.AddOrUpdate(user.PhoneNumber, refreshToken, (key, oldValue) => refreshToken);
+
+
+            return new JWTResult() { AccessToken = token, RefreshToken = refreshToken };
+        }
+
+        private RefreshToken GenerateRefreshToken()
+        {
+            var refreshToken = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            return new RefreshToken
+            {
+                Token = refreshToken,
+                Expiration = DateTime.Now.AddDays(7) // Set expiration for 7 days
+            };
+
+
         }
     }
 }
