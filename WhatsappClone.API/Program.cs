@@ -35,36 +35,7 @@ namespace WhatsappClone.API
             builder.Services.AddCoreDependencies();
             builder.Services.AddModuleInfrastructureDependencies(builder.Configuration);
             builder.Services.AddModuleServiceDependencies();
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = "default";
-                options.DefaultChallengeScheme = "default";
 
-
-            }).AddJwtBearer("default", options =>
-            {
-
-                options.TokenValidationParameters = new()
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["secretKey"]))
-                };
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        var token = context.Request.Query["access_token"];
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(token) && (path.StartsWithSegments("/startChat")))
-                        {
-                            context.Token = token;
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
 
             builder.Services.AddCors(options =>
             {

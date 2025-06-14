@@ -10,10 +10,10 @@ namespace WhatsappClone.Core.Features.Users.Commands.Validation
 {
 
 
-    public class AddUserValidator : AbstractValidator<AddUserCommand>
+    public class LoginValidator : AbstractValidator<AddUserCommand>
     {
 
-        public AddUserValidator()
+        public LoginValidator()
         {
             ApplyValidations();
             ApplyCustomValidations();

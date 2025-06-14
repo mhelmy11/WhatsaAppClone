@@ -7,11 +7,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="Features\Authentication\Queries\Results\**" />
+		<EmbeddedResource Remove="Features\Authentication\Queries\Results\**" />
+		<None Remove="Features\Authentication\Queries\Results\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\WhatsappClone.Data\WhatsappClone.Data.csproj" />
 		<ProjectReference Include="..\WhatsappClone.Service\WhatsappClone.Service.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Features\Authentication\Queries\Handler\" />
+		<Folder Include="Features\Authentication\Queries\Models\" />
 		<Folder Include="Features\Blacklists\Commands\Handler\" />
 		<Folder Include="Features\Blacklists\Commands\Models\" />
 		<Folder Include="Features\Blacklists\Commands\Validation\" />
