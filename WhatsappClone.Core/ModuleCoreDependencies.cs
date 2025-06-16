@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MoMediatoR;
 using System.Reflection;
 using WhatsappClone.Core.Behaviours;
+using WhatsappClone.Core.RequirementsHandlers;
 
 namespace WhatsappClone.Core
 {
@@ -32,6 +33,9 @@ namespace WhatsappClone.Core
             // بنقول لـ MediatR إن أي أمر أو استعلام (IPipelineBehavior<,>) بيعدي،
             // يعدي الأول على الـ ValidationBehavior بتاعنا.
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+
+            services.AddTransient<SeesionNotRevokedRequirementHandler>();
 
             return services;
         }

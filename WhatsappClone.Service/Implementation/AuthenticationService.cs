@@ -37,7 +37,6 @@ namespace WhatsappClone.Service.Implementation
         {
 
             var GeneratedRefreshToken = GenerateRefreshToken(user);
-            var accessToken = GenerateAccessToken(user);
             var refreshToken = new TokenRefreshing
             {
                 CreationDate = DateTime.UtcNow,
@@ -52,6 +51,30 @@ namespace WhatsappClone.Service.Implementation
             //Saving to database....
             await RefreshTokenRepo.AddAsync(refreshToken);
 
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
+            var hashing = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+            var exp = DateTime.UtcNow.AddMinutes(3);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.MobilePhone, user.PhoneNumber!),
+                new Claim("TID",refreshToken.Id.ToString())
+
+
+            };
+
+            var jwt = new JwtSecurityToken(
+
+                issuer: jwtSettings.Issuer,
+                audience: jwtSettings.Audience,
+                claims: claims,
+                expires: exp,
+                signingCredentials: hashing
+                );
+
+            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var accessToken = new AccessToken { Token = token, Expiration = exp };
 
             return new JWTResult() { AccessToken = accessToken, RefreshToken = GeneratedRefreshToken };
         }
@@ -68,6 +91,8 @@ namespace WhatsappClone.Service.Implementation
         }
         public AccessToken GenerateAccessToken(AppUser user)
         {
+
+            var generatedRefreshToken = GenerateRefreshToken(user);
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
             var hashing = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
             var exp = DateTime.UtcNow.AddMinutes(1);
@@ -75,12 +100,14 @@ namespace WhatsappClone.Service.Implementation
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.MobilePhone, user.PhoneNumber!)
+                new Claim(ClaimTypes.MobilePhone, user.PhoneNumber!),
+                new Claim("TID",generatedRefreshToken.Id.ToString())
 
 
             };
 
             var jwt = new JwtSecurityToken(
+
                 issuer: jwtSettings.Issuer,
                 audience: jwtSettings.Audience,
                 claims: claims,

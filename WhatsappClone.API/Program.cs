@@ -1,10 +1,12 @@
 ﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MoMediatoR;
 using System.Reflection;
+using WhatsappClone.API.Requirements.Handlers;
 using WhatsappClone.Core;
 using WhatsappClone.Core.Features.Chats.Queries.Handler;
 using WhatsappClone.Core.Features.Chats.Queries.Models;
@@ -29,13 +31,20 @@ namespace WhatsappClone.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSignalR();
-
-
+            builder.Services.AddTransient<IAuthorizationHandler, SessionNotRevokedHandler>();
             //builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddCoreDependencies();
             builder.Services.AddModuleInfrastructureDependencies(builder.Configuration);
             builder.Services.AddModuleServiceDependencies();
 
+            // إضافة الـ Policy
+            builder.Services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                       .RequireAuthenticatedUser() // هذا هو الشرط الافتراضي الأصلي، يجب إبقاؤه
+                       .AddRequirements(new SessionNotRevokedRequirement()) // نضيف شرطنا المخصص إليه
+                       .Build();
+            });
 
             builder.Services.AddCors(options =>
             {
