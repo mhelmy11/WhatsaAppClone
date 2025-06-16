@@ -9,7 +9,7 @@ using WhatsappClone.Core.Bases;
 
 namespace WhatsappClone.Core.Filters
 {
-    public class AuthFilter : Attribute, IAuthorizationFilter
+    public class AuthorizeFilter : Attribute, IAuthorizationFilter
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {

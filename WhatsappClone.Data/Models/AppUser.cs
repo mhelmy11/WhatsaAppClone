@@ -11,9 +11,9 @@ namespace WhatsappClone.Data.Models
     public class AppUser : IdentityUser
     {
         public bool IsActive { get; set; } = false;
-        public DateTime activeAt { get; set; } = DateTime.Now;
+        public DateTime activeAt { get; set; } = DateTime.UtcNow;
 
-        public DateTime lastSeen { get; set; } = DateTime.Now;
+        public DateTime lastSeen { get; set; } = DateTime.UtcNow;
 
 
         //Blacklist navigations
@@ -50,6 +50,7 @@ namespace WhatsappClone.Data.Models
         public virtual ICollection<UserContact> UserContactContactUsers { get; set; } = new List<UserContact>();
 
         public virtual ICollection<UserContact> UserContactUsers { get; set; } = new List<UserContact>();
+        public virtual ICollection<TokenRefreshing> UserRefreshTokens { get; set; } = new List<TokenRefreshing>();
 
 
         public string? PicUrl { get; set; }

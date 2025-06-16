@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace WhatsappClone.Data.Helpers
 {
-    public class JWTResult
+    public class AccessToken
     {
-        public AccessToken AccessToken { get; set; }
-        public RefreshToken RefreshToken { get; set; }
-
+        public string Token { get; set; }
+        public DateTime Expiration { get; set; }
     }
 }

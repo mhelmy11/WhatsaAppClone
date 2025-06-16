@@ -11,6 +11,18 @@ namespace WhatsappClone.Service.Abstract
     public interface IAuthenticationService
     {
 
-        public Task<JWTResult> GetToken(AppUser user);
+        public Task<JWTResult> GetTokenAfterLogging(AppUser user);
+
+        public AccessToken GenerateAccessToken(AppUser user);
+
+        public RefreshToken GenerateRefreshToken(AppUser user);
+
+        public TokenRefreshing GetRefreshToken(string token);
+
+        public void RevokeRefreshToken(string token);
+
+
+
+
     }
 }

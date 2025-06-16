@@ -13,6 +13,7 @@ public class Context : IdentityDbContext<AppUser>
 {
 
     public virtual DbSet<Blacklist> Blacklists { get; set; }
+    public virtual DbSet<TokenRefreshing> RefreshTokens { get; set; }
 
     public virtual DbSet<Chat> Chats { get; set; }
 

@@ -24,6 +24,7 @@ namespace WhatsappClone.Infrastructure
         {
             #region CustomServices
             services.AddScoped<IChat, ChatRepo>();
+            services.AddScoped<IRefreshToken, RefreshTokenRepo>();
             services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
 
             #endregion
@@ -77,6 +78,7 @@ namespace WhatsappClone.Infrastructure
                     ValidAudience = JwtSettings.Audience,
                     ValidateIssuerSigningKey = JwtSettings.ValidateIssuerSigningKey,
                     ValidateLifetime = JwtSettings.ValidateLifetime,
+                    ClockSkew = TimeSpan.Zero // Disable the default 5 minute clock skew
 
                 };
 

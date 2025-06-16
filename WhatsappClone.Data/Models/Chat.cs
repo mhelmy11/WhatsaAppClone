@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WhatsappClone.Data.Enums;
 
 namespace WhatsappClone.Data.Models
 {
@@ -14,6 +15,8 @@ namespace WhatsappClone.Data.Models
         public string SenderId { get; set; }
         public string ReceiverId { get; set; }
         public string LastMessageContent { get; set; }
+
+
         public DateTime LastMessageTime { get; set; }
         public bool IsStarted { get; set; } // Indicates if the chat has started
         public bool IsBlocked { get; set; } // Indicates if the chat is blocked
