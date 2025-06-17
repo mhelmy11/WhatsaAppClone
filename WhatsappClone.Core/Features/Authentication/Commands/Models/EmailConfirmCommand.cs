@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
-using WhatsappClone.Data.Helpers;
 
 namespace WhatsappClone.Core.Features.Authentication.Commands.Models
 {
-    public class LoginCommand : IRequest<Response<JWTResult>>
+    public class EmailConfirmCommand : IRequest<Response<string>>
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public string Id { get; set; }
+        public string Token { get; set; }
+
 
     }
 }

@@ -39,15 +39,16 @@ namespace WhatsappClone.Infrastructure
 
                 options =>
                 {
-                    options.User.RequireUniqueEmail = false;
+                    options.User.RequireUniqueEmail = true;
                     options.Password.RequiredLength = 4;
                     options.Password.RequireUppercase = false;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Lockout.MaxFailedAccessAttempts = 3;
                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
+                    options.SignIn.RequireConfirmedEmail = true; // Require email confirmation for sign-in
                 }
 
-                ).AddEntityFrameworkStores<Context>();
+                ).AddEntityFrameworkStores<Context>().AddDefaultTokenProviders(); ;
 
             #endregion
 

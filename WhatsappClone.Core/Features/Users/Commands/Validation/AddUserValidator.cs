@@ -23,6 +23,11 @@ namespace WhatsappClone.Core.Features.Users.Commands.Validation
 
         public void ApplyValidations()
         {
+
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("Email is required.")
+                .EmailAddress().WithMessage("Invalid email format.");
+
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("Phone number is required.")
                 .Matches(@"^\+\d{1,3}\d{9,15}$").WithMessage("Phone number must be in international format.");

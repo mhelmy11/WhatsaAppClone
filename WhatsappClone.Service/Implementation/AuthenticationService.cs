@@ -53,7 +53,7 @@ namespace WhatsappClone.Service.Implementation
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
             var hashing = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-            var exp = DateTime.UtcNow.AddMinutes(3);
+            var exp = DateTime.UtcNow.AddMinutes(5);
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),

@@ -36,5 +36,13 @@ namespace WhatsappClone.API.Controllers
 
             return ResponseResult(result);
         }
+
+
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] EmailConfirmCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
     }
 }

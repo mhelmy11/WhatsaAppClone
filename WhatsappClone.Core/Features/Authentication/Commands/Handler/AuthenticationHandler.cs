@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,26 +20,47 @@ namespace WhatsappClone.Core.Features.Authentication.Commands.Handler
 {
     public class AuthenticationHandler : ResponseHandler, IRequestHandler<LoginCommand, Response<JWTResult>>
                                                         , IRequestHandler<RefreshTokenCommand, Response<JWTResult>>
+                                                        , IRequestHandler<EmailConfirmCommand, Response<string>>
+
+
     {
         private readonly UserManager<AppUser> userManager;
         private readonly IAuthenticationService authenticationService;
+        private readonly SignInManager<AppUser> signInManager;
 
-        public AuthenticationHandler(UserManager<AppUser> userManager, IAuthenticationService authenticationService)
+        public AuthenticationHandler(UserManager<AppUser> userManager, IAuthenticationService authenticationService, SignInManager<AppUser> signInManager)
         {
             this.userManager = userManager;
             this.authenticationService = authenticationService;
+            this.signInManager = signInManager;
         }
 
         public async Task<Response<JWTResult>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var user = userManager.FindByPhoneNumber(request.PhoneNumber);
+            var user = await userManager.FindByEmailAsync(request.Email);
             if (user == null) return BadRequest<JWTResult>("User not found. Please register first.");
-            var isValid = await userManager.CheckPasswordAsync(user, request.Password);
-            if (!isValid) return BadRequest<JWTResult>("Invalid password. Please try again.");
-            var jwtResult = await authenticationService.GetTokenAfterLogging(user);
-            if (jwtResult == null) return BadRequest<JWTResult>("Token generation failed. Please try again.");
+            var passwordCheck = await userManager.CheckPasswordAsync(user, request.Password);
+            var result = await signInManager.PasswordSignInAsync(user, request.Password, false, true);
 
-            return Success(jwtResult, "Login successful. Token generated successfully.");
+            if (result.Succeeded)
+            {
+                var jwtResult = await authenticationService.GetTokenAfterLogging(user);
+                if (jwtResult == null) return BadRequest<JWTResult>("Token generation failed. Please try again.");
+
+                return Success(jwtResult, "Login successful. Token generated successfully.");
+            }
+
+
+
+            if (!result.Succeeded)
+            {
+                if (passwordCheck == false) return BadRequest<JWTResult>("Invalid credentials. Please try again.");
+
+                if (passwordCheck && result.IsNotAllowed) return BadRequest<JWTResult>("User is not allowed to login. Please confirm your email first.");
+                if (result.IsLockedOut) return BadRequest<JWTResult>("Account is locked out. Please try again later after 1 min.");
+            }
+
+            return BadRequest<JWTResult>("Invalid credentials. Please try again.");
 
 
         }
@@ -74,6 +97,34 @@ namespace WhatsappClone.Core.Features.Authentication.Commands.Handler
             authenticationService.RevokeRefreshToken(request.RefreshToken);
             var jwtResult = await authenticationService.GetTokenAfterLogging(refreshToken.User);
             return Success(jwtResult);
+        }
+
+        public async Task<Response<string>> Handle(EmailConfirmCommand request, CancellationToken cancellationToken)
+        {
+            var user = await userManager.FindByIdAsync(request.Id);
+            if (user == null)
+            {
+                return BadRequest<string>("User not found.");
+            }
+
+            // Decoding the token
+            try
+            {
+                var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
+
+                var result = await userManager.ConfirmEmailAsync(user, decodedToken);
+
+                if (result.Succeeded)
+                {
+                    return Success("Email confirmed successfully!");
+                }
+
+                return BadRequest<string>("Email confirmation failed.");
+            }
+            catch (FormatException)
+            {
+                return BadRequest<string>("Invalid token format.");
+            }
         }
     }
 }

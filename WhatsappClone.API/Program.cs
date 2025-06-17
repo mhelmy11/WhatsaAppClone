@@ -11,6 +11,7 @@ using WhatsappClone.Core;
 using WhatsappClone.Core.Features.Chats.Queries.Handler;
 using WhatsappClone.Core.Features.Chats.Queries.Models;
 using WhatsappClone.Core.Filters;
+using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Service;
@@ -33,6 +34,8 @@ namespace WhatsappClone.API
             builder.Services.AddSignalR();
             builder.Services.AddTransient<IAuthorizationHandler, SessionNotRevokedHandler>();
             //builder.Services.AddScoped<UnitOfWork>();
+
+            builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
             builder.Services.AddCoreDependencies();
             builder.Services.AddModuleInfrastructureDependencies(builder.Configuration);
             builder.Services.AddModuleServiceDependencies();

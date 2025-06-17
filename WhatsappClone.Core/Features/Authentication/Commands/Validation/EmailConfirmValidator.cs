@@ -8,40 +8,31 @@ using WhatsappClone.Core.Features.Authentication.Commands.Models;
 
 namespace WhatsappClone.Core.Features.Authentication.Commands.Validation
 {
-
-
-    public class LoginValidator : AbstractValidator<LoginCommand>
+    public class EmailConfirmValidator : AbstractValidator<EmailConfirmCommand>
     {
 
-        public LoginValidator()
+        public EmailConfirmValidator()
         {
             ApplyValidations();
             ApplyCustomValidations();
-
         }
-
 
         public void ApplyValidations()
         {
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Invalid email format."); ;
+            RuleFor(x => x.Id)
+                .NotEmpty().WithMessage("Invalid email confirmation link.")
+                .NotNull().WithMessage("Invalid email confirmation link.");
 
 
 
-
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Password is required.");
-
-
-
-
+            RuleFor(x => x.Token)
+                .NotEmpty().WithMessage("Invalid email confirmation link.")
+                .NotNull().WithMessage("Invalid email confirmation link.");
         }
 
         public void ApplyCustomValidations()
         {
             // Add any custom validations here if needed
         }
-
     }
 }
