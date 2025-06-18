@@ -22,41 +22,52 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
         private readonly UserManager<AppUser> userManager;
         private readonly IHttpContextAccessor httpContext;
         private readonly IEmailService emailService;
+        private readonly ITransactionService transactionService;
 
-        public UserCommandsHandler(IMapper mapper, UserManager<AppUser> userManager, IHttpContextAccessor httpContext, IEmailService emailService)
+        public UserCommandsHandler(IMapper mapper, UserManager<AppUser> userManager, IHttpContextAccessor httpContext, IEmailService emailService, ITransactionService transactionService)
         {
             this.mapper = mapper;
             this.userManager = userManager;
             this.httpContext = httpContext;
             this.emailService = emailService;
+            this.transactionService = transactionService;
         }
         public async Task<Response<string>> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await userManager.FindByEmailAsync(request.Email);
-
-            if (user != null) return BadRequest<string>("Email is already in use.");
-            user = await userManager.FindByNameAsync(request.UserName);
-            if (user != null) return BadRequest<string>("Username is already in use.");
 
 
-            var newUser = mapper.Map<AppUser>(request);
 
-            var Result = await userManager.CreateAsync(newUser, request.Password);
-
-            if (Result.Succeeded)
+            // Start a transaction
+            var transaction = transactionService.BeginTransaction();
+            var error = string.Empty;
+            try
             {
-                var token = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
-                var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token)); //important to avoid "/ or +" in generated token
-                var requestContext = httpContext.HttpContext.Request;
-                var confirmationLink = $"{requestContext.Scheme}://{requestContext.Host}/api/authentication/confirm-email?Id={newUser.Id}&token={encodedToken}";
-                var subject = "Confirm Your Email";
-                var htmlContent = $"<h1>Welcome!</h1><p>Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.</p>";
-                await emailService.SendEmailAsync(newUser.Email, subject, htmlContent);
-                return Success<string>("Registration successful. Please check your email to confirm your account.");
-            }
-            var error = Result.Errors.Select(x => x.Description).FirstOrDefault() ?? "";
-            return BadRequest<string>(error);
 
+                var newUser = mapper.Map<AppUser>(request);
+
+                var Result = await userManager.CreateAsync(newUser, request.Password);
+
+                if (Result.Succeeded)
+                {
+                    var token = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
+                    var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token)); //important to avoid "/ or +" in generated token
+                    var requestContext = httpContext.HttpContext!.Request;
+                    var confirmationLink = $"{requestContext.Scheme}://{requestContext.Host}/api/authentication/confirm-email?Id={newUser.Id}&token={encodedToken}";
+                    var subject = "Confirm Your Email";
+                    var htmlContent = $"<h1>Welcome!</h1><p>Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.</p>";
+                    await emailService.SendEmailAsync(newUser.Email!, subject, htmlContent);
+                    transaction.Commit();
+                    return Success<string>("Registration successful. Please check your email to confirm your account.");
+                }
+                error = Result.Errors.Select(x => x.Description).FirstOrDefault() ?? "";
+            }
+
+            catch
+            {
+                transaction.Rollback();
+            }
+
+            return BadRequest<string>(error);
 
 
 

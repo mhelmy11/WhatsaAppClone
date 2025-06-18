@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Users.Commands.Models;
+using WhatsappClone.Data.Models;
 
 namespace WhatsappClone.Core.Features.Users.Commands.Validation
 {
@@ -12,12 +14,13 @@ namespace WhatsappClone.Core.Features.Users.Commands.Validation
 
     public class LoginValidator : AbstractValidator<AddUserCommand>
     {
+        private readonly UserManager<AppUser> userManager;
 
-        public LoginValidator()
+        public LoginValidator(UserManager<AppUser> userManager)
         {
             ApplyValidations();
             ApplyCustomValidations();
-
+            this.userManager = userManager;
         }
 
 
@@ -45,6 +48,21 @@ namespace WhatsappClone.Core.Features.Users.Commands.Validation
                 .NotEmpty().WithMessage("Confirm Password is required.")
                 .Equal(x => x.Password).WithMessage("Password and Confirm Password must match.");
 
+
+
+            RuleFor(x => x.Email).MustAsync(async (email, cancellation) =>
+            {
+                var user = await userManager.FindByEmailAsync(email);
+                return user == null;
+
+            }).WithMessage("Email is already in use.");
+
+            RuleFor(x => x.UserName).MustAsync(async (username, cancellation) =>
+            {
+                var user = await userManager.FindByNameAsync(username);
+                return user == null;
+
+            }).WithMessage("Username is already in use.");
 
         }
 

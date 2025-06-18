@@ -38,7 +38,7 @@ namespace WhatsappClone.API.Controllers
         }
 
 
-        [HttpPost("confirm-email")]
+        [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] EmailConfirmCommand command)
         {
             var result = await mediator.Send(command);
