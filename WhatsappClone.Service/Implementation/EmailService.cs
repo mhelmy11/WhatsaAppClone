@@ -41,12 +41,8 @@ namespace WhatsappClone.Service.Implementation
             if (!response.IsSuccessStatusCode)
             {
 
-                return "Failed to send email. Please check the logs for more details.";
-                // يمكنك هنا إضافة logging لتسجيل الخطأ
-                // var errorBody = await response.Body.ReadAsStringAsync();
-                // _logger.LogError($"Failed to send email: {errorBody}");
-
                 throw new Exception($"Failed to send email: {response.StatusCode} - {errorBody}");
+
 
             }
 

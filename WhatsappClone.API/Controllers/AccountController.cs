@@ -45,5 +45,21 @@ namespace WhatsappClone.API.Controllers
 
             return ResponseResult(result);
         }
+
+
+        [HttpPost("forget-password")]
+        public async Task<IActionResult> ForgetPassword([FromForm] ForgetPasswordCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
     }
 }

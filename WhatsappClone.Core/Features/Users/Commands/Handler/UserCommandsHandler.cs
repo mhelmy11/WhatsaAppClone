@@ -11,12 +11,15 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Users.Commands.Models;
 using WhatsappClone.Data.Models;
+using WhatsappClone.Infrastructure.Interfaces;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
 
 namespace WhatsappClone.Core.Features.Users.Commands.Handler
 {
     public class UserCommandsHandler : ResponseHandler, IRequestHandler<AddUserCommand, Response<string>>
+                                                      , IRequestHandler<ForgetPasswordCommand, Response<string>>
+                                                      , IRequestHandler<ResetPasswordCommand, Response<string>>
     {
         private readonly IMapper mapper;
         private readonly UserManager<AppUser> userManager;
@@ -72,6 +75,57 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
 
 
 
+
+        }
+
+        public async Task<Response<string>> Handle(ForgetPasswordCommand request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var user = await userManager.FindByEmailAsync(request.Email);
+                var token = await userManager.GeneratePasswordResetTokenAsync(user);
+                var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+                var encodedEmail = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(request.Email));
+                var requestContext = httpContext.HttpContext!.Request;
+                var confirmationLink = $"{requestContext.Scheme}://Whatsapp/reset-password?Email={encodedEmail}&ResetToken={encodedToken}";
+                var subject = "Reset Password";
+                var htmlContent = $"<h1>Welcome!</h1><p>reset password by <a href='{confirmationLink}'>clicking here</a>.</p>";
+                await emailService.SendEmailAsync(request.Email, subject, htmlContent);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest<string>(ex.Message);
+            }
+
+            return Success<string>("Reset password email sent successfully. Please check your email to reset your password.");
+
+
+
+        }
+
+        public async Task<Response<string>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.ResetToken));
+                var decodedEmail = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Email));
+                var user = await userManager.FindByEmailAsync(decodedEmail);
+
+                var result = await userManager.ResetPasswordAsync(user, decodedToken, request.Password);
+
+                if (result.Succeeded)
+                {
+                    // تم تغيير كلمة المرور بنجاح
+                    return Success<string>("Password reset successful.");
+                }
+
+                var error = result.Errors.Select(e => e.Description).FirstOrDefault() ?? "";
+                return BadRequest<string>(error);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest<string>(ex.Message);
+            }
 
         }
     }
