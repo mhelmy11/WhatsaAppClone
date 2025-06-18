@@ -14,32 +14,9 @@ namespace WhatsappClone.API.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromForm] AddUserCommand command, [FromServices] IFileService fileService)
+        public async Task<IActionResult> Register([FromForm] AddUserCommand command)
         {
 
-            #region old
-            //var ProfilePic = command.ProfilePic; //Request.Form.Files["ProfilePic"];
-            //var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-            //if (!Directory.Exists(uploadsFolder))
-            //{
-            //    Directory.CreateDirectory(uploadsFolder);
-            //}
-
-            //var filePath = Path.Combine(uploadsFolder, Guid.NewGuid().ToString() + Path.GetExtension(ProfilePic.FileName).ToLowerInvariant());
-
-            //using (var stream = new FileStream(filePath, FileMode.Create))
-            //{
-            //    await ProfilePic.CopyToAsync(stream);
-            //}
-
-            #endregion
-
-            if (command.ProfilePic != null)
-            {
-                var profilePicPath = await fileService.SaveFileAsync(command.ProfilePic, "ProfilePics");
-
-                command.PicUrl = profilePicPath;
-            }
 
             var result = await mediator.Send(command);
 

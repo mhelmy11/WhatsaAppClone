@@ -24,6 +24,6 @@ namespace WhatsappClone.Core.Features.Users.Commands.Models
 
         [Ignore]
         public IFormFile? ProfilePic { get; set; }
-        public string? PicUrl { get; set; }
+        //public string? PicUrl { get; set; }
     }
 }

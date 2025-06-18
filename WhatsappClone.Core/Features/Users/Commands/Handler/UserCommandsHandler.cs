@@ -21,14 +21,16 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
                                                       , IRequestHandler<ForgetPasswordCommand, Response<string>>
                                                       , IRequestHandler<ResetPasswordCommand, Response<string>>
     {
+        private readonly IFileService fileService;
         private readonly IMapper mapper;
         private readonly UserManager<AppUser> userManager;
         private readonly IHttpContextAccessor httpContext;
         private readonly IEmailService emailService;
         private readonly ITransactionService transactionService;
 
-        public UserCommandsHandler(IMapper mapper, UserManager<AppUser> userManager, IHttpContextAccessor httpContext, IEmailService emailService, ITransactionService transactionService)
+        public UserCommandsHandler(IFileService fileService, IMapper mapper, UserManager<AppUser> userManager, IHttpContextAccessor httpContext, IEmailService emailService, ITransactionService transactionService)
         {
+            this.fileService = fileService;
             this.mapper = mapper;
             this.userManager = userManager;
             this.httpContext = httpContext;
@@ -47,6 +49,14 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
             {
 
                 var newUser = mapper.Map<AppUser>(request);
+
+                if (request.ProfilePic != null)
+                {
+                    // Save the profile picture and get the URL
+                    var picUrl = await fileService.SaveFileAsync(request.ProfilePic, "ProfilePics");
+                    newUser.PicUrl = picUrl;
+                }
+
 
                 var Result = await userManager.CreateAsync(newUser, request.Password);
 

@@ -14,17 +14,10 @@ namespace WhatsappClone.Core.Filters
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             // هنا ممكن نضيف منطق التحقق من الصلاحيات
-            // مثلاً، لو المستخدم غير مسجل دخول، نرجع Unauthorized
-            if (!context.HttpContext.User.Identity.IsAuthenticated)
+            if (!context.HttpContext.User.HasClaim("Permission", "RequiredPermission"))
             {
-                throw new UnauthorizedAccessException("You are not authorized to access this resource.");
-
+                context.Result = new ForbidResult();
             }
-            // لو في صلاحيات معينة لازم تتوفر، ممكن نتحقق منها هنا
-            // else if (!context.HttpContext.User.HasClaim("Permission", "RequiredPermission"))
-            // {
-            //     context.Result = new Microsoft.AspNetCore.Mvc.ForbidResult();
-            // }
 
         }
     }
