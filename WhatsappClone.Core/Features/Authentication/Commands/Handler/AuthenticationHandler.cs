@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,14 @@ namespace WhatsappClone.Core.Features.Authentication.Commands.Handler
 
 
     {
+        private readonly ILogger<AuthenticationHandler> logger;
         private readonly UserManager<AppUser> userManager;
         private readonly IAuthenticationService authenticationService;
         private readonly SignInManager<AppUser> signInManager;
 
-        public AuthenticationHandler(UserManager<AppUser> userManager, IAuthenticationService authenticationService, SignInManager<AppUser> signInManager)
+        public AuthenticationHandler(ILogger<AuthenticationHandler> logger, UserManager<AppUser> userManager, IAuthenticationService authenticationService, SignInManager<AppUser> signInManager)
         {
+            this.logger = logger;
             this.userManager = userManager;
             this.authenticationService = authenticationService;
             this.signInManager = signInManager;
@@ -38,7 +41,12 @@ namespace WhatsappClone.Core.Features.Authentication.Commands.Handler
         public async Task<Response<JWTResult>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
             var user = await userManager.FindByEmailAsync(request.Email);
-            if (user == null) return BadRequest<JWTResult>("User not found. Please register first.");
+            if (user == null)
+            {
+                logger.LogWarning($"A request was made with a user not found: {request.Email}");
+
+                return BadRequest<JWTResult>("User not found. Please register first.");
+            }
             var passwordCheck = await userManager.CheckPasswordAsync(user, request.Password);
             var result = await signInManager.PasswordSignInAsync(user, request.Password, false, true);
 
