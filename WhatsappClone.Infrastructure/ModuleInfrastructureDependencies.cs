@@ -25,6 +25,7 @@ namespace WhatsappClone.Infrastructure
             #region CustomServices
             services.AddScoped<IChat, ChatRepo>();
             services.AddScoped<IRefreshToken, RefreshTokenRepo>();
+            services.AddScoped<IUserContacts, UserContactsRepo>();
             services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
 
             #endregion

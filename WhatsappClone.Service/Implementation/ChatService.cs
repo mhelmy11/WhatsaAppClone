@@ -66,5 +66,12 @@ namespace WhatsappClone.Service.Implementation
         }
 
 
+        public async Task<Chat> AddChatAsync(Chat chat)
+        {
+            var newChat = await chatRepo.AddAsync(chat);
+            return newChat;
+        }
+
+
     }
 }

@@ -12,8 +12,8 @@ using WhatsappClone.Infrastructure;
 namespace WhatsappClone.Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250619130005_addChatName")]
-    partial class addChatName
+    [Migration("20250619131604_chatname")]
+    partial class chatname
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

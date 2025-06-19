@@ -35,13 +35,10 @@
 		<Folder Include="Features\Groups\Queries\Results\" />
 		<Folder Include="Features\Groups\Queries\Validation\" />
 		<Folder Include="Features\Messages\Queries\Results\" />
-		<Folder Include="Features\UserGroups\Commands\Handler\" />
-		<Folder Include="Features\UserGroups\Commands\Models\" />
-		<Folder Include="Features\UserGroups\Commands\Validation\" />
-		<Folder Include="Features\UserGroups\Queries\Handler\" />
-		<Folder Include="Features\UserGroups\Queries\Models\" />
-		<Folder Include="Features\UserGroups\Queries\Results\" />
-		<Folder Include="Features\UserGroups\Queries\Validation\" />
+		<Folder Include="Features\Contacts\Queries\Handler\" />
+		<Folder Include="Features\Contacts\Queries\Models\" />
+		<Folder Include="Features\Contacts\Queries\Results\" />
+		<Folder Include="Features\Contacts\Queries\Validation\" />
 		<Folder Include="Features\Messages\Commands\Handler\" />
 		<Folder Include="Features\Messages\Commands\Models\" />
 		<Folder Include="Features\Messages\Commands\Validation\" />

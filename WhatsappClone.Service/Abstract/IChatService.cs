@@ -15,6 +15,8 @@ namespace WhatsappClone.Service.Abstract
         public Task<Chat> GetChatByIdAsync(int chatId);
 
         public IQueryable<Chat> GetChatsAsQueryable();
+        public Task<Chat> AddChatAsync(Chat chat);
+
 
         public IQueryable<Chat> FilterChatPaginatedQueryable(ChatOrderingEnum? orderingEnum, string? search);
     }
