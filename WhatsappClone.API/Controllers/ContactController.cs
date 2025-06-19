@@ -16,9 +16,6 @@ namespace WhatsappClone.API.Controllers
 
         public async Task<IActionResult> AddContact([FromForm] AddContactCommand command)
         {
-
-            var Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            command.userId = Id;
             var result = await mediator.Send(command);
             return ResponseResult(result);
         }

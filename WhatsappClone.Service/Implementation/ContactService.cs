@@ -42,10 +42,15 @@ namespace WhatsappClone.Service.Implementation
 
         public async Task<bool> IsContactAdded(string userId, string phoneNumber)
         {
-            var contact = userManager.FindByPhoneNumber(phoneNumber);
-            var userContact = userContactsRepo.GetTableAsTracking().Where(c => (c.ContactId == contact.Id && c.UserId == userId)).FirstOrDefault();
+            var Contact = userManager.FindByPhoneNumber(phoneNumber);
+            if (Contact == null)
+            {
+                return true;
+            }
 
-            return userContact != null;
+            return userContactsRepo.GetTableNoTracking().Any(x => x.UserId == userId && x.ContactId == Contact.Id);
+
+
 
         }
     }

@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Contacts.Commands.Models;
@@ -16,13 +18,15 @@ namespace WhatsappClone.Core.Features.Contacts.Commands.Validation
     {
         private readonly UserManager<AppUser> userManager;
         private readonly IContactsService contactsService;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AddContactValidator(UserManager<AppUser> userManager, IContactsService contactsService)
+        public AddContactValidator(UserManager<AppUser> userManager, IContactsService contactsService, IHttpContextAccessor httpContextAccessor)
         {
             ApplyValidation();
             ApplyCustomValidation();
             this.userManager = userManager;
             this.contactsService = contactsService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -43,38 +47,53 @@ namespace WhatsappClone.Core.Features.Contacts.Commands.Validation
 
         public void ApplyCustomValidation()
         {
-
             RuleFor(x => x.PhoneNumber)
-                .MustAsync(async (phoneNumber, cancellation) =>
-                {
-                    var existingUser = userManager.FindByPhoneNumber(phoneNumber);
-                    return existingUser != null;
+             .MustAsync(NotBeOwnPhoneNumber)
+            .WithMessage("You cannot add yourself as a contact.")
 
-                }).WithMessage("This phone number is not on Whatsapp. Please invite them to join WhatsApp.")
-                ;
+            .MustAsync(PhoneNumberMustExistInSystem)
+            .WithMessage("This person is not on WhatsApp.")
 
-
-            //ensure that the contact is not already added
-            RuleFor(x => x)
-                .MustAsync(async (user, cancellation) =>
-
-                {
-                    var isContactAdded = await contactsService.IsContactAdded(user.userId, user.PhoneNumber);
-                    return !isContactAdded;
+            .MustAsync(PhoneNumberMustNotBeInContactsList)
+            .WithMessage("You have already added this contact.");
 
 
-                }).WithMessage("This contact is already added.")
-                ;
+        }
 
-            //ensure that not the same user is being added as a contact
-            RuleFor(x => x)
-                .MustAsync(async (user, cancellation) =>
-                {
-                    var existingUser = await userManager.FindByIdAsync(user.userId);
-                    return existingUser != null && existingUser.PhoneNumber != user.PhoneNumber;
+        private async Task<bool> PhoneNumberMustNotBeInContactsList(string phoneNumber, CancellationToken cancellationToken)
+        {
+            var currentUserId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserId == null)
+            {
+                return true;
+            }
 
-                }).WithMessage("You cannot add yourself as a contact.")
-                ;
+            var contactId = userManager.FindByPhoneNumber(phoneNumber)?.Id;
+
+            if (contactId == null)
+            {
+                return true;
+            }
+            return !await contactsService.IsContactAdded(currentUserId, contactId);
+
+        }
+
+        private async Task<bool> PhoneNumberMustExistInSystem(string phoneNumber, CancellationToken cancellationToken)
+        {
+            var contact = userManager.FindByPhoneNumber(phoneNumber);
+            return contact != null;
+        }
+
+        private async Task<bool> NotBeOwnPhoneNumber(string phoneNumber, CancellationToken cancellationToken)
+        {
+            var currentUserPhone = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.MobilePhone);
+            if (currentUserPhone == null)
+            {
+                return true;
+
+            }
+
+            return currentUserPhone != phoneNumber;
         }
 
 

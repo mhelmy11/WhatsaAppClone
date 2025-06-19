@@ -43,10 +43,10 @@ namespace WhatsappClone.Core.Behaviours
                 {
                     // بنرمي استثناء (Exception) اسمه ValidationException
                     // الاستثناء ده هيتلقف في طبقة الـ Web API عشان يتعامل معاه صح
-                    failures = failures
-                        .Select(f => new ValidationFailure(f.PropertyName, f.ErrorMessage))
-                        .ToList();
-                    throw new ValidationException(failures);
+                    var e = failures
+                        .Select(f => f.ErrorMessage)
+                        .FirstOrDefault();
+                    throw new ValidationException(e);
                 }
             }
 

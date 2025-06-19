@@ -79,7 +79,7 @@ namespace WhatsappClone.Core.Filters
 
                     default:
                         // unhandled error
-                        responseModel.Message = error.Message;
+                        responseModel.Message = $"{error.Message} {error.InnerException.Message}";
                         responseModel.StatusCode = HttpStatusCode.InternalServerError;
                         response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         break;
