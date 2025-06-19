@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MoMediatoR;
 using Serilog;
 using System.Reflection;
@@ -51,8 +52,45 @@ namespace WhatsappClone.API
 
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
                 builder.Services.AddEndpointsApiExplorer();
-                builder.Services.AddSwaggerGen();
-                builder.Services.AddSignalR();
+                builder.Services.AddSwaggerGen(options =>
+                {
+                    // هذا السطر يضيف الدعم للتعليقات XML إذا أردت
+                    // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    // options.IncludeXmlComments(xmlPath);
+
+                    // --- هنا يبدأ الجزء الخاص بالـ JWT ---
+
+                    // 1. تعريف مخطط الأمان (Security Scheme)
+                    // نحن نُعرّف نظام المصادقة الذي نستخدمه، وهو Bearer Token (JWT).
+                    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    {
+                        Name = "Authorization", // اسم الـ Header
+                        Type = SecuritySchemeType.Http, // نوع المخطط
+                        Scheme = "bearer", // يجب أن تكون "bearer" (بحروف صغيرة)
+                        BearerFormat = "JWT", // نوضح أن الصيغة هي JWT
+                        In = ParameterLocation.Header, // مكان التوكن في الـ Header
+                        Description = "Please enter a valid token. \n\n" +
+                                      "Enter 'Bearer' [space] and then your token in the text input below.\n\n" +
+                                      "Example: \"Bearer 12345abcdef\""
+                    });
+
+                    // 2. تطبيق مخطط الأمان على كل العمليات التي تحتاج لمصادقة
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer" // يجب أن يتطابق مع الاسم في AddSecurityDefinition
+                }
+            },
+            new string[] {}
+        }
+    });
+                }); builder.Services.AddSignalR();
                 builder.Services.AddTransient<IAuthorizationHandler, SessionNotRevokedHandler>();
                 //builder.Services.AddScoped<UnitOfWork>();
 

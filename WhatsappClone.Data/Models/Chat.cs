@@ -14,6 +14,8 @@ namespace WhatsappClone.Data.Models
         public int Id { get; set; }
         public string SenderId { get; set; }
         public string ReceiverId { get; set; }
+
+        public int? GroupId { get; set; }
         public string LastMessageContent { get; set; }
 
 
@@ -29,6 +31,8 @@ namespace WhatsappClone.Data.Models
         // Navigation properties
         public virtual AppUser Sender { get; set; }
         public virtual AppUser Receiver { get; set; }
+
+        public virtual Group Group { get; set; }
 
         public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 

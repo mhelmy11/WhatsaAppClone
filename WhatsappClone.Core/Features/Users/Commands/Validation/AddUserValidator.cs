@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Users.Commands.Models;
 using WhatsappClone.Data.Models;
+using WhatsappClone.Service.Implementation;
 
 namespace WhatsappClone.Core.Features.Users.Commands.Validation
 {
@@ -57,12 +58,12 @@ namespace WhatsappClone.Core.Features.Users.Commands.Validation
 
             }).WithMessage("Email is already in use.");
 
-            RuleFor(x => x.UserName).MustAsync(async (username, cancellation) =>
+            RuleFor(x => x.PhoneNumber).MustAsync(async (phone, cancellation) =>
             {
-                var user = await userManager.FindByNameAsync(username);
+                var user = userManager.FindByPhoneNumber(phone);
                 return user == null;
 
-            }).WithMessage("Username is already in use.");
+            }).WithMessage("Phone is already in use.");
 
         }
 

@@ -20,6 +20,7 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
     public class UserCommandsHandler : ResponseHandler, IRequestHandler<AddUserCommand, Response<string>>
                                                       , IRequestHandler<ForgetPasswordCommand, Response<string>>
                                                       , IRequestHandler<ResetPasswordCommand, Response<string>>
+                                                      , IRequestHandler<EditMeCommand, Response<string>>
     {
         private readonly IFileService fileService;
         private readonly IMapper mapper;
@@ -136,6 +137,35 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
             {
                 return BadRequest<string>(ex.Message);
             }
+
+        }
+
+        public async Task<Response<string>> Handle(EditMeCommand request, CancellationToken cancellationToken)
+        {
+            var user = await userManager.FindByIdAsync(request.Id);
+            if (user == null)
+            {
+                return BadRequest<string>("User not found.");
+            }
+
+            var updatedUser = mapper.Map(request, user);
+
+            if (request.ProfilePic != null)
+            {
+                // Save the profile picture and get the URL
+                var picUrl = await fileService.SaveFileAsync(request.ProfilePic, "ProfilePics");
+                updatedUser.PicUrl = picUrl;
+            }
+
+            var result = await userManager.UpdateAsync(updatedUser);
+            if (result.Succeeded)
+            {
+                return Success<string>("User updated successfully.");
+            }
+            var error = result.Errors.Select(e => e.Description).FirstOrDefault() ?? "";
+            return BadRequest<string>(error);
+
+
 
         }
     }

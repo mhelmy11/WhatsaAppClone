@@ -21,5 +21,7 @@ namespace WhatsappClone.Data.Models
         public virtual AppUser Creator { get; set; }
 
         public virtual ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+
+        public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
     }
 }

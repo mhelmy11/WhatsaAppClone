@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WhatsappClone.API.Base;
 using WhatsappClone.Core.Features.Users.Commands.Models;
+using WhatsappClone.Core.Features.Users.Queries.Models;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.API.Controllers
@@ -34,6 +37,28 @@ namespace WhatsappClone.API.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordCommand command)
         {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+
+        [HttpGet("Me")]
+        [Authorize]
+        public async Task<IActionResult> GetMe()
+        {
+            var Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            var result = await mediator.Send(new GetMeQuery(Id));
+            return ResponseResult(result);
+        }
+
+
+        [HttpPut("Me")]
+        [Authorize]
+        public async Task<IActionResult> EditMe([FromForm] EditMeCommand command)
+        {
+            var Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            command.Id = Id;
             var result = await mediator.Send(command);
             return ResponseResult(result);
         }

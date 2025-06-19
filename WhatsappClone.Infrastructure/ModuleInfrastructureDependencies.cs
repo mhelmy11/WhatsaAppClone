@@ -79,7 +79,6 @@ namespace WhatsappClone.Infrastructure
                     ValidAudience = JwtSettings.Audience,
                     ValidateIssuerSigningKey = JwtSettings.ValidateIssuerSigningKey,
                     ValidateLifetime = JwtSettings.ValidateLifetime,
-                    ClockSkew = TimeSpan.Zero // Disable the default 5 minute clock skew
 
                 };
 

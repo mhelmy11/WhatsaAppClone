@@ -15,6 +15,8 @@ namespace WhatsappClone.Data.Models
 
         public DateTime lastSeen { get; set; } = DateTime.UtcNow;
 
+        public string? About { get; set; } = "Hey there! I'm using WhatsappClone!";
+
 
         //Blacklist navigations
 

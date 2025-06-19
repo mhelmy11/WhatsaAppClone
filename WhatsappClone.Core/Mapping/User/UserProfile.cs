@@ -12,6 +12,8 @@ namespace WhatsappClone.Core.Mapping.User
         public UserProfile()
         {
             AddUserMapping();
+            GetMeMapping();
+            EditMeMapping();
 
         }
     }

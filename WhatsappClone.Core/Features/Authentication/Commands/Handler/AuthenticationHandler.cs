@@ -43,7 +43,7 @@ namespace WhatsappClone.Core.Features.Authentication.Commands.Handler
             var user = await userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                logger.LogWarning($"A request was made with a user not found: {request.Email}");
+                logger.LogInformation("A request was made with a user not found: {@Request}", request);
 
                 return BadRequest<JWTResult>("User not found. Please register first.");
             }
