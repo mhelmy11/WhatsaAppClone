@@ -12,6 +12,7 @@ namespace WhatsappClone.Data.Models
 
 
         public int Id { get; set; }
+        public string ChatName { get; set; }
         public string SenderId { get; set; }
         public string ReceiverId { get; set; }
 

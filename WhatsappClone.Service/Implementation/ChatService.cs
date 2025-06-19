@@ -61,9 +61,7 @@ namespace WhatsappClone.Service.Implementation
         public async Task<List<Chat>> GetChatsAsync()
         {
             //add any additional logic here if needed
-            var Chats = await chatRepo.GetTableNoTracking().Where(c => c.IsStarted && !c.isDeleted).ToListAsync();
-
-
+            var Chats = await chatRepo.GetTableNoTracking().Where(c => c.IsStarted && !c.isDeleted && !c.IsArchived).ToListAsync();
             return Chats;
         }
 
