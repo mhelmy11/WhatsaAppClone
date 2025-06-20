@@ -11,11 +11,6 @@ namespace WhatsappClone.Core.Features.Users.Queries.Models
 {
     public class GetMeQuery : IRequest<Response<GetMeQueryResult>>
     {
-        public string Id { get; set; }
-        public GetMeQuery(string Id)
-        {
-            this.Id = Id;
 
-        }
     }
 }

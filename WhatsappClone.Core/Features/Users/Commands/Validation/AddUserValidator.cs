@@ -27,6 +27,8 @@ namespace WhatsappClone.Core.Features.Users.Commands.Validation
 
         public void ApplyValidations()
         {
+            RuleFor(x => x.FullName)
+                .NotEmpty().WithMessage("Full name is required.");
 
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required.")

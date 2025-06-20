@@ -12,7 +12,7 @@ using WhatsappClone.Infrastructure;
 namespace WhatsappClone.Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250620115446_init")]
+    [Migration("20250620122811_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -299,8 +299,9 @@ namespace WhatsappClone.Infrastructure.Migrations
 
             modelBuilder.Entity("WhatsappClone.Data.Models.Message", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AttachmentId")
                         .HasColumnType("int");
@@ -350,13 +351,10 @@ namespace WhatsappClone.Infrastructure.Migrations
 
             modelBuilder.Entity("WhatsappClone.Data.Models.MessageReadStatus", b =>
                 {
-                    b.Property<int>("MessageId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("MessageId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
@@ -366,8 +364,6 @@ namespace WhatsappClone.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("MessageId", "UserId");
-
-                    b.HasIndex("MessageId1");
 
                     b.HasIndex("UserId");
 
@@ -669,7 +665,9 @@ namespace WhatsappClone.Infrastructure.Migrations
                 {
                     b.HasOne("WhatsappClone.Data.Models.Message", "Message")
                         .WithMany("MessageReadStatuses")
-                        .HasForeignKey("MessageId1");
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "User")
                         .WithMany()

@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.WebUtilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Users.Commands.Models;
+using WhatsappClone.Core.Features.Users.Commands.Results;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure.Interfaces;
 using WhatsappClone.Service.Abstract;
@@ -20,7 +22,7 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
     public class UserCommandsHandler : ResponseHandler, IRequestHandler<AddUserCommand, Response<string>>
                                                       , IRequestHandler<ForgetPasswordCommand, Response<string>>
                                                       , IRequestHandler<ResetPasswordCommand, Response<string>>
-                                                      , IRequestHandler<EditMeCommand, Response<string>>
+                                                      , IRequestHandler<EditMeCommand, Response<EditMeResult>>
     {
         private readonly IFileService fileService;
         private readonly IMapper mapper;
@@ -140,15 +142,21 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
 
         }
 
-        public async Task<Response<string>> Handle(EditMeCommand request, CancellationToken cancellationToken)
+        public async Task<Response<EditMeResult>> Handle(EditMeCommand request, CancellationToken cancellationToken)
         {
-            var user = await userManager.FindByIdAsync(request.Id);
+
+            // Get the current user from the context
+            var CurrentuserId = httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await userManager.FindByIdAsync(CurrentuserId);
             if (user == null)
             {
-                return BadRequest<string>("User not found.");
+                return BadRequest<EditMeResult>("User not found.");
             }
 
             var updatedUser = mapper.Map(request, user);
+
+
+
 
             if (request.ProfilePic != null)
             {
@@ -157,13 +165,16 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
                 updatedUser.PicUrl = picUrl;
             }
 
+            var response = mapper.Map<EditMeResult>(updatedUser);
+
+
             var result = await userManager.UpdateAsync(updatedUser);
             if (result.Succeeded)
             {
-                return Success<string>("User updated successfully.");
+                return Success<EditMeResult>(response, "User updated successfully.");
             }
             var error = result.Errors.Select(e => e.Description).FirstOrDefault() ?? "";
-            return BadRequest<string>(error);
+            return BadRequest<EditMeResult>(error);
 
 
 

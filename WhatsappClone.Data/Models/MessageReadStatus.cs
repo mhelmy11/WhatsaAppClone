@@ -11,7 +11,7 @@ namespace WhatsappClone.Data.Models
     {
 
 
-        public int MessageId { get; set; }
+        public Guid MessageId { get; set; }
         public string UserId { get; set; }
         public MessageStatus Status { get; set; } // e.g., 1=Delivered, 2=Read
 

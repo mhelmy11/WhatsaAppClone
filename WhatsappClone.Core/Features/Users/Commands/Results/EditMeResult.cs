@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WhatsappClone.Core.Features.Users.Queries.Results
+namespace WhatsappClone.Core.Features.Users.Commands.Results
 {
-    public class GetMeQueryResult
+    public class EditMeResult
     {
         public string? PicUrl { get; set; }
         public string? FullName { get; set; }
@@ -14,7 +14,5 @@ namespace WhatsappClone.Core.Features.Users.Queries.Results
         public string? PhoneNumber { get; set; }
 
         public string? About { get; set; }
-
-
     }
 }

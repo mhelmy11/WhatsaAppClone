@@ -178,7 +178,7 @@ namespace WhatsappClone.Infrastructure.Migrations
                         column: x => x.BlockedUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Blacklists_AspNetUsers2",
                         column: x => x.UserId,
@@ -274,7 +274,7 @@ namespace WhatsappClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -333,7 +333,7 @@ namespace WhatsappClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserChatSettings_Groups_GroupId",
                         column: x => x.GroupId,
@@ -358,7 +358,7 @@ namespace WhatsappClone.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserGroups_Groups_GroupId",
                         column: x => x.GroupId,
@@ -371,7 +371,7 @@ namespace WhatsappClone.Infrastructure.Migrations
                 name: "Messages",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -414,11 +414,10 @@ namespace WhatsappClone.Infrastructure.Migrations
                 name: "MessageReadStatuses",
                 columns: table => new
                 {
-                    MessageId = table.Column<int>(type: "int", nullable: false),
+                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    StatusTimestamp = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    MessageId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    StatusTimestamp = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -430,10 +429,11 @@ namespace WhatsappClone.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MessageReadStatuses_Messages_MessageId1",
-                        column: x => x.MessageId1,
+                        name: "FK_MessageReadStatuses_Messages_MessageId",
+                        column: x => x.MessageId,
                         principalTable: "Messages",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -489,11 +489,6 @@ namespace WhatsappClone.Infrastructure.Migrations
                 name: "IX_Groups_CreatorId",
                 table: "Groups",
                 column: "CreatorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MessageReadStatuses_MessageId1",
-                table: "MessageReadStatuses",
-                column: "MessageId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MessageReadStatuses_UserId",

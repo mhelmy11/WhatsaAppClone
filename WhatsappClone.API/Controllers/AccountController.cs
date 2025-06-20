@@ -46,9 +46,7 @@ namespace WhatsappClone.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMe()
         {
-            var Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
-            var result = await mediator.Send(new GetMeQuery(Id));
+            var result = await mediator.Send(new GetMeQuery());
             return ResponseResult(result);
         }
 
@@ -57,8 +55,6 @@ namespace WhatsappClone.API.Controllers
         [Authorize]
         public async Task<IActionResult> EditMe([FromForm] EditMeCommand command)
         {
-            var Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            command.Id = Id;
             var result = await mediator.Send(command);
             return ResponseResult(result);
         }

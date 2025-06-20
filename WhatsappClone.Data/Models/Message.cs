@@ -11,7 +11,7 @@ namespace WhatsappClone.Data.Models
     public class Message
     {
 
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string SenderId { get; set; }
         public string? ReceiverId { get; set; }
         public string Content { get; set; }
@@ -23,8 +23,6 @@ namespace WhatsappClone.Data.Models
         public bool IsDeleted { get; set; }
         public Attachment AttachmentId { get; set; }
         public string AttachmentUrl { get; set; }
-
-        public Status Status { get; set; }
 
 
 
