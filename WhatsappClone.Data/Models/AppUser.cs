@@ -10,52 +10,36 @@ namespace WhatsappClone.Data.Models
 {
     public class AppUser : IdentityUser
     {
+        public string FullName { get; set; }
         public bool IsActive { get; set; } = false;
         public DateTime activeAt { get; set; } = DateTime.UtcNow;
 
         public DateTime lastSeen { get; set; } = DateTime.UtcNow;
 
         public string? About { get; set; } = "Hey there! I'm using WhatsappClone!";
+        public string? PicUrl { get; set; }
 
 
         //Blacklist navigations
 
-        public virtual ICollection<Blacklist> BlockedUsers { get; set; } = new List<Blacklist>(); //my blocked users
+        public virtual ICollection<Blacklist> BlockedUsers { get; set; } = new HashSet<Blacklist>(); //my blocked users
 
-        public virtual ICollection<Blacklist> BlockedByUsers { get; set; } = new List<Blacklist>();//users that blocked me
-
-
-
-
-        public virtual ICollection<Chat> ReceiverChats { get; set; } = new List<Chat>(); //all chats
-        public virtual ICollection<Chat> SenderChats { get; set; } = new List<Chat>(); //all chats
-        #region oldNav
-        //public virtual ICollection<Chat> ChatReceivers { get; set; } = new List<Chat>();
-
-        //public virtual ICollection<Chat> ChatSenders { get; set; } = new List<Chat>(); 
-        #endregion
-
-
-        public virtual ICollection<Message> Messages { get; set; } = new List<Message>(); //all messages
-        public virtual ICollection<Message> SenderMessages { get; set; } = new List<Message>(); //all messages
-        public virtual ICollection<Message> ReceiverMessages { get; set; } = new List<Message>(); //all messages
+        public virtual ICollection<Blacklist> BlockedByUsers { get; set; } = new HashSet<Blacklist>();//users that blocked me
+        public virtual ICollection<Message> SentMessages { get; set; } = new HashSet<Message>();
+        public virtual ICollection<Message> ReceivedMessages { get; set; } = new HashSet<Message>(); //all messages
+        public virtual ICollection<UserContact> Contacts { get; set; } = new HashSet<UserContact>();
+        public virtual ICollection<UserContact> ContactsOf { get; set; } = new HashSet<UserContact>();
+        public virtual ICollection<UserGroup> UserGroups { get; set; } = new HashSet<UserGroup>();
+        public virtual ICollection<Status> Statuses { get; set; } = new HashSet<Status>();
+        public virtual ICollection<UserChatSettings> ChatSettings { get; set; } = new HashSet<UserChatSettings>();
+        public virtual ICollection<UserConnection> UserConnections { get; set; } = new HashSet<UserConnection>();
+        public virtual ICollection<TokenRefreshing> UserRefreshTokens { get; set; } = new HashSet<TokenRefreshing>();
 
 
 
-        public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
-
-        public virtual ICollection<UserConnection> UserConnections { get; set; } = new List<UserConnection>();
-
-        public virtual ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
 
 
-        public virtual ICollection<UserContact> UserContactContactUsers { get; set; } = new List<UserContact>();
 
-        public virtual ICollection<UserContact> UserContactUsers { get; set; } = new List<UserContact>();
-        public virtual ICollection<TokenRefreshing> UserRefreshTokens { get; set; } = new List<TokenRefreshing>();
-
-
-        public string? PicUrl { get; set; }
 
     }
 }

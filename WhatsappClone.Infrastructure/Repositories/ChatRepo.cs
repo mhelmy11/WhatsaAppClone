@@ -21,6 +21,6 @@ namespace WhatsappClone.Infrastructure.Repositories
         }
 
         public async Task<List<Chat>> GetChatsAsync()
-            => await context.Chats.Where(c => c.IsStarted && !c.IsArchived).Include(c => c.Receiver).Include(c => c.Messages).OrderByDescending(c => c.LastMessageTime).ToListAsync();
+            => new List<Chat>();
     }
 }

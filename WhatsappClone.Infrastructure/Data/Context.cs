@@ -14,8 +14,11 @@ public class Context : IdentityDbContext<AppUser>
 
     public virtual DbSet<Blacklist> Blacklists { get; set; }
     public virtual DbSet<TokenRefreshing> RefreshTokens { get; set; }
+    public virtual DbSet<Status> Statuses { get; set; }
+    public virtual DbSet<UserChatSettings> UserChatSettings { get; set; }
 
-    public virtual DbSet<Chat> Chats { get; set; }
+    public virtual DbSet<MessageReadStatus> MessageReadStatuses { get; set; }
+
 
     public virtual DbSet<Message> Messages { get; set; }
 
@@ -47,84 +50,43 @@ public class Context : IdentityDbContext<AppUser>
                 .HasConstraintName("FK_Blacklists_AspNetUsers");
         });
 
-        modelBuilder.Entity<UserContact>(entity =>
+        modelBuilder.Entity<UserContact>().HasKey(c => new { c.UserId, c.ContactId });
+        modelBuilder.Entity<UserConnection>().HasKey(c => new { c.UserId, c.ConnectionId });
+        modelBuilder.Entity<UserGroup>().HasKey(gm => new { gm.GroupId, gm.UserId });
+        modelBuilder.Entity<MessageReadStatus>().HasKey(mrs => new { mrs.MessageId, mrs.UserId });
+
+
+        modelBuilder.Entity<UserContact>()
+            .HasOne(c => c.User)
+            .WithMany(u => u.Contacts)
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<UserContact>()
+            .HasOne(c => c.Contact)
+            .WithMany(u => u.ContactsOf)
+            .HasForeignKey(c => c.ContactId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Sender)
+            .WithMany(u => u.SentMessages)
+            .HasForeignKey(m => m.SenderId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Receiver)
+            .WithMany(u => u.ReceivedMessages)
+            .HasForeignKey(m => m.ReceiverId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+        modelBuilder.Entity<UserChatSettings>(entity =>
         {
-            entity.HasKey(e => new { e.UserId, e.ContactId }).HasName("PK_UserContact");
-
-            entity.HasIndex(e => e.UserId, "IX_UserContacts_UserId");
-
-            entity.HasOne(d => d.Contact).WithMany(p => p.UserContactContactUsers)
-                .HasForeignKey(d => d.ContactId)
-                .HasConstraintName("FK_UserContacts_AspNetUsers2");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserContactUsers)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_UserContacts_AspNetUsers");
-        });
+            entity.HasOne(s => s.User).WithMany(u => u.ChatSettings).HasForeignKey(s => s.UserId);
+            entity.HasOne(s => s.Receiver).WithMany().HasForeignKey(s => s.ReceiverId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(s => s.Group).WithMany().HasForeignKey(s => s.GroupId);
 
 
-        modelBuilder.Entity<Chat>(entity =>
-        {
-
-            entity.Property(e => e.LastMessageTime).HasColumnType("datetime");
-
-            entity.HasOne(d => d.Receiver).WithMany(p => p.ReceiverChats)
-                .HasForeignKey(d => d.ReceiverId)
-                .HasConstraintName("FK_Chats_AspNetUsers1");
-
-            entity.HasOne(d => d.Sender).WithMany(p => p.SenderChats)
-                .HasForeignKey(d => d.SenderId)
-                .HasConstraintName("FK_Chats_AspNetUsers");
-        });
-
-        modelBuilder.Entity<Group>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK_Group");
-
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
-            entity.HasOne(d => d.Creator).WithMany(p => p.Groups)
-                .HasForeignKey(d => d.CreatorId)
-                .HasConstraintName("FK_Groups_AspNetUsers");
-        });
-
-
-        modelBuilder.Entity<UserConnection>(entity =>
-        {
-            entity.HasKey(uc => new { uc.UserId, uc.ConnectionId });
-
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserConnections)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_UserConnections_AspNetUsers");
-        });
-
-        modelBuilder.Entity<UserGroup>(entity =>
-        {
-
-            entity.HasKey(ug => new { ug.UserId, ug.GroupId });
-
-            entity.HasOne(d => d.Group).WithMany(p => p.UserGroups)
-                .HasForeignKey(d => d.GroupId)
-                .HasConstraintName("FK_UserGroups_Groups");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserGroups)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_UserGroups_AspNetUsers");
-        });
-        modelBuilder.Entity<Message>(entity =>
-        {
-
-            entity.HasOne(d => d.Chat).WithMany(p => p.Messages)
-                .HasForeignKey(d => d.ChatId)
-                .HasConstraintName("FK_Messages_Chats");
-
-            entity.HasOne(d => d.Receiver).WithMany(p => p.ReceiverMessages)
-                .HasForeignKey(d => d.ReceiverId)
-                .HasConstraintName("FK_Messages_AspNetUsers");
-
-            entity.HasOne(d => d.Sender).WithMany(p => p.SenderMessages)
-                .HasForeignKey(d => d.SenderId)
-                .HasConstraintName("FK_Messages_AspNetUsers2");
         });
 
 

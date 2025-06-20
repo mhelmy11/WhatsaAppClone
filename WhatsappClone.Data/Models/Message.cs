@@ -11,11 +11,12 @@ namespace WhatsappClone.Data.Models
     public class Message
     {
 
-        public int Id { get; set; }
-        public int ChatId { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string SenderId { get; set; }
-        public string ReceiverId { get; set; }
+        public string? ReceiverId { get; set; }
         public string Content { get; set; }
+
+        public Guid? GroupId { get; set; } // Nullable for direct messages
         public MessageType MessageType { get; set; }
 
         public DateTime SentAt { get; set; }
@@ -28,10 +29,15 @@ namespace WhatsappClone.Data.Models
 
 
         // Navigation properties
-        public virtual Chat Chat { get; set; }
 
         public virtual AppUser Sender { get; set; }
-        public virtual AppUser Receiver { get; set; }
+        public virtual AppUser? Receiver { get; set; }
+
+        public virtual Group? Group { get; set; } // Nullable for direct messages
+
+        public virtual ICollection<MessageReadStatus> MessageReadStatuses { get; set; } = new HashSet<MessageReadStatus>();
+
+
 
 
 

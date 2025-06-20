@@ -177,6 +177,10 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -256,93 +260,34 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.ToTable("Blacklists");
                 });
 
-            modelBuilder.Entity("WhatsappClone.Data.Models.Chat", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ChatName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsArchived")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsBlocked")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsStarted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastMessageContent")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LastMessageTime")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("UnreadCount")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isFavorite")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isPinned")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Chats");
-                });
-
             modelBuilder.Entity("WhatsappClone.Data.Models.Group", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("CreatorId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("CreatorUserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GroupPictureUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id")
-                        .HasName("PK_Group");
+                    b.HasKey("Id");
 
                     b.HasIndex("CreatorId");
 
@@ -351,13 +296,7 @@ namespace WhatsappClone.Infrastructure.Migrations
 
             modelBuilder.Entity("WhatsappClone.Data.Models.Message", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AttachmentId")
@@ -367,12 +306,12 @@ namespace WhatsappClone.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ChatId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -381,7 +320,6 @@ namespace WhatsappClone.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ReceiverId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SenderId")
@@ -391,20 +329,78 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("StatusID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
-
-                    b.HasIndex("ChatId");
+                    b.HasIndex("GroupId");
 
                     b.HasIndex("ReceiverId");
 
                     b.HasIndex("SenderId");
 
+                    b.HasIndex("StatusID");
+
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("WhatsappClone.Data.Models.MessageReadStatus", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MessageId1")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StatusTimestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageId", "UserId");
+
+                    b.HasIndex("MessageId1");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MessageReadStatuses");
+                });
+
+            modelBuilder.Entity("WhatsappClone.Data.Models.Status", b =>
+                {
+                    b.Property<string>("ID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ContentType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Statuses");
                 });
 
             modelBuilder.Entity("WhatsappClone.Data.Models.TokenRefreshing", b =>
@@ -449,6 +445,50 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("WhatsappClone.Data.Models.UserChatSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPinned")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("MuteUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("isMuted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserChatSettings");
+                });
+
             modelBuilder.Entity("WhatsappClone.Data.Models.UserConnection", b =>
                 {
                     b.Property<string>("UserId")
@@ -470,27 +510,41 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Property<string>("ContactId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("UserId", "ContactId")
-                        .HasName("PK_UserContact");
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LNAme")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "ContactId");
 
                     b.HasIndex("ContactId");
-
-                    b.HasIndex(new[] { "UserId" }, "IX_UserContacts_UserId");
 
                     b.ToTable("UserContacts");
                 });
 
             modelBuilder.Entity("WhatsappClone.Data.Models.UserGroup", b =>
                 {
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("UserId", "GroupId");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("GroupId");
+                    b.HasKey("GroupId", "UserId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserGroups");
                 });
@@ -567,77 +621,73 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WhatsappClone.Data.Models.Chat", b =>
-                {
-                    b.HasOne("WhatsappClone.Data.Models.Group", "Group")
-                        .WithMany("Chats")
-                        .HasForeignKey("GroupId");
-
-                    b.HasOne("WhatsappClone.Data.Models.AppUser", "Receiver")
-                        .WithMany("ReceiverChats")
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Chats_AspNetUsers1");
-
-                    b.HasOne("WhatsappClone.Data.Models.AppUser", "Sender")
-                        .WithMany("SenderChats")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Chats_AspNetUsers");
-
-                    b.Navigation("Group");
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("WhatsappClone.Data.Models.Group", b =>
                 {
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "Creator")
-                        .WithMany("Groups")
+                        .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Groups_AspNetUsers");
+                        .IsRequired();
 
                     b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("WhatsappClone.Data.Models.Message", b =>
                 {
-                    b.HasOne("WhatsappClone.Data.Models.AppUser", null)
+                    b.HasOne("WhatsappClone.Data.Models.Group", "Group")
                         .WithMany("Messages")
-                        .HasForeignKey("AppUserId");
-
-                    b.HasOne("WhatsappClone.Data.Models.Chat", "Chat")
-                        .WithMany("Messages")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Messages_Chats");
+                        .HasForeignKey("GroupId");
 
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "Receiver")
-                        .WithMany("ReceiverMessages")
+                        .WithMany("ReceivedMessages")
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Messages_AspNetUsers");
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "Sender")
-                        .WithMany("SenderMessages")
+                        .WithMany("SentMessages")
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Messages_AspNetUsers2");
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("Chat");
+                    b.HasOne("WhatsappClone.Data.Models.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusID");
+
+                    b.Navigation("Group");
 
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("WhatsappClone.Data.Models.MessageReadStatus", b =>
+                {
+                    b.HasOne("WhatsappClone.Data.Models.Message", "Message")
+                        .WithMany("MessageReadStatuses")
+                        .HasForeignKey("MessageId1");
+
+                    b.HasOne("WhatsappClone.Data.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WhatsappClone.Data.Models.Status", b =>
+                {
+                    b.HasOne("WhatsappClone.Data.Models.AppUser", "User")
+                        .WithMany("Statuses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WhatsappClone.Data.Models.TokenRefreshing", b =>
@@ -651,14 +701,37 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WhatsappClone.Data.Models.UserChatSettings", b =>
+                {
+                    b.HasOne("WhatsappClone.Data.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId");
+
+                    b.HasOne("WhatsappClone.Data.Models.AppUser", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("WhatsappClone.Data.Models.AppUser", "User")
+                        .WithMany("ChatSettings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WhatsappClone.Data.Models.UserConnection", b =>
                 {
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "User")
                         .WithMany("UserConnections")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_UserConnections_AspNetUsers");
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -666,18 +739,16 @@ namespace WhatsappClone.Infrastructure.Migrations
             modelBuilder.Entity("WhatsappClone.Data.Models.UserContact", b =>
                 {
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "Contact")
-                        .WithMany("UserContactContactUsers")
+                        .WithMany("ContactsOf")
                         .HasForeignKey("ContactId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_UserContacts_AspNetUsers2");
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "User")
-                        .WithMany("UserContactUsers")
+                        .WithMany("Contacts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_UserContacts_AspNetUsers");
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Contact");
 
@@ -690,15 +761,13 @@ namespace WhatsappClone.Infrastructure.Migrations
                         .WithMany("UserGroups")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_UserGroups_Groups");
+                        .IsRequired();
 
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "User")
                         .WithMany("UserGroups")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_UserGroups_AspNetUsers");
+                        .IsRequired();
 
                     b.Navigation("Group");
 
@@ -711,39 +780,35 @@ namespace WhatsappClone.Infrastructure.Migrations
 
                     b.Navigation("BlockedUsers");
 
-                    b.Navigation("Groups");
+                    b.Navigation("ChatSettings");
 
-                    b.Navigation("Messages");
+                    b.Navigation("Contacts");
 
-                    b.Navigation("ReceiverChats");
+                    b.Navigation("ContactsOf");
 
-                    b.Navigation("ReceiverMessages");
+                    b.Navigation("ReceivedMessages");
 
-                    b.Navigation("SenderChats");
+                    b.Navigation("SentMessages");
 
-                    b.Navigation("SenderMessages");
+                    b.Navigation("Statuses");
 
                     b.Navigation("UserConnections");
-
-                    b.Navigation("UserContactContactUsers");
-
-                    b.Navigation("UserContactUsers");
 
                     b.Navigation("UserGroups");
 
                     b.Navigation("UserRefreshTokens");
                 });
 
-            modelBuilder.Entity("WhatsappClone.Data.Models.Chat", b =>
-                {
-                    b.Navigation("Messages");
-                });
-
             modelBuilder.Entity("WhatsappClone.Data.Models.Group", b =>
                 {
-                    b.Navigation("Chats");
+                    b.Navigation("Messages");
 
                     b.Navigation("UserGroups");
+                });
+
+            modelBuilder.Entity("WhatsappClone.Data.Models.Message", b =>
+                {
+                    b.Navigation("MessageReadStatuses");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,9 +9,11 @@ namespace WhatsappClone.Data.Models
     public class UserGroup
     {
 
-        public int GroupId { get; set; }
+        public Guid GroupId { get; set; } = Guid.NewGuid();
 
         public string UserId { get; set; }
+        public string Role { get; set; } // 0 = Member, 1 = Admin
+        public DateTime AddedOn { get; set; }
 
         public virtual Group Group { get; set; }
 
