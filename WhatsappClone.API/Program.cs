@@ -27,6 +27,7 @@ namespace WhatsappClone.API
             #region Serilog
             Log.Logger = new LoggerConfiguration()
                     .WriteTo.Console()
+                    .Enrich.FromLogContext()
                     .CreateBootstrapLogger();
 
             Log.Information("Starting up the web host");
@@ -54,15 +55,7 @@ namespace WhatsappClone.API
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen(options =>
                 {
-                    // هذا السطر يضيف الدعم للتعليقات XML إذا أردت
-                    // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                    // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                    // options.IncludeXmlComments(xmlPath);
 
-                    // --- هنا يبدأ الجزء الخاص بالـ JWT ---
-
-                    // 1. تعريف مخطط الأمان (Security Scheme)
-                    // نحن نُعرّف نظام المصادقة الذي نستخدمه، وهو Bearer Token (JWT).
                     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {
                         Name = "Authorization", // اسم الـ Header
@@ -137,6 +130,7 @@ namespace WhatsappClone.API
 
                 var app = builder.Build();
 
+                app.UseMiddleware<ErrorHandlerMiddleware>();
                 app.UseSerilogRequestLogging();
                 if (app.Environment.IsDevelopment())
                 {
@@ -160,7 +154,6 @@ namespace WhatsappClone.API
                     context.Database.ExecuteSqlRaw("DELETE FROM UserConnections");
                     Console.WriteLine("Table UserConnections cleared before shutdown.");
                 });
-                app.UseMiddleware<ErrorHandlerMiddleware>();
                 app.Run();
             }
             catch (Exception ex)

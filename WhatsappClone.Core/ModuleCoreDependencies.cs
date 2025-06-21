@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MoMediatoR;
 using System.Reflection;
 using WhatsappClone.Core.Behaviours;
+using WhatsappClone.Core.Filters;
 using WhatsappClone.Core.RequirementsHandlers;
 
 namespace WhatsappClone.Core

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,33 @@ namespace WhatsappClone.Service.Implementation
             return contact;
         }
 
+        public async Task<UserContact> AddContactAsync(UserContact contact)
+        {
+            await userContactsRepo.AddAsync(contact);
+
+            return contact;
+        }
+
+        public async Task DeleteContactAsync(string contactId, string userId)
+        {
+            await userContactsRepo.DeleteAsync(new UserContact
+            {
+                ContactId = contactId,
+                UserId = userId
+            });
+        }
+
+        public async Task EditContactAsync(UserContact contact)
+        {
+            await userContactsRepo.UpdateAsync(contact);
+        }
+
+        public List<UserContact> GetContacts(string currentUserId)
+        {
+            var contacts = userContactsRepo.GetContactsOrderedByAlpha(currentUserId);
+            return contacts;
+        }
+
         public async Task<bool> IsContactAdded(string userId, string phoneNumber)
         {
             var Contact = userManager.FindByPhoneNumber(phoneNumber);
@@ -49,6 +77,14 @@ namespace WhatsappClone.Service.Implementation
             }
 
             return userContactsRepo.GetTableNoTracking().Any(x => x.UserId == userId && x.ContactId == Contact.Id);
+
+
+
+        }
+        public bool IsContactAddedByid(string userId, string contactId)
+        {
+
+            return userContactsRepo.GetTableNoTracking().Any(x => x.UserId == userId && x.ContactId == contactId);
 
 
 

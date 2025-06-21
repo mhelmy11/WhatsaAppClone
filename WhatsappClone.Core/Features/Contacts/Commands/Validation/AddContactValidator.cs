@@ -74,7 +74,7 @@ namespace WhatsappClone.Core.Features.Contacts.Commands.Validation
             {
                 return true;
             }
-            return !await contactsService.IsContactAdded(currentUserId, contactId);
+            return !await contactsService.IsContactAdded(currentUserId, phoneNumber);
 
         }
 

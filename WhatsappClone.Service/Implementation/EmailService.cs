@@ -36,7 +36,6 @@ namespace WhatsappClone.Service.Implementation
             var response = await client.SendEmailAsync(msg);
             var errorBody = await response.Body.ReadAsStringAsync();
 
-            Console.WriteLine(errorBody);
 
             if (!response.IsSuccessStatusCode)
             {

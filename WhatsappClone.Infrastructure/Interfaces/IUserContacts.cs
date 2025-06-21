@@ -10,5 +10,7 @@ namespace WhatsappClone.Infrastructure.Interfaces
 {
     public interface IUserContacts : IRepo<UserContact>
     {
+
+        public List<UserContact> GetContactsOrderedByAlpha(string userId);
     }
 }

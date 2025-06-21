@@ -50,33 +50,33 @@ public class ResponseHandler
     {
 
     }
-    public Response<T> Deleted<T>()
+    public Response<T> Deleted<T>(string msg = "Deleted Successfully")
     {
         return new Response<T>()
         {
             StatusCode = HttpStatusCode.OK,
             Succeeded = true,
-            Message = "Deleted Successfully"
+            Message = msg
         };
     }
-    public Response<T> Success<T>(T entity, object Meta = null)
+    public Response<T> Success<T>(T entity, string msg = "Retrieved Successfully", object Meta = null)
     {
         return new Response<T>()
         {
             Data = entity,
             StatusCode = HttpStatusCode.OK,
             Succeeded = true,
-            Message = "Retrieved Successfully",
+            Message = msg,
             Meta = Meta
         };
     }
-    public Response<T> Unauthorized<T>()
+    public Response<T> Unauthorized<T>(string msg = "UnAuthorized")
     {
         return new Response<T>()
         {
             StatusCode = HttpStatusCode.Unauthorized,
             Succeeded = true,
-            Message = "UnAuthorized"
+            Message = msg
         };
     }
     public Response<T> BadRequest<T>(string Message = null)

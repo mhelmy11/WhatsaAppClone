@@ -17,7 +17,6 @@ namespace WhatsappClone.Data.Models
         public string FName { get; set; }
         public string? LNAme { get; set; }
 
-        [NotMapped]
         public string FullName { set; get; }
 
 

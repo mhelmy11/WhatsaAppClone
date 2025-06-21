@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,15 @@ namespace WhatsappClone.Infrastructure.Repositories
         public UserContactsRepo(Context dbContext) : base(dbContext)
         {
             this.dbContext = dbContext;
+        }
+
+        public List<UserContact> GetContactsOrderedByAlpha(string userId)
+        {
+            return GetTableNoTracking()
+                    .Where(uc => uc.UserId == userId)
+                    .Include(uc => uc.Contact)
+                    .OrderBy(uc => uc.FullName)
+                    .ToList();
         }
     }
 }
