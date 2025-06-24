@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Enums;
+using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Infrastructure.Bases;
@@ -17,10 +18,16 @@ namespace WhatsappClone.Service.Implementation
     public class ChatService : IChatService
     {
         private readonly IChat chatRepo;
+        private readonly IMessage messageRepo;
+        private readonly IGroup groupRepo;
+        private readonly IUserGroup userGroupRepo;
 
-        public ChatService(IChat chatRepo)
+        public ChatService(IChat chatRepo, IMessage messageRepo, IGroup groupRepo, IUserGroup userGroupRepo)
         {
             this.chatRepo = chatRepo;
+            this.messageRepo = messageRepo;
+            this.groupRepo = groupRepo;
+            this.userGroupRepo = userGroupRepo;
         }
 
         public Task<Chat> GetChatByIdAsync(int chatId)
@@ -70,6 +77,13 @@ namespace WhatsappClone.Service.Implementation
         {
             var newChat = await chatRepo.AddAsync(chat);
             return newChat;
+        }
+
+        public List<ChatDTO> GetChatListOfCurrentUSer(string currenUserId)
+        {
+            var GroupsOfCurrentUser = userGroupRepo.GetTableNoTracking().Where(ug => ug.UserId == currenUserId).ToList(); // get all groups of current user
+            return new List<ChatDTO>();
+
         }
 
 

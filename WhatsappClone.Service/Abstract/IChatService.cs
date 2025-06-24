@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Enums;
+using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 
@@ -16,6 +17,8 @@ namespace WhatsappClone.Service.Abstract
 
         public IQueryable<Chat> GetChatsAsQueryable();
         public Task<Chat> AddChatAsync(Chat chat);
+
+        public List<ChatDTO> GetChatListOfCurrentUSer(string currenUserId);
 
 
         public IQueryable<Chat> FilterChatPaginatedQueryable(ChatOrderingEnum? orderingEnum, string? search);

@@ -8,9 +8,7 @@ using WhatsappClone.Infrastructure.Bases;
 
 namespace WhatsappClone.Infrastructure.Interfaces
 {
-    public interface IMessage : IRepo<Message>
+    public interface IUserGroup : IRepo<UserGroup>
     {
-
     }
-
 }

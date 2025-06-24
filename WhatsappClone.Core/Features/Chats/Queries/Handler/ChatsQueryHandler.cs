@@ -14,21 +14,26 @@ using WhatsappClone.Core.Features.Chats.Queries.Results;
 using WhatsappClone.Core.Wrapper;
 using System.Linq.Expressions;
 using WhatsappClone.Core.Wrappers;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace WhatsappClone.Core.Features.Chats.Queries.Handler
 {
     public class ChatsQueryHandler : ResponseHandler, IRequestHandler<GetChatsQuery, Response<List<GetChatsResponse>>>
                                                     , IRequestHandler<GetChatByIdQuery, Response<GetChatByIdResponse>>
                                                     , IRequestHandler<GetPaginatedChatsQuery, PaginatedResult<GetPaginatedChatsResponse>>
+                                                    , IRequestHandler<GetChatListQuery, Response<List<GetChatListResult>>>
 
     {
         private readonly IChatService chatService;
         private readonly IMapper mapper;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public ChatsQueryHandler(IChatService chatService, IMapper mapper)
+        public ChatsQueryHandler(IChatService chatService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             this.chatService = chatService;
             this.mapper = mapper;
+            this.httpContextAccessor = httpContextAccessor;
         }
         #region GetChatsListQuery
         public async Task<Response<List<GetChatsResponse>>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
@@ -67,6 +72,12 @@ namespace WhatsappClone.Core.Features.Chats.Queries.Handler
 
             return PaginatedList;
 
+        }
+
+        public Task<Response<List<GetChatListResult>>> Handle(GetChatListQuery request, CancellationToken cancellationToken)
+        {
+
+            throw new NotImplementedException();
         }
         #endregion
     }

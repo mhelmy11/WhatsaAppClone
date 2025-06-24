@@ -9,15 +9,14 @@ using WhatsappClone.Infrastructure.Interfaces;
 
 namespace WhatsappClone.Infrastructure.Repositories
 {
-    public class GroupRepo : Repo<Group>, IGroup
+    public class MessageReadStatusRepo : Repo<MessageReadStatus>,
+        IMessageReadStatus
     {
-        private readonly Context context;
+        private readonly Context dbContext;
 
-        public GroupRepo(Context context) : base(context)
+        public MessageReadStatusRepo(Context dbContext) : base(dbContext)
         {
-            this.context = context;
+            this.dbContext = dbContext;
         }
-
-
     }
 }

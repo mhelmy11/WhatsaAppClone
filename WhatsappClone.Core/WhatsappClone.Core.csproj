@@ -27,11 +27,6 @@
 		<Folder Include="Features\Blacklists\Queries\Models\" />
 		<Folder Include="Features\Blacklists\Queries\Results\" />
 		<Folder Include="Features\Blacklists\Queries\Validation\" />
-		<Folder Include="Features\Groups\Commands\Handler\" />
-		<Folder Include="Features\Groups\Commands\Models\" />
-		<Folder Include="Features\Groups\Commands\Validation\" />
-		<Folder Include="Features\Groups\Queries\Handler\" />
-		<Folder Include="Features\Groups\Queries\Models\" />
 		<Folder Include="Features\Groups\Queries\Results\" />
 		<Folder Include="Features\Groups\Queries\Validation\" />
 		<Folder Include="Features\Messages\Queries\Results\" />
@@ -42,6 +37,7 @@
 		<Folder Include="Features\Messages\Queries\Handler\" />
 		<Folder Include="Features\Messages\Queries\Models\" />
 		<Folder Include="Features\Messages\Queries\Validation\" />
+		<Folder Include="Mapping\Groups\GroupQueriesMapping\" />
 	</ItemGroup>
 
 	<ItemGroup>

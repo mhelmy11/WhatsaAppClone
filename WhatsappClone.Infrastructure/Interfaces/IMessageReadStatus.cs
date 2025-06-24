@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure.Bases;
 
 namespace WhatsappClone.Infrastructure.Interfaces
 {
-    public interface IMessage : IRepo<Message>
+    public interface IMessageReadStatus : IRepo<Data.Models.MessageReadStatus>
     {
-
     }
-
 }

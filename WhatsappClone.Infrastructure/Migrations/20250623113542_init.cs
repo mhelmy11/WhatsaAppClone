@@ -195,7 +195,6 @@ namespace WhatsappClone.Infrastructure.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     GroupPictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatorUserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatorId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -285,7 +284,8 @@ namespace WhatsappClone.Infrastructure.Migrations
                     ContactId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LNAme = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    LNAme = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -302,6 +302,45 @@ namespace WhatsappClone.Infrastructure.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    MessageType = table.Column<int>(type: "int", nullable: false),
+                    MessageStatus = table.Column<int>(type: "int", nullable: true),
+                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    IsEdit = table.Column<bool>(type: "bit", nullable: false),
+                    EditAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsSystemMessage = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_AspNetUsers_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -368,46 +407,45 @@ namespace WhatsappClone.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
+                name: "Attachments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    MessageType = table.Column<int>(type: "int", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    AttachmentId = table.Column<int>(type: "int", nullable: false),
-                    AttachmentUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StatusID = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.PrimaryKey("PK_Attachments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Messages_AspNetUsers_ReceiverId",
-                        column: x => x.ReceiverId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_Attachments_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MessageReaction",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Reaction = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageReaction", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Messages_AspNetUsers_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_MessageReaction_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Messages_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Messages_Statuses_StatusID",
-                        column: x => x.StatusID,
-                        principalTable: "Statuses",
-                        principalColumn: "ID");
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -476,6 +514,11 @@ namespace WhatsappClone.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Attachments_MessageId",
+                table: "Attachments",
+                column: "MessageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Blacklists_BlockedUserId",
                 table: "Blacklists",
                 column: "BlockedUserId");
@@ -489,6 +532,11 @@ namespace WhatsappClone.Infrastructure.Migrations
                 name: "IX_Groups_CreatorId",
                 table: "Groups",
                 column: "CreatorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MessageReaction_MessageId",
+                table: "MessageReaction",
+                column: "MessageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MessageReadStatuses_UserId",
@@ -509,11 +557,6 @@ namespace WhatsappClone.Infrastructure.Migrations
                 name: "IX_Messages_SenderId",
                 table: "Messages",
                 column: "SenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Messages_StatusID",
-                table: "Messages",
-                column: "StatusID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
@@ -570,13 +613,22 @@ namespace WhatsappClone.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Attachments");
+
+            migrationBuilder.DropTable(
                 name: "Blacklists");
+
+            migrationBuilder.DropTable(
+                name: "MessageReaction");
 
             migrationBuilder.DropTable(
                 name: "MessageReadStatuses");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "Statuses");
 
             migrationBuilder.DropTable(
                 name: "UserChatSettings");
@@ -598,9 +650,6 @@ namespace WhatsappClone.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Groups");
-
-            migrationBuilder.DropTable(
-                name: "Statuses");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
@@ -31,6 +32,8 @@ namespace WhatsappClone.Data.Models
         public virtual AppUser User { get; set; }
 
         public virtual AppUser? Receiver { get; set; } // Nullable for direct messages
+
+
         public virtual Group? Group { get; set; } // Nullable for direct messages
 
 

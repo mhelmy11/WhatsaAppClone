@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
@@ -19,10 +20,13 @@ namespace WhatsappClone.Data.Models
         public Guid? GroupId { get; set; } // Nullable for direct messages
         public MessageType MessageType { get; set; }
 
-        public DateTime SentAt { get; set; }
-        public bool IsDeleted { get; set; }
-        public Attachment AttachmentId { get; set; }
-        public string AttachmentUrl { get; set; }
+        public MessageStatus? MessageStatus { get; set; }  // for groupid = null, so it is from contact not group
+
+        public DateTime SentAt { get; set; } = DateTime.Now;
+        public bool IsDeleted { get; set; } = false;
+        public bool IsEdit { get; set; } = false;
+        public DateTime? EditAt { get; set; }
+        public bool IsSystemMessage { get; set; } = false;
 
 
 
@@ -31,9 +35,13 @@ namespace WhatsappClone.Data.Models
         public virtual AppUser Sender { get; set; }
         public virtual AppUser? Receiver { get; set; }
 
+
+        [ForeignKey("GroupId")]
         public virtual Group? Group { get; set; } // Nullable for direct messages
 
-        public virtual ICollection<MessageReadStatus> MessageReadStatuses { get; set; } = new HashSet<MessageReadStatus>();
+        public virtual ICollection<MessageReadStatus>? MessageReadStatuses { get; set; } = new HashSet<MessageReadStatus>();
+        public virtual ICollection<Attachments>? Attachments { get; set; } = new HashSet<Attachments>();
+        public virtual ICollection<MessageReaction>? MessageReactions { get; set; } = new HashSet<MessageReaction>();
 
 
 

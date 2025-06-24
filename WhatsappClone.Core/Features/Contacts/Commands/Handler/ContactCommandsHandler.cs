@@ -61,12 +61,12 @@ namespace WhatsappClone.Core.Features.Contacts.Commands.Handler
 
         public async Task<Response<string>> Handle(EditContactCommand request, CancellationToken cancellationToken)
         {
-            var CurrentUserId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var CurrentUserId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             //map edit command to user contact model
             var contact = mapper.Map<UserContact>(request);
 
-            contact.UserId = CurrentUserId;
+            contact.UserId = CurrentUserId!;
 
             //edit contact
             await ContactsService.EditContactAsync(contact);

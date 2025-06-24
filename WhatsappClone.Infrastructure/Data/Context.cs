@@ -15,6 +15,7 @@ public class Context : IdentityDbContext<AppUser>
     public virtual DbSet<Blacklist> Blacklists { get; set; }
     public virtual DbSet<TokenRefreshing> RefreshTokens { get; set; }
     public virtual DbSet<Status> Statuses { get; set; }
+    public virtual DbSet<Attachments> Attachments { get; set; }
     public virtual DbSet<UserChatSettings> UserChatSettings { get; set; }
 
     public virtual DbSet<MessageReadStatus> MessageReadStatuses { get; set; }
@@ -35,6 +36,13 @@ public class Context : IdentityDbContext<AppUser>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        modelBuilder.Entity<Attachments>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.Message).WithMany(e => e.Attachments).HasForeignKey(e => e.MessageId);
+
+        });
         modelBuilder.Entity<Blacklist>(entity =>
         {
             entity.HasKey(e => new { e.UserId, e.BlockedUserId }).HasName("PK_Blacklist");
@@ -84,7 +92,7 @@ public class Context : IdentityDbContext<AppUser>
         {
             entity.HasOne(s => s.User).WithMany(u => u.ChatSettings).HasForeignKey(s => s.UserId);
             entity.HasOne(s => s.Receiver).WithMany().HasForeignKey(s => s.ReceiverId).OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne(s => s.Group).WithMany().HasForeignKey(s => s.GroupId);
+            entity.HasOne(s => s.Group).WithMany(u => u.ChatSettings).HasForeignKey(s => s.GroupId);
 
 
         });
@@ -96,6 +104,11 @@ public class Context : IdentityDbContext<AppUser>
     }
 
 
+    //{
+    //"type":"MEMBER_ADDED",
+    //"actorUserId":"474a5eb7-c051-4ef4-aa6d-01245d374f82"
+    //,"targetUserIds":["474a5eb7-c051-4ef4-aa6d-01245d374f82"
+    //,"f4a60247-6a19-4f2d-a050-65e91013b704"]}
 
 
 
