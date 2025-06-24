@@ -10,7 +10,7 @@ namespace WhatsappClone.Infrastructure.Bases
     public interface IRepo<T> where T : class
     {
         Task DeleteRangeAsync(ICollection<T> entities);
-        Task<T> GetByIdAsync(int id);
+        Task<T> GetByIdAsync(object id);
         Task SaveChangesAsync();
         IDbContextTransaction BeginTransaction();
         void Commit();

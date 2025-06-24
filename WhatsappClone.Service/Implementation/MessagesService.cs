@@ -63,6 +63,7 @@ namespace WhatsappClone.Service.Implementation
                     MessageStatus = x.First().MessageReadStatuses!.Where(m => m.MessageId == x.First().Id).Select(v => v.Status).ToList()
 
                 })
+                .OrderByDescending(x => x.SentAt)
                 .AsSplitQuery()
                 .ToList();
 

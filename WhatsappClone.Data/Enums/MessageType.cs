@@ -23,11 +23,13 @@ namespace WhatsappClone.Data.Enums
         AddMember = 12,
         RemoveMember = 13,
         GroupCreated = 14,
-        GroupUpdated = 15,
+        GroupPicChanged = 15,
         GroupDeleted = 16,
         GroupSettingsChanged = 17,
         GroupMemberLeft = 18,
         GroupMemberJoined = 19,
+        GroupNameChanged = 20,
+        GroupDescriptionChanged = 21
 
 
     }

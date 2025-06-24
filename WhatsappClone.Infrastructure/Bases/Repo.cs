@@ -30,7 +30,7 @@ namespace WhatsappClone.Infrastructure.Bases
         #endregion
 
         #region Actions
-        public virtual async Task<T> GetByIdAsync(int id)
+        public virtual async Task<T> GetByIdAsync(object id)
         {
 
             return await _dbContext.Set<T>().FindAsync(id);

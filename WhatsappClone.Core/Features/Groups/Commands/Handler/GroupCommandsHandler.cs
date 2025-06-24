@@ -15,6 +15,9 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
                                                        , IRequestHandler<RemoveMemberCommand, Response<string>>
                                                        , IRequestHandler<AddListOfMembersCommand, Response<List<string>>>
                                                        , IRequestHandler<LeaveGroupCommand, Response<string>>
+                                                       , IRequestHandler<EditGroupDescriptionCommand, Response<string>>
+                                                       , IRequestHandler<EditGroupNameCommand, Response<string>>
+                                                       , IRequestHandler<EditGroupPhotoCommand, Response<string>>
 
     {
         private readonly IMapper mapper;
@@ -104,6 +107,72 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
             return Success("User left the group successfully");
             //Leave Service
 
+        }
+
+
+
+        public async Task<Response<string>> Handle(EditGroupPhotoCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //check if adder is admin of the group
+            var isAdmin = groupService.IsUserAdmin(actorId, request.GroupId);
+            if (!isAdmin.Result)
+            {
+                return BadRequest<string>("You are not authorized to edit group photo");
+            }
+
+            var group = groupService.GetGroupById(request.GroupId);
+            var oldPicUrl = group.GroupPictureUrl;
+
+
+            if (request.GroupProfilePic != null)
+            {
+
+
+                var picUrl = await fileService.SaveFileAsync(request.GroupProfilePic, "GroupPics");
+                group.GroupPictureUrl = picUrl;
+            }
+
+            await groupService.UpdateGroupPic(group, actorId, oldPicUrl);
+
+            return Success("Group photo updated successfully");
+
+        }
+
+        public async Task<Response<string>> Handle(EditGroupNameCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //check if adder is admin of the group
+            var isAdmin = groupService.IsUserAdmin(actorId, request.GroupId);
+            if (!isAdmin.Result)
+            {
+                return BadRequest<string>("You are not authorized to edit group Name");
+            }
+
+            var group = groupService.GetGroupById(request.GroupId);
+            var oldName = group.Name;
+
+
+
+            await groupService.UpdateGroupName(group, actorId, oldName);
+
+            return Success("Group Name updated successfully");
+        }
+
+        public async Task<Response<string>> Handle(EditGroupDescriptionCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = groupService.IsUserAdmin(actorId, request.GroupId);
+            if (!isAdmin.Result)
+            {
+                return BadRequest<string>("You are not authorized to edit group description");
+            }
+
+            var group = groupService.GetGroupById(request.GroupId);
+
+            await groupService.UpdateGroupDescription(group, actorId);
+
+            return Success("Group Description updated successfully");
         }
     }
 }

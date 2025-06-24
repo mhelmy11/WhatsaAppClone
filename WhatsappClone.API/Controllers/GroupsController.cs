@@ -63,5 +63,14 @@ namespace WhatsappClone.API.Controllers
             return ResponseResult(result);
         }
 
+
+        [HttpPut("update-group-picture")]
+        [Authorize]
+        public async Task<IActionResult> UpdateGroupPicture([FromForm] EditGroupPhotoCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
     }
 }

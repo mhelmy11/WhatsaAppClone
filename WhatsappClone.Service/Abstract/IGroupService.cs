@@ -29,5 +29,12 @@ namespace WhatsappClone.Service.Abstract
 
 
         public Task LeaveGroup(string userId, Guid groupId);
+
+
+        public Group GetGroupById(Guid groupId);
+        public Task UpdateGroupPic(Group entity, string actorId, string? oldPic);
+        public Task UpdateGroupName(Group entity, string actorId, string oldName);
+        public Task UpdateGroupDescription(Group entity, string actorId);
+
     }
 }

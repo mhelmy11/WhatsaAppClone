@@ -135,6 +135,13 @@ namespace WhatsappClone.Service.Implementation
 
         }
 
+        public Group GetGroupById(Guid groupId)
+        {
+            return groupRepo.GetTableNoTracking()
+                .First(g => g.Id == groupId);
+
+        }
+
         public List<Guid> GetGroupIdsOfUser(string userId)
         {
             // retrieve the group IDs of a user by their userId using userGroupRepo
@@ -171,6 +178,7 @@ namespace WhatsappClone.Service.Implementation
 
         public async Task LeaveGroup(string userId, Guid groupId)
         {
+            var groupname = groupRepo.GetTableNoTracking().Where(g => g.Id == groupId).Select(g => g.Name).FirstOrDefault();
             var transaction = userGroupRepo.BeginTransaction();
             try
             {
@@ -181,6 +189,8 @@ namespace WhatsappClone.Service.Implementation
                 {
                     type = "MEMBER_LEFT",
                     actorUserId = userId,
+                    groupName = groupname,
+
                 };
 
                 var content = JsonSerializer.Serialize(systemRemoveMessage);
@@ -225,5 +235,94 @@ namespace WhatsappClone.Service.Implementation
                 throw new Exception("Error removing members from group", ex);
             }
         }
+
+        public async Task UpdateGroupDescription(Group entity, string actorId)
+        {
+            var transaction = userGroupRepo.BeginTransaction();
+            try
+            {
+                await groupRepo.UpdateAsync(entity);
+
+                // add system message for each member removed
+                var systemRemoveMessage = new
+                {
+                    type = "GROUP_DESCRIPTION_UPDATED",
+                    actorUserId = actorId,
+                    newGroupDesc = entity.Description,
+                };
+
+                var content = JsonSerializer.Serialize(systemRemoveMessage);
+                await messagesService.AddSystemMessage(content, entity.Id, actorId, MessageType.GroupDescriptionChanged);
+                await transaction.CommitAsync();
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error while updating Group's Pic", ex);
+            }
+        }
+
+        public async Task UpdateGroupName(Group entity, string actorId, string oldName)
+        {
+            var transaction = userGroupRepo.BeginTransaction();
+            try
+            {
+                await groupRepo.UpdateAsync(entity);
+
+                // add system message for each member removed
+                var systemRemoveMessage = new
+                {
+                    type = "GROUP_NAME_UPDATED",
+                    actorUserId = actorId,
+                    newGroupPic = entity.GroupPictureUrl,
+                    oldGroupName = oldName
+                };
+
+                var content = JsonSerializer.Serialize(systemRemoveMessage);
+                await messagesService.AddSystemMessage(content, entity.Id, actorId, MessageType.GroupNameChanged);
+                await transaction.CommitAsync();
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error while updating Group's Pic", ex);
+            }
+        }
+
+        public async Task UpdateGroupPic(Group entity, string actorId, string? oldPic)
+        {
+
+            var transaction = userGroupRepo.BeginTransaction();
+            try
+            {
+                await groupRepo.UpdateAsync(entity);
+
+                // add system message for each member removed
+                var systemRemoveMessage = new
+                {
+                    type = "GROUP_PICTURE_UPDATED",
+                    actorUserId = actorId,
+                    newGroupPic = entity.GroupPictureUrl,
+                    oldGroupPic = oldPic
+                };
+
+                var content = JsonSerializer.Serialize(systemRemoveMessage);
+                await messagesService.AddSystemMessage(content, entity.Id, actorId, MessageType.GroupPicChanged);
+                await transaction.CommitAsync();
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error while updating Group's Pic", ex);
+            }
+
+        }
+
+
+
+
     }
 }
