@@ -169,6 +169,32 @@ namespace WhatsappClone.Service.Implementation
 
         }
 
+        public async Task LeaveGroup(string userId, Guid groupId)
+        {
+            var transaction = userGroupRepo.BeginTransaction();
+            try
+            {
+                await userGroupRepo.DeleteAsync(new UserGroup { GroupId = groupId, UserId = userId });
+
+                // add system message for each member removed
+                var systemRemoveMessage = new
+                {
+                    type = "MEMBER_LEFT",
+                    actorUserId = userId,
+                };
+
+                var content = JsonSerializer.Serialize(systemRemoveMessage);
+                await messagesService.AddSystemMessage(content, groupId, userId, MessageType.GroupMemberLeft);
+                await transaction.CommitAsync();
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error removing members from group", ex);
+            }
+        }
+
         public async Task RemoveMemberFromGroup(List<string> userIDs, Guid groupId, string actorId)
         {
             var transaction = userGroupRepo.BeginTransaction();

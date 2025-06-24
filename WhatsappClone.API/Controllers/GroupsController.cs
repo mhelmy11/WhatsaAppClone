@@ -52,5 +52,16 @@ namespace WhatsappClone.API.Controllers
             return ResponseResult(result);
         }
 
+
+        [HttpDelete("leave-group")]
+        [Authorize]
+
+
+        public async Task<IActionResult> LeaveGroup([FromQuery] LeaveGroupCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
     }
 }

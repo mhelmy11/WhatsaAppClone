@@ -26,5 +26,8 @@ namespace WhatsappClone.Service.Abstract
 
 
         public Task<List<string>> AddListOfMembers(string actorId, Guid groupId, List<string> membersIDs);
+
+
+        public Task LeaveGroup(string userId, Guid groupId);
     }
 }

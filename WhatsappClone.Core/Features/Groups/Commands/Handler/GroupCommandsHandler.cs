@@ -14,6 +14,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
     public class GroupCommandsHandler : ResponseHandler, IRequestHandler<CreateGroupCommand, Response<Guid>>
                                                        , IRequestHandler<RemoveMemberCommand, Response<string>>
                                                        , IRequestHandler<AddListOfMembersCommand, Response<List<string>>>
+                                                       , IRequestHandler<LeaveGroupCommand, Response<string>>
 
     {
         private readonly IMapper mapper;
@@ -94,6 +95,15 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
             var result = await groupService.AddListOfMembers(actorId, request.groupId, request.members);
             return Success(result, "Members added successfully");
+        }
+
+        public async Task<Response<string>> Handle(LeaveGroupCommand request, CancellationToken cancellationToken)
+        {
+            var userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await groupService.LeaveGroup(userId, request.GroupId);
+            return Success("User left the group successfully");
+            //Leave Service
+
         }
     }
 }
