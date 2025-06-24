@@ -89,10 +89,10 @@ namespace WhatsappClone.Service.Implementation
             var content = "{\r\n  \"type\": \"GROUP_UPDATED\",\r\n  \"actorUserId\": \"admin_user_id\"\r\n}";
             throw new NotImplementedException("This method is not implemented yet.");
         }
-        public async Task AddMemberMessage(string? content, Guid groupId, string actorId)
+        public async Task AddSystemMessage(string? content, Guid groupId, string actorId, MessageType messageType)
         {
 
-            await messageRepo.AddAsync(new Message { GroupId = groupId, SenderId = actorId, Content = content, IsSystemMessage = true, MessageType = MessageType.AddMember });
+            await messageRepo.AddAsync(new Message { GroupId = groupId, SenderId = actorId, Content = content, IsSystemMessage = true, MessageType = messageType });
 
         }
         public async Task<Message> RemoveMemberMessage(string actorUserId, string targetUserId)

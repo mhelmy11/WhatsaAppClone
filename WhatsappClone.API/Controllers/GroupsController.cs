@@ -25,14 +25,6 @@ namespace WhatsappClone.API.Controllers
         }
 
 
-        [HttpPost("add-member")]
-        [Authorize]
-        public async Task<IActionResult> AddMember([FromForm] AddMemberCommand command)
-        {
-            var result = await mediator.Send(command);
-            return ResponseResult(result);
-        }
-
         [HttpPost("add-member-list")]
         [Authorize]
         public async Task<IActionResult> AddMembersList([FromForm] AddListOfMembersCommand command)

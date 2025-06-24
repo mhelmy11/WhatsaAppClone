@@ -12,7 +12,6 @@ using WhatsappClone.Service.Abstract;
 namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 {
     public class GroupCommandsHandler : ResponseHandler, IRequestHandler<CreateGroupCommand, Response<Guid>>
-                                                       , IRequestHandler<AddMemberCommand, Response<string>>
                                                        , IRequestHandler<RemoveMemberCommand, Response<string>>
                                                        , IRequestHandler<AddListOfMembersCommand, Response<List<string>>>
 
@@ -56,42 +55,14 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
             group.CreatorId = creatorId;
 
-
-            ///Begin Transaction .... TODO..
             //create group
-            var createdGroup = await groupService.CreateGroup(group);
-            // add creation message
-            await messagesService.AddMessage(creatorId, request.Name, createdGroup.Id, $"{creator.Id} Created Group {request.Name}");
-            //add creator to the group
-            await groupService.AddMemberToGroup(new UserGroup { GroupId = createdGroup.Id, Role = GroupRole.Member, UserId = creatorId });
+            var createdGroup = await groupService.CreateGroup(group, creatorId, request.UserIDs);
+
 
             return Success(createdGroup.Id, "Group Created Successfully");
 
         }
 
-        public async Task<Response<string>> Handle(AddMemberCommand request, CancellationToken cancellationToken)
-        {
-            var adminId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            //check if adder is admin of the group
-            var isAdmin = await groupService.IsUserAdmin(adminId, request.groupId);
-            if (!isAdmin)
-            {
-                return BadRequest<string>("You are not authorized to add members to this group");
-            }
-            var member = await userManager.FindByIdAsync(request.userId);
-            var adder = await userManager.FindByIdAsync(adminId);
-
-
-
-
-            await groupService.AddMemberToGroup(new UserGroup { GroupId = request.groupId, Role = GroupRole.Member, UserId = request.userId });
-
-            await messagesService.AddMessage(adminId, "", request.groupId, $"{adder.Id} added {member.Id}");
-
-            return Success($"{adder.FullName} added {member.FullName}");
-
-        }
 
         public async Task<Response<string>> Handle(RemoveMemberCommand request, CancellationToken cancellationToken)
         {

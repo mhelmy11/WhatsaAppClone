@@ -30,7 +30,7 @@ namespace WhatsappClone.Service.Implementation
         public async Task<List<string>> AddListOfMembers(string actorId, Guid groupId, List<string> membersIDs)
         {
 
-            userGroupRepo.BeginTransaction();
+            var transaction = userGroupRepo.BeginTransaction();
             try
             {
                 await userGroupRepo.AddRangeAsync(membersIDs.Select(memberId => new UserGroup
@@ -44,21 +44,22 @@ namespace WhatsappClone.Service.Implementation
                 // add system message for each member added
                 var systemMessage = new
                 {
+
                     type = "MEMBER_ADDED",
-                    actorUserId = actorId, // Assuming the first member is the one who added others
+                    actorUserId = actorId,
                     targetUserIds = membersIDs
                 };
 
                 var content = JsonSerializer.Serialize(systemMessage);
 
-                await messagesService.AddMemberMessage(content, groupId, actorId);
+                await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.AddMember);
 
-                userGroupRepo.Commit();
+                await transaction.CommitAsync();
                 return membersIDs;
             }
             catch (Exception ex)
             {
-                userGroupRepo.RollBack();
+                await transaction.RollbackAsync();
                 throw new Exception("Error adding members to group", ex);
             }
         }
@@ -68,8 +69,68 @@ namespace WhatsappClone.Service.Implementation
             return await userGroupRepo.AddAsync(entity);
         }
 
-        public async Task<Group> CreateGroup(Group entity)
+        public async Task<Group> CreateGroup(Group entity, string actorId, List<string>? membersIDs)
         {
+            var transaction = userGroupRepo.BeginTransaction();
+            try
+            {
+
+                // Add admin
+                var result = await groupRepo.AddAsync(entity);
+                await userGroupRepo.AddAsync(new UserGroup
+                {
+                    GroupId = entity.Id,
+                    UserId = actorId,
+                    Role = GroupRole.Admin // The creator is the admin of the group
+                });
+                var systemMessageCreate = new
+                {
+
+                    type = "CREATE_GROUP",
+                    actorUserId = actorId,
+                    groupName = entity.Name,
+                    targetUserIds = membersIDs
+                };
+                var contentCreate = JsonSerializer.Serialize(systemMessageCreate);
+
+                await messagesService.AddSystemMessage(contentCreate, entity.Id, actorId, MessageType.GroupCreated);
+
+
+
+                // add Members
+
+                await userGroupRepo.AddRangeAsync(membersIDs.Select(memberId => new UserGroup
+                {
+                    GroupId = entity.Id,
+                    UserId = memberId,
+                    Role = GroupRole.Member // Default role for new members
+                }).ToList());
+
+                var systemMessageAdd = new
+                {
+
+                    type = "MEMBER_ADDED",
+                    actorUserId = actorId,
+                    targetUserIds = membersIDs
+
+
+                };
+
+
+                var contentAdd = JsonSerializer.Serialize(systemMessageAdd);
+                //add List of members
+                await messagesService.AddSystemMessage(contentAdd, entity.Id, actorId, MessageType.AddMember);
+
+
+                await transaction.CommitAsync();
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error creating group", ex);
+            }
             return await groupRepo.AddAsync(entity);
 
         }
