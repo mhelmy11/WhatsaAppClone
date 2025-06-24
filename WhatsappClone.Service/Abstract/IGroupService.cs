@@ -19,10 +19,10 @@ namespace WhatsappClone.Service.Abstract
         public Task<UserGroup> AddMemberToGroup(UserGroup entity);
 
 
-        public Task<Group> CreateGroup(Group entity, string actorId , List<string> membersIDs);
+        public Task<Group> CreateGroup(Group entity, string actorId, List<string> membersIDs);
 
 
-        public Task RemoveMemberFromGroup(string userId, Guid groupId);
+        public Task RemoveMemberFromGroup(List<string> userIds, Guid groupId, string actorId);
 
 
         public Task<List<string>> AddListOfMembers(string actorId, Guid groupId, List<string> membersIDs);

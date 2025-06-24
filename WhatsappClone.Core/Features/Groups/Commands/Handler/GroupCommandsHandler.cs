@@ -68,27 +68,16 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
         {
             var adminId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            //check if adder is admin of the group
             var isAdmin = await groupService.IsUserAdmin(adminId, request.GroupId);
             if (!isAdmin)
             {
                 return BadRequest<string>("You are not authorized to remove members to this group");
             }
-            var member = await userManager.FindByIdAsync(request.UserId);
-            var admin = await userManager.FindByIdAsync(adminId);
+
+            await groupService.RemoveMemberFromGroup(request.UserId, request.GroupId, adminId);
 
 
-
-
-            await groupService.RemoveMemberFromGroup(userId: request.UserId, groupId: request.GroupId);
-            if (member == null)
-            {
-                return BadRequest<string>("Member not found");
-            }
-
-            await messagesService.AddMessage(adminId, "", request.GroupId, $"{member.Id} has been removed from the group");
-
-            return Success($"{admin.FullName} removed {member.FullName}");
+            return Success($"{adminId} removed {request.UserId.Count()} member(s)");
 
         }
 
@@ -103,11 +92,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
                 return BadRequest<List<string>>("You are not authorized to remove members to this group");
             }
 
-            //1. create a service to handle adding members to a group
             var result = await groupService.AddListOfMembers(actorId, request.groupId, request.members);
-            //1.1 add members to group
-            //1.2 add system message content for each member added after serializing it to json
-            //2. return the list of members added
             return Success(result, "Members added successfully");
         }
     }
