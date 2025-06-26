@@ -87,5 +87,40 @@ namespace WhatsappClone.API.Controllers
             return ResponseResult(result);
         }
 
+
+        [HttpPut("promote-user")]
+        [Authorize]
+        public async Task<IActionResult> PromoteUser([FromForm] PromoteToAdminCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+
+        [HttpPut("revoke-user")]
+        [Authorize]
+        public async Task<IActionResult> RevokeUser([FromForm] RevokeAdminCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+        [HttpPut("update-group-description")]
+        [Authorize]
+        public async Task<IActionResult> UpdateGroupDescription([FromForm] EditGroupDescriptionCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+        [HttpPut("update-group-name")]
+        [Authorize]
+        public async Task<IActionResult> UpdateGroupName([FromForm] EditGroupNameCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+
     }
 }
