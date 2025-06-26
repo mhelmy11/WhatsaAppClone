@@ -31,9 +31,6 @@
 		<Folder Include="Features\Groups\Queries\Validation\" />
 		<Folder Include="Features\Messages\Queries\Results\" />
 		<Folder Include="Features\Contacts\Queries\Validation\" />
-		<Folder Include="Features\Messages\Commands\Handler\" />
-		<Folder Include="Features\Messages\Commands\Models\" />
-		<Folder Include="Features\Messages\Commands\Validation\" />
 		<Folder Include="Features\Messages\Queries\Handler\" />
 		<Folder Include="Features\Messages\Queries\Models\" />
 		<Folder Include="Features\Messages\Queries\Validation\" />

@@ -36,5 +36,8 @@ namespace WhatsappClone.Service.Abstract
         public Task UpdateGroupName(Group entity, string actorId, string oldName);
         public Task UpdateGroupDescription(Group entity, string actorId);
 
+
+        public bool IsUserInGroup(string userId, Guid groupId);
+
     }
 }

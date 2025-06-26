@@ -24,6 +24,8 @@ public class Context : IdentityDbContext<AppUser>
     public virtual DbSet<Message> Messages { get; set; }
 
     public virtual DbSet<Group> Groups { get; set; }
+    public virtual DbSet<GroupPermissions> GroupPermissions { get; set; }
+    public virtual DbSet<Permission> Permissions { get; set; }
 
     public virtual DbSet<UserConnection> UserConnections { get; set; }
 
@@ -58,9 +60,12 @@ public class Context : IdentityDbContext<AppUser>
                 .HasConstraintName("FK_Blacklists_AspNetUsers");
         });
 
+
+
         modelBuilder.Entity<UserContact>().HasKey(c => new { c.UserId, c.ContactId });
         modelBuilder.Entity<UserConnection>().HasKey(c => new { c.UserId, c.ConnectionId });
         modelBuilder.Entity<UserGroup>().HasKey(gm => new { gm.GroupId, gm.UserId });
+        modelBuilder.Entity<GroupPermissions>().HasKey(gm => new { gm.GroupId, gm.PermissionId });
         modelBuilder.Entity<MessageReadStatus>().HasKey(mrs => new { mrs.MessageId, mrs.UserId });
 
 
@@ -73,6 +78,19 @@ public class Context : IdentityDbContext<AppUser>
             .HasOne(c => c.Contact)
             .WithMany(u => u.ContactsOf)
             .HasForeignKey(c => c.ContactId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+
+        modelBuilder.Entity<GroupPermissions>()
+            .HasOne(c => c.Permission)
+            .WithMany(u => u.GroupPermissions)
+            .HasForeignKey(c => c.PermissionId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<GroupPermissions>()
+            .HasOne(c => c.Group)
+            .WithMany(u => u.GroupPermissions)
+            .HasForeignKey(c => c.GroupId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Message>()

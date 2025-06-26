@@ -22,6 +22,8 @@ namespace WhatsappClone.Data.Models
 
         public virtual ICollection<Message> Messages { get; set; } = new HashSet<Message>();
         public virtual ICollection<UserChatSettings>? ChatSettings { get; set; }
+        public virtual ICollection<GroupPermissions> GroupPermissions { get; set; } = new List<GroupPermissions>();
+
 
     }
 }

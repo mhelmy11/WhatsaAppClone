@@ -1,11 +1,16 @@
 ﻿using AutoMapper;
+using AutoMapper.Execution;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Enums;
@@ -21,12 +26,16 @@ namespace WhatsappClone.Service.Implementation
         private readonly IMessage messageRepo;
         private readonly IMapper mapper;
         private readonly UserManager<AppUser> userManager;
+        private readonly ILogger<MessagesService> logger;
+        private readonly IFileService fileService;
 
-        public MessagesService(IMessage messageRepo, IMapper mapper, UserManager<AppUser> userManager)
+        public MessagesService(IMessage messageRepo, IMapper mapper, UserManager<AppUser> userManager, ILogger<MessagesService> logger, IFileService fileService)
         {
             this.messageRepo = messageRepo;
             this.mapper = mapper;
             this.userManager = userManager;
+            this.logger = logger;
+            this.fileService = fileService;
         }
         public List<Guid> GetMessagesOfGroupsIDs(List<Guid> GroupsIDs)
         {
@@ -38,6 +47,18 @@ namespace WhatsappClone.Service.Implementation
 
             return messages;
 
+        }
+
+
+
+
+        private static object ResolveContent(Message message)
+        {
+            if (message.IsSystemMessage)
+            {
+                return JsonSerializer.Deserialize<JsonElement>(message.Content);
+            }
+            return message.Content;
         }
         public List<ChatDTO> GetLasMessageOfGroupsIDs(List<Guid> GroupsIDs, string currentUserId)
         {
@@ -52,7 +73,7 @@ namespace WhatsappClone.Service.Implementation
                     Name = x.First().Group!.Name,
                     Id = x.Key,
                     PicUrl = x.First().Group!.GroupPictureUrl!,
-                    LastMessageContent = x.OrderByDescending(m => m.SentAt).First().Content,
+                    LastMessageContent = ResolveContent(x.OrderByDescending(m => m.SentAt).First()),
                     SentAt = x.OrderByDescending(m => m.SentAt).First().SentAt,
                     ImageCount = x.First().Attachments!.Where(a => a.Type == Attachment.Image).Count(),
                     VideoCount = x.First().Attachments!.Where(a => a.Type == Attachment.Video).Count(),
@@ -64,61 +85,118 @@ namespace WhatsappClone.Service.Implementation
 
                 })
                 .OrderByDescending(x => x.SentAt)
-                .AsSplitQuery()
-                .ToList();
+                .AsSplitQuery();
 
-            return messages;
+
+
+            logger.LogInformation(messages.ToQueryString());
+
+
+
+            return messages.ToList(); ;
 
         }
 
-        public async Task<Message> AddMessage(string userId, string GroupName, Guid GroupId, string msg)
-        {
-
-            return await messageRepo.AddAsync(new Message { GroupId = GroupId, SenderId = userId, Content = msg, IsSystemMessage = true });
-        }
 
 
-        public async Task<Message> CreateGroupMessage(string actorUserId, string groupName)
-        {
-            var content = "{\r\n  \"type\": \"GROUP_CREATED\",\r\n  \"actorUserId\": \"user_id_of_creator\",\r\n  \"groupName\": \"The New Group Name\"\r\n}";
-            // This method is not implemented in the original code.
-            // You can implement it based on your requirements.
-            throw new NotImplementedException("This method is not implemented yet.");
-        }
-        public async Task<Message> UpdateGroupMessage(string actorUserId)
-        {
-            var content = "{\r\n  \"type\": \"GROUP_UPDATED\",\r\n  \"actorUserId\": \"admin_user_id\"\r\n}";
-            throw new NotImplementedException("This method is not implemented yet.");
-        }
+
+
+
         public async Task AddSystemMessage(string? content, Guid groupId, string actorId, MessageType messageType)
         {
 
             await messageRepo.AddAsync(new Message { GroupId = groupId, SenderId = actorId, Content = content, IsSystemMessage = true, MessageType = messageType });
 
         }
-        public async Task<Message> RemoveMemberMessage(string actorUserId, string targetUserId)
+
+
+
+
+        public async Task<Message> SendGroupMessage(string senderId, Guid groupId, List<IFormFile>? attachmentsDTO, string content)
         {
-            var content = "{\r\n  \"type\": \"MEMBER_REMOVED\",\r\n  \"actorUserId\": \"admin_user_id\",\r\n  \"targetUserId\": \"removed_member_id\"\r\n}";
-            // This method is not implemented in the original code.
-            // You can implement it based on your requirements.
-            throw new NotImplementedException("This method is not implemented yet.");
+            //add a new message to the database using messageRepo
+            var transaction = messageRepo.BeginTransaction();
+            try
+            {
+
+                var message = await messageRepo.AddAsync(new Message
+                {
+                    GroupId = groupId,
+                    SenderId = senderId,
+                    Content = content,
+                    Attachments = attachmentsDTO?.Select(a => new Attachments
+                    {
+                        Type = a.ContentType switch
+                        {
+                            "image/jpeg" => Attachment.Image,
+                            "image/png" => Attachment.Image,
+                            "image/jpg" => Attachment.Image,
+                            "application/pdf" => Attachment.Document,
+                            "video/mp4" => Attachment.Video,
+                            _ => Attachment.None
+                        },
+                        Url = fileService.SaveFileAsync(a, $"Group_{groupId}").Result
+                    }).ToList(),
+                    IsSystemMessage = false,
+                    MessageType = MessageType.Text,
+                });
+
+                await transaction.CommitAsync();
+                return message;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("An error occurred while sending the group message.", ex);
+            }
+
+
         }
 
-        public async Task<Message> LeaveGroupMessage(string actorUserId, string targetUserId)
+        public async Task EditGroupMessage(string actorId, Guid messageId, Guid groupId, string content)
         {
-            var content = "{\r\n  \"type\": \"MEMBER_LEFT\",\r\n  \"actorUserId\": \"user_id_who_left\"\r\n}";
-            // This method is not implemented in the original code.
-            // You can implement it based on your requirements.
-            throw new NotImplementedException("This method is not implemented yet.");
+
+            // Retrieve the message from the database
+            var message = await messageRepo.GetTableNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == messageId && m.GroupId == groupId);
+            if (message == null)
+            {
+                throw new Exception("Message not found.");
+            }
+            // Update the content of the message
+            message.Content = content;
+            message.IsEdit = true;
+            message.EditAt = DateTime.Now;
+            // Save the changes to the database
+            await messageRepo.UpdateAsync(message);
+
+
         }
 
-        public async Task<Message> JoinGroupMessage(string actorUserId, string targetUserId)
+        public async Task DeleteGroupMessage(string actorId, Guid messageId, Guid groupId)
         {
-            var content = "{\r\n  \"type\": \"MEMBER_JOINED_BY_LINK\",\r\n  \"actorUserId\": \"user_id_who_joined\"\r\n}";
-            // This method is not implemented in the original code.
-            // You can implement it based on your requirements.
-            throw new NotImplementedException("This method is not implemented yet.");
-        }
 
+            var message = await messageRepo.GetTableNoTracking()
+              .FirstOrDefaultAsync(m => m.Id == messageId && m.GroupId == groupId);
+            if (message == null)
+            {
+                throw new Exception("Message not found.");
+            }
+            // Update the content of the message
+            message.IsDeleted = true;
+            var systemMessage = new
+            {
+
+                type = "MESSAGE_DELETED",
+                actorUserId = actorId
+            };
+
+            var content = JsonSerializer.Serialize(systemMessage);
+            message.Content = content;
+
+            await messageRepo.UpdateAsync(message);
+
+
+        }
     }
 }

@@ -72,5 +72,20 @@ namespace WhatsappClone.API.Controllers
             return ResponseResult(result);
         }
 
+        [HttpPut("update-group-message")]
+        [Authorize]
+        public async Task<IActionResult> UpdateGroupMessage([FromForm] EditGroupMessageCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+        [HttpDelete("delete-group-message")]
+        [Authorize]
+        public async Task<IActionResult> DeleteGroupMessage([FromForm] DeleteGroupMessageCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
     }
 }

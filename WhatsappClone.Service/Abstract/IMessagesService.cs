@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,11 @@ namespace WhatsappClone.Service.Abstract
         public List<ChatDTO> GetLasMessageOfGroupsIDs(List<Guid> GroupsIDs, string currentUserId);
         public Task AddSystemMessage(string? content, Guid groupId, string actorId, MessageType messageType);
 
-        public Task<Message> AddMessage(string userId, string GroupName, Guid GroupId, string msg);
+
+        public Task<Message> SendGroupMessage(string senderId, Guid groupId, List<IFormFile>? attachmentsDTO, string content);
+        public Task EditGroupMessage(string actorId, Guid groupId, Guid messageId, string content);
+
+        public Task DeleteGroupMessage(string actorId, Guid messageId, Guid groupId);
 
     }
 }

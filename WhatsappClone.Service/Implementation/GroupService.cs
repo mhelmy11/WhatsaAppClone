@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,17 +43,20 @@ namespace WhatsappClone.Service.Implementation
 
 
                 // add system message for each member added
-                var systemMessage = new
+                foreach (var member in membersIDs)
                 {
+                    var systemMessage = new
+                    {
 
-                    type = "MEMBER_ADDED",
-                    actorUserId = actorId,
-                    targetUserIds = membersIDs
-                };
+                        type = "MEMBER_ADDED",
+                        actorUserId = actorId,
+                        targetUserIds = member
+                    };
 
-                var content = JsonSerializer.Serialize(systemMessage);
+                    var content = JsonSerializer.Serialize(systemMessage);
 
-                await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.AddMember);
+                    await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.AddMember);
+                }
 
                 await transaction.CommitAsync();
                 return membersIDs;
@@ -89,11 +93,13 @@ namespace WhatsappClone.Service.Implementation
                     type = "CREATE_GROUP",
                     actorUserId = actorId,
                     groupName = entity.Name,
-                    targetUserIds = membersIDs
                 };
                 var contentCreate = JsonSerializer.Serialize(systemMessageCreate);
 
                 await messagesService.AddSystemMessage(contentCreate, entity.Id, actorId, MessageType.GroupCreated);
+
+
+
 
 
 
@@ -106,20 +112,21 @@ namespace WhatsappClone.Service.Implementation
                     Role = GroupRole.Member // Default role for new members
                 }).ToList());
 
-                var systemMessageAdd = new
+                foreach (var member in membersIDs)
                 {
+                    var systemMessage = new
+                    {
 
-                    type = "MEMBER_ADDED",
-                    actorUserId = actorId,
-                    targetUserIds = membersIDs
+                        type = "MEMBER_ADDED",
+                        actorUserId = actorId,
+                        targetUserIds = member
+                    };
 
+                    var content = JsonSerializer.Serialize(systemMessage);
 
-                };
+                    await messagesService.AddSystemMessage(content, entity.Id, actorId, MessageType.AddMember);
+                }
 
-
-                var contentAdd = JsonSerializer.Serialize(systemMessageAdd);
-                //add List of members
-                await messagesService.AddSystemMessage(contentAdd, entity.Id, actorId, MessageType.AddMember);
 
 
                 await transaction.CommitAsync();
@@ -131,7 +138,6 @@ namespace WhatsappClone.Service.Implementation
                 await transaction.RollbackAsync();
                 throw new Exception("Error creating group", ex);
             }
-            return await groupRepo.AddAsync(entity);
 
         }
 
@@ -176,15 +182,25 @@ namespace WhatsappClone.Service.Implementation
 
         }
 
+        public bool IsUserInGroup(string userId, Guid groupId)
+        {
+            return userGroupRepo.GetTableNoTracking().Any(ug => ug.UserId == userId && ug.GroupId == groupId);
+
+        }
+
         public async Task LeaveGroup(string userId, Guid groupId)
         {
             var groupname = groupRepo.GetTableNoTracking().Where(g => g.Id == groupId).Select(g => g.Name).FirstOrDefault();
             var transaction = userGroupRepo.BeginTransaction();
             try
             {
-                await userGroupRepo.DeleteAsync(new UserGroup { GroupId = groupId, UserId = userId });
+                var group = userGroupRepo.GetTableNoTracking()
+                                         .Where(g => g.GroupId == groupId && userId == g.UserId)
+                                         .ExecuteUpdate(p => p.SetProperty(g => g.isMember, false));
 
-                // add system message for each member removed
+
+
+                // add system message for each member left
                 var systemRemoveMessage = new
                 {
                     type = "MEMBER_LEFT",
@@ -210,22 +226,24 @@ namespace WhatsappClone.Service.Implementation
             var transaction = userGroupRepo.BeginTransaction();
             try
             {
-                await userGroupRepo.DeleteRangeAsync(userIDs.Select(u => new UserGroup
-                {
-                    UserId = u,
-                    GroupId = groupId
-                }).ToList());
+                var group = userGroupRepo.GetTableNoTracking()
+                                         .Where(g => g.GroupId == groupId && userIDs.Contains(g.UserId))
+                                         .ExecuteUpdate(p => p.SetProperty(g => g.isMember, false));
+
 
                 // add system message for each member removed
-                var systemRemoveMessage = new
+                foreach (var member in userIDs)
                 {
-                    type = "MEMBER_REMOVED",
-                    actorUserId = actorId,
-                    targetUserIds = userIDs
-                };
+                    var systemRemoveMessage = new
+                    {
+                        type = "MEMBER_REMOVED",
+                        actorUserId = actorId,
+                        targetUserId = member
+                    };
 
-                var content = JsonSerializer.Serialize(systemRemoveMessage);
-                await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.RemoveMember);
+                    var content = JsonSerializer.Serialize(systemRemoveMessage);
+                    await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.RemoveMember);
+                }
                 await transaction.CommitAsync();
 
             }

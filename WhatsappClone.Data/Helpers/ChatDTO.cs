@@ -10,7 +10,7 @@ namespace WhatsappClone.Data.Helpers
         public string Name { get; set; } //chat name
         public bool isGroup { get; set; }
         public string PicUrl { get; set; } //chat pic
-        public string? LastMessageContent { get; set; }
+        public object LastMessageContent { get; set; }
         public List<MessageStatus>? MessageStatus { get; set; }
         public DateTime SentAt { get; set; } = DateTime.Now;
         public string SenderId { get; set; }

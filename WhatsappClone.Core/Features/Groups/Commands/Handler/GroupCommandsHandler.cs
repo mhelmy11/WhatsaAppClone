@@ -18,6 +18,9 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
                                                        , IRequestHandler<EditGroupDescriptionCommand, Response<string>>
                                                        , IRequestHandler<EditGroupNameCommand, Response<string>>
                                                        , IRequestHandler<EditGroupPhotoCommand, Response<string>>
+                                                       , IRequestHandler<EditGroupMessageCommand, Response<string>>
+                                                       , IRequestHandler<DeleteGroupMessageCommand, Response<string>>
+
 
     {
         private readonly IMapper mapper;
@@ -173,6 +176,22 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
             await groupService.UpdateGroupDescription(group, actorId);
 
             return Success("Group Description updated successfully");
+        }
+
+        public async Task<Response<string>> Handle(EditGroupMessageCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await messagesService.EditGroupMessage(actorId, request.messageId, request.groupId, request.content);
+
+            return Success("Group message edited successfully");
+        }
+
+        public async Task<Response<string>> Handle(DeleteGroupMessageCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await messagesService.DeleteGroupMessage(actorId, request.messageId, request.groupId);
+
+            return Success("Group message deleted successfully");
         }
     }
 }
