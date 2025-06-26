@@ -12,6 +12,10 @@ namespace WhatsappClone.Infrastructure.Interfaces
     {
 
 
+        public bool IsSendMessagesAllowed(Guid groupId);
+        public bool IsAddMembersAllowed(Guid groupId);
+        public bool IsEditGroupAllowed(Guid groupId);
+
 
     }
 }

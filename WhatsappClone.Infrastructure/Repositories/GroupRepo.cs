@@ -18,6 +18,25 @@ namespace WhatsappClone.Infrastructure.Repositories
             this.context = context;
         }
 
+        public bool IsAddMembersAllowed(Guid groupId)
+        {
+            return GetTableNoTracking()
+                           .Any(g => g.Id == groupId && g.CanAddMembers);
+        }
+
+        public bool IsEditGroupAllowed(Guid groupId)
+        {
+            return GetTableNoTracking()
+                           .Any(g => g.Id == groupId && g.EditGroupSettings);
+
+        }
+
+        public bool IsSendMessagesAllowed(Guid groupId)
+        {
+            return GetTableNoTracking()
+                .Any(g => g.Id == groupId && g.AllowSendMessages);
+        }
+
 
     }
 }

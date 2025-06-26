@@ -16,13 +16,20 @@ namespace WhatsappClone.Data.Models
 
         public string CreatorId { get; set; }
 
+        public bool CanAddMembers { get; set; } = true;
+
+        public bool EditGroupSettings { get; set; } = true;
+
+        public bool AllowSendMessages { get; set; } = true;
+        public bool ApproveMembers { get; set; } = false;
+
         public virtual AppUser Creator { get; set; }
 
         public virtual ICollection<UserGroup> UserGroups { get; set; } = new HashSet<UserGroup>();
 
         public virtual ICollection<Message> Messages { get; set; } = new HashSet<Message>();
         public virtual ICollection<UserChatSettings>? ChatSettings { get; set; }
-        public virtual ICollection<GroupPermissions> GroupPermissions { get; set; } = new List<GroupPermissions>();
+        //public virtual ICollection<GroupPermissions> GroupPermissions { get; set; } = new List<GroupPermissions>();
 
 
     }

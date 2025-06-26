@@ -29,20 +29,6 @@ namespace WhatsappClone.Core.Features.Messages.Commands.Handler
         public async Task<Response<string>> Handle(SendGroupMessageCommand request, CancellationToken cancellationToken)
         {
             var senderId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //check if sender is member of the group
-
-            var isUserInGroup = groupService.IsUserInGroup(senderId!, request.GroupId);
-
-
-            if (!isUserInGroup)
-            {
-
-                return BadRequest<string>("You are not a member of this group.");
-
-            }
-
-
-
 
             var message = await messagesService.SendGroupMessage(senderId!, request.GroupId, request.Attachments, request.Content ?? "");
 

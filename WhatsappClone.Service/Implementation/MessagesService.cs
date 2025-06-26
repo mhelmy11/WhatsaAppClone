@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.Execution;
 using AutoMapper.QueryableExtensions;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ using WhatsappClone.Data.Enums;
 using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure.Interfaces;
+using WhatsappClone.Infrastructure.Repositories;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Service.Implementation
@@ -28,14 +30,25 @@ namespace WhatsappClone.Service.Implementation
         private readonly UserManager<AppUser> userManager;
         private readonly ILogger<MessagesService> logger;
         private readonly IFileService fileService;
+        private readonly IUserGroup userGroupRepo;
+        private readonly IGroup groupRepo;
 
-        public MessagesService(IMessage messageRepo, IMapper mapper, UserManager<AppUser> userManager, ILogger<MessagesService> logger, IFileService fileService)
+        public MessagesService(
+                                IMessage messageRepo,
+                                IMapper mapper,
+                                UserManager<AppUser> userManager,
+                                ILogger<MessagesService> logger,
+                                IFileService fileService,
+                                IUserGroup userGroupRepo,
+                                IGroup groupRepo)
         {
             this.messageRepo = messageRepo;
             this.mapper = mapper;
             this.userManager = userManager;
             this.logger = logger;
             this.fileService = fileService;
+            this.userGroupRepo = userGroupRepo;
+            this.groupRepo = groupRepo;
         }
         public List<Guid> GetMessagesOfGroupsIDs(List<Guid> GroupsIDs)
         {
@@ -114,7 +127,24 @@ namespace WhatsappClone.Service.Implementation
 
         public async Task<Message> SendGroupMessage(string senderId, Guid groupId, List<IFormFile>? attachmentsDTO, string content)
         {
-            //add a new message to the database using messageRepo
+            //check if user is a member of the group
+            var isUserInGroup = userGroupRepo.IsUserInGroup(senderId, groupId);
+
+            if (!isUserInGroup)
+            {
+                throw new UnauthorizedAccessException("You are not a member of this group.");
+            }
+
+            var isAdmin = userGroupRepo.IsGroupAdmin(senderId, groupId);
+            // check group permissions
+            var isSendMessageAllowed = groupRepo.IsSendMessagesAllowed(groupId);
+
+
+
+            if (!isSendMessageAllowed && !isAdmin)
+            {
+                throw new UnauthorizedAccessException("You are not allowed to send messages in this group.");
+            }
             var transaction = messageRepo.BeginTransaction();
             try
             {
@@ -176,8 +206,23 @@ namespace WhatsappClone.Service.Implementation
         public async Task DeleteGroupMessage(string actorId, Guid messageId, Guid groupId)
         {
 
+            if (!userGroupRepo.IsUserInGroup(actorId, groupId))
+                throw new UnauthorizedAccessException("you are not authorize to delete this message");
+
+
+            // get message
             var message = await messageRepo.GetTableNoTracking()
-              .FirstOrDefaultAsync(m => m.Id == messageId && m.GroupId == groupId);
+                      .FirstAsync(m => m.Id == messageId && m.GroupId == groupId);
+
+            //if actor is admin -> can delete any message else you can can delete only your message
+            if (!(message.SenderId == actorId))
+            {
+                if (!userGroupRepo.IsGroupAdmin(actorId, groupId))
+                {
+                    throw new UnauthorizedAccessException("you are not authorize to delete this message");
+                }
+            }
+
             if (message == null)
             {
                 throw new Exception("Message not found.");

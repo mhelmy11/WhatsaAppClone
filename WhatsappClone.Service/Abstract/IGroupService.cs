@@ -39,5 +39,8 @@ namespace WhatsappClone.Service.Abstract
 
         public bool IsUserInGroup(string userId, Guid groupId);
 
+        public void PromoteToAdmin(string actorId, string userId, Guid groupId);
+        public void RevokeAdmin(string actorId, string userId, Guid groupId);
+
     }
 }

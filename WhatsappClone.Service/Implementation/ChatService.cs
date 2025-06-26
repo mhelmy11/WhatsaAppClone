@@ -19,14 +19,13 @@ namespace WhatsappClone.Service.Implementation
     {
         private readonly IChat chatRepo;
         private readonly IMessage messageRepo;
-        private readonly IGroup groupRepo;
         private readonly IUserGroup userGroupRepo;
 
-        public ChatService(IChat chatRepo, IMessage messageRepo, IGroup groupRepo, IUserGroup userGroupRepo)
+
+        public ChatService(IChat chatRepo, IMessage messageRepo, IUserGroup userGroupRepo)
         {
             this.chatRepo = chatRepo;
             this.messageRepo = messageRepo;
-            this.groupRepo = groupRepo;
             this.userGroupRepo = userGroupRepo;
         }
 

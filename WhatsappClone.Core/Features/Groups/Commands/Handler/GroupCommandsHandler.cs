@@ -20,6 +20,8 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
                                                        , IRequestHandler<EditGroupPhotoCommand, Response<string>>
                                                        , IRequestHandler<EditGroupMessageCommand, Response<string>>
                                                        , IRequestHandler<DeleteGroupMessageCommand, Response<string>>
+                                                       , IRequestHandler<PromoteToAdminCommand, Response<string>>
+                                                       , IRequestHandler<RevokeAdminCommand, Response<string>>
 
 
     {
@@ -73,16 +75,9 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
         public async Task<Response<string>> Handle(RemoveMemberCommand request, CancellationToken cancellationToken)
         {
-            var adminId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var adminId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var isAdmin = await groupService.IsUserAdmin(adminId, request.GroupId);
-            if (!isAdmin)
-            {
-                return BadRequest<string>("You are not authorized to remove members to this group");
-            }
-
-            await groupService.RemoveMemberFromGroup(request.UserId, request.GroupId, adminId);
-
+            await groupService.RemoveMemberFromGroup(request.UserId, request.GroupId, adminId!);
 
             return Success($"{adminId} removed {request.UserId.Count()} member(s)");
 
@@ -90,16 +85,9 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
         public async Task<Response<List<string>>> Handle(AddListOfMembersCommand request, CancellationToken cancellationToken)
         {
-            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            //check if adder is admin of the group
-            var isAdmin = await groupService.IsUserAdmin(actorId, request.groupId);
-            if (!isAdmin)
-            {
-                return BadRequest<List<string>>("You are not authorized to remove members to this group");
-            }
-
-            var result = await groupService.AddListOfMembers(actorId, request.groupId, request.members);
+            var result = await groupService.AddListOfMembers(actorId!, request.groupId, request.members);
             return Success(result, "Members added successfully");
         }
 
@@ -116,13 +104,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
         public async Task<Response<string>> Handle(EditGroupPhotoCommand request, CancellationToken cancellationToken)
         {
-            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //check if adder is admin of the group
-            var isAdmin = groupService.IsUserAdmin(actorId, request.GroupId);
-            if (!isAdmin.Result)
-            {
-                return BadRequest<string>("You are not authorized to edit group photo");
-            }
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var group = groupService.GetGroupById(request.GroupId);
             var oldPicUrl = group.GroupPictureUrl;
@@ -131,12 +113,11 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
             if (request.GroupProfilePic != null)
             {
 
-
                 var picUrl = await fileService.SaveFileAsync(request.GroupProfilePic, "GroupPics");
                 group.GroupPictureUrl = picUrl;
             }
 
-            await groupService.UpdateGroupPic(group, actorId, oldPicUrl);
+            await groupService.UpdateGroupPic(group, actorId!, oldPicUrl);
 
             return Success("Group photo updated successfully");
 
@@ -145,12 +126,6 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
         public async Task<Response<string>> Handle(EditGroupNameCommand request, CancellationToken cancellationToken)
         {
             var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //check if adder is admin of the group
-            var isAdmin = groupService.IsUserAdmin(actorId, request.GroupId);
-            if (!isAdmin.Result)
-            {
-                return BadRequest<string>("You are not authorized to edit group Name");
-            }
 
             var group = groupService.GetGroupById(request.GroupId);
             var oldName = group.Name;
@@ -165,11 +140,6 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
         public async Task<Response<string>> Handle(EditGroupDescriptionCommand request, CancellationToken cancellationToken)
         {
             var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var isAdmin = groupService.IsUserAdmin(actorId, request.GroupId);
-            if (!isAdmin.Result)
-            {
-                return BadRequest<string>("You are not authorized to edit group description");
-            }
 
             var group = groupService.GetGroupById(request.GroupId);
 
@@ -180,18 +150,38 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
         public async Task<Response<string>> Handle(EditGroupMessageCommand request, CancellationToken cancellationToken)
         {
-            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await messagesService.EditGroupMessage(actorId, request.messageId, request.groupId, request.content);
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await messagesService.EditGroupMessage(actorId!, request.messageId, request.groupId, request.content);
 
             return Success("Group message edited successfully");
         }
 
         public async Task<Response<string>> Handle(DeleteGroupMessageCommand request, CancellationToken cancellationToken)
         {
-            var actorId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await messagesService.DeleteGroupMessage(actorId, request.messageId, request.groupId);
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await messagesService.DeleteGroupMessage(actorId!, request.messageId, request.groupId);
 
             return Success("Group message deleted successfully");
+        }
+
+        public async Task<Response<string>> Handle(PromoteToAdminCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            groupService.PromoteToAdmin(actorId!, request.userId, request.groupId);
+
+            return Success("Promoted Successfully");
+
+
+        }
+
+        public async Task<Response<string>> Handle(RevokeAdminCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            groupService.RevokeAdmin(actorId!, request.userId, request.groupId);
+
+            return Success("Revoked Successfully");
         }
     }
 }

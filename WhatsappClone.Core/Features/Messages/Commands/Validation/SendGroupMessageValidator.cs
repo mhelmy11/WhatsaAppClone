@@ -42,6 +42,10 @@ namespace WhatsappClone.Core.Features.Messages.Commands.Validation
                 return hasContent || hasAttachments;
             })
             .WithMessage("A message must have either content or at least one attachment.");
+
+
+
+
         }
     }
 }
