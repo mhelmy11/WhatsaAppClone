@@ -27,7 +27,6 @@
 		<Folder Include="Features\Blacklists\Queries\Models\" />
 		<Folder Include="Features\Blacklists\Queries\Results\" />
 		<Folder Include="Features\Blacklists\Queries\Validation\" />
-		<Folder Include="Features\Groups\Queries\Results\" />
 		<Folder Include="Features\Groups\Queries\Validation\" />
 		<Folder Include="Features\Messages\Queries\Results\" />
 		<Folder Include="Features\Contacts\Queries\Validation\" />

@@ -23,6 +23,27 @@ namespace WhatsappClone.API.Controllers
             var result = await mediator.Send(command);
             return ResponseResult(result);
         }
+        [HttpPost("generate-invite-group")]
+        [Authorize]
+        public async Task<IActionResult> GenerateInviteGroupLink([FromForm] CreateInviteLinkCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+        [HttpPost("reset-invite-link")]
+        [Authorize]
+        public async Task<IActionResult> ResetInviteGroupLink([FromForm] CreateInviteLinkCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+        [HttpPost("join-group-via-link")]
+        [Authorize]
+        public async Task<IActionResult> JoinGroupViaLink([FromForm] JoinGroupViaLinkCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
 
 
         [HttpPost("add-member-list")]
@@ -33,6 +54,14 @@ namespace WhatsappClone.API.Controllers
             return ResponseResult(result);
         }
 
+
+        [HttpGet("group-invite-info/{inviteCode}")]
+        [Authorize]
+        public async Task<IActionResult> GetGroupInviteInfo(string inviteCode)
+        {
+            var result = await mediator.Send(new GetGroupInviteInfoQuery(inviteCode));
+            return ResponseResult(result);
+        }
 
         [HttpGet("group-list")]
         [Authorize]

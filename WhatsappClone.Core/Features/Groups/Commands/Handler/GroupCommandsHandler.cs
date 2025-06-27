@@ -23,6 +23,9 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
                                                        , IRequestHandler<PromoteToAdminCommand, Response<string>>
                                                        , IRequestHandler<RevokeAdminCommand, Response<string>>
                                                        , IRequestHandler<EditGroupPermissionsCommand, Response<string>>
+                                                       , IRequestHandler<CreateInviteLinkCommand, Response<string>>
+                                                       , IRequestHandler<ResetInviteLinkCommand, Response<string>>
+                                                       , IRequestHandler<JoinGroupViaLinkCommand, Response<string>>
 
 
     {
@@ -196,6 +199,21 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
 
 
+        }
+
+        public Task<Response<string>> Handle(CreateInviteLinkCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<string>> Handle(ResetInviteLinkCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<string>> Handle(JoinGroupViaLinkCommand request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

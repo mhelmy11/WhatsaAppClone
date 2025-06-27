@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Groups.Queries.Models;
+using WhatsappClone.Core.Features.Groups.Queries.Results;
 using WhatsappClone.Data.Helpers;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Core.Features.Groups.Queries.Handler
 {
-    public class GroupQueriesHandler : ResponseHandler, IRequestHandler<GetGroupListQuery, Response<List<ChatDTO>>>
+    public class GroupQueriesHandler : ResponseHandler
+                                        , IRequestHandler<GetGroupListQuery, Response<List<ChatDTO>>>
+                                        , IRequestHandler<GetGroupInviteInfoQuery, Response<GetGroupInviteInfoResult>>
     {
         private readonly IMessagesService messagesService;
         private readonly IGroupService groupService;
@@ -28,12 +31,17 @@ namespace WhatsappClone.Core.Features.Groups.Queries.Handler
         public async Task<Response<List<ChatDTO>>> Handle(GetGroupListQuery request, CancellationToken cancellationToken)
         {
 
-            var currentuserId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentuserId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var groupsIDs = groupService.GetGroupIdsOfUser(currentuserId);
             var lastMessages = messagesService.GetLasMessageOfGroupsIDs(groupsIDs, currentuserId);
 
-            return Success(lastMessages, "GroupList retrieved successfully");
+            return Success(lastMessages, "Group List retrieved successfully");
 
+        }
+
+        public Task<Response<GetGroupInviteInfoResult>> Handle(GetGroupInviteInfoQuery request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }
