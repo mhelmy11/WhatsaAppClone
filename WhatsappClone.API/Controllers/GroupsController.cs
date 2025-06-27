@@ -120,7 +120,13 @@ namespace WhatsappClone.API.Controllers
             var result = await mediator.Send(command);
             return ResponseResult(result);
         }
-
+        [HttpPut("update-group-settings")]
+        [Authorize]
+        public async Task<IActionResult> UpdateGroupSettings([FromForm] EditGroupPermissionsCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
 
     }
 }

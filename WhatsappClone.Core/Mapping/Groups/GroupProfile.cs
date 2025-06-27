@@ -13,6 +13,7 @@ namespace WhatsappClone.Core.Mapping.Groups
         {
 
             CreateGroupMapping();
+            EditGroupPermissionsMapping();
         }
     }
 }

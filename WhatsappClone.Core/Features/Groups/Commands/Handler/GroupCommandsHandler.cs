@@ -22,6 +22,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
                                                        , IRequestHandler<DeleteGroupMessageCommand, Response<string>>
                                                        , IRequestHandler<PromoteToAdminCommand, Response<string>>
                                                        , IRequestHandler<RevokeAdminCommand, Response<string>>
+                                                       , IRequestHandler<EditGroupPermissionsCommand, Response<string>>
 
 
     {
@@ -168,7 +169,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
         {
             var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            groupService.PromoteToAdmin(actorId!, request.userId, request.groupId);
+            await groupService.PromoteToAdmin(actorId!, request.userId, request.groupId);
 
             return Success("Promoted Successfully");
 
@@ -179,9 +180,22 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
         {
             var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            groupService.RevokeAdmin(actorId!, request.userId, request.groupId);
+            await groupService.RevokeAdmin(actorId!, request.userId, request.groupId);
 
             return Success("Revoked Successfully");
+        }
+
+        public async Task<Response<string>> Handle(EditGroupPermissionsCommand request, CancellationToken cancellationToken)
+        {
+
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var group = mapper.Map<Group>(request);
+            await groupService.EditGroupPermissions(actorId!, group);
+
+            return Success("Edited Successfully");
+
+
+
         }
     }
 }

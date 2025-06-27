@@ -188,10 +188,18 @@ namespace WhatsappClone.Service.Implementation
 
             // Retrieve the message from the database
             var message = await messageRepo.GetTableNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == messageId && m.GroupId == groupId);
+                .FirstAsync(m => m.Id == messageId && m.GroupId == groupId);
             if (message == null)
             {
                 throw new Exception("Message not found.");
+            }
+
+            //if actor is the sender -> can edit only your message
+            if (!(message.SenderId == actorId))
+            {
+
+                throw new UnauthorizedAccessException("you are not authorize to edit this message");
+
             }
             // Update the content of the message
             message.Content = content;
@@ -214,19 +222,19 @@ namespace WhatsappClone.Service.Implementation
             var message = await messageRepo.GetTableNoTracking()
                       .FirstAsync(m => m.Id == messageId && m.GroupId == groupId);
 
-            //if actor is admin -> can delete any message else you can can delete only your message
-            if (!(message.SenderId == actorId))
-            {
-                if (!userGroupRepo.IsGroupAdmin(actorId, groupId))
-                {
-                    throw new UnauthorizedAccessException("you are not authorize to delete this message");
-                }
-            }
-
             if (message == null)
             {
                 throw new Exception("Message not found.");
             }
+            //if actor is admin -> can delete any message else you can can delete only your message
+            if (!(message.SenderId == actorId) && !userGroupRepo.IsGroupAdmin(actorId, groupId))
+            {
+
+                throw new UnauthorizedAccessException("you are not authorize to delete this message");
+
+            }
+
+
             // Update the content of the message
             message.IsDeleted = true;
             var systemMessage = new

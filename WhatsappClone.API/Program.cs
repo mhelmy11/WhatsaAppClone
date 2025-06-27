@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MoMediatoR;
+using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
+using WhatsappClone.API.Base;
 using WhatsappClone.API.Requirements.Handlers;
 using WhatsappClone.Core;
 using WhatsappClone.Core.Features.Chats.Queries.Handler;
@@ -37,7 +40,10 @@ namespace WhatsappClone.API
             {
 
                 var builder = WebApplication.CreateBuilder(args);
-
+                //builder.Services.AddOpenApi("v1", options =>
+                //               {
+                //                   options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+                //               });
 
                 #region Serilog
                 builder.Host.UseSerilog((context, services, configuration) => configuration
@@ -52,6 +58,7 @@ namespace WhatsappClone.API
 
 
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen(options =>
                 {
@@ -71,19 +78,20 @@ namespace WhatsappClone.API
                     // 2. تطبيق مخطط الأمان على كل العمليات التي تحتاج لمصادقة
                     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer" // يجب أن يتطابق مع الاسم في AddSecurityDefinition
-                }
-            },
-            new string[] {}
-        }
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer" // يجب أن يتطابق مع الاسم في AddSecurityDefinition
+                            }
+                        },
+                        new string[] {}
+                    }
     });
-                }); builder.Services.AddSignalR();
+                });
+                builder.Services.AddSignalR();
                 builder.Services.AddTransient<IAuthorizationHandler, SessionNotRevokedHandler>();
                 //builder.Services.AddScoped<UnitOfWork>();
 
@@ -136,6 +144,9 @@ namespace WhatsappClone.API
                 {
                     app.UseSwagger();
                     app.UseSwaggerUI();
+                    //app.MapScalarApiReference();
+                    //app.MapOpenApi();
+
                 }
 
                 app.UseStaticFiles();

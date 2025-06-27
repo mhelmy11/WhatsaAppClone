@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azure.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,8 +40,11 @@ namespace WhatsappClone.Service.Abstract
 
         public bool IsUserInGroup(string userId, Guid groupId);
 
-        public void PromoteToAdmin(string actorId, string userId, Guid groupId);
-        public void RevokeAdmin(string actorId, string userId, Guid groupId);
+        public Task PromoteToAdmin(string actorId, string userId, Guid groupId);
+        public Task RevokeAdmin(string actorId, string userId, Guid groupId);
+
+
+        public Task EditGroupPermissions(string actorId, Group group);
 
     }
 }

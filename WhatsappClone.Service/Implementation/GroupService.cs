@@ -1,4 +1,5 @@
 ﻿using AutoMapper.Execution;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -214,16 +215,26 @@ namespace WhatsappClone.Service.Implementation
                 throw new Exception("Error removing members from group", ex);
             }
         }
-        public void RevokeAdmin(string actorId, string userId, Guid groupId)
+        public async Task RevokeAdmin(string actorId, string userId, Guid groupId)
         {
-            var getCurrentRole = userGroupRepo.GetTableNoTracking()
-                    .First(ug => ug.GroupId == groupId && ug.UserId == userId).Role;
-            if (!userGroupRepo.IsGroupAdmin(actorId, groupId))
+
+            var members = userGroupRepo.GetTableAsTracking()
+                .Where(ug => ug.GroupId == groupId && (ug.UserId == userId || ug.UserId == actorId)).ToList();
+
+            var actor = members.FirstOrDefault(ug => ug.UserId == actorId);
+            var revokedUser = members.FirstOrDefault(ug => ug.UserId == userId);
+
+            if (actor == null || revokedUser == null || revokedUser.isMember == false)
+            {
+                throw new NullReferenceException("user not found");
+            }
+
+            if (actor.Role != GroupRole.Admin)
             {
                 throw new UnauthorizedAccessException("you are not authorized to revoke this user");
             }
 
-            if (getCurrentRole == GroupRole.Member)
+            if (revokedUser.Role == GroupRole.Member)
             {
                 throw new Exception("user is already a member");
             }
@@ -232,9 +243,7 @@ namespace WhatsappClone.Service.Implementation
             try
             {
 
-                userGroupRepo.GetTableNoTracking()
-                    .Where(ug => ug.GroupId == groupId && ug.UserId == userId)
-                    .ExecuteUpdate(g => g.SetProperty(p => p.Role, GroupRole.Member));
+                revokedUser.Role = GroupRole.Member;
 
                 var systemRevokeMessage = new
                 {
@@ -244,9 +253,9 @@ namespace WhatsappClone.Service.Implementation
                 };
 
                 var content = JsonSerializer.Serialize(systemRevokeMessage);
-                messagesService.AddSystemMessage(content, groupId, actorId, MessageType.Revoke);
+                await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.Revoke);
 
-                transaction.Commit();
+                await transaction.CommitAsync();
 
 
 
@@ -254,22 +263,31 @@ namespace WhatsappClone.Service.Implementation
             catch (Exception ex)
             {
 
-                transaction.Rollback();
-                throw new Exception("Error while revoking the member", ex);
+                await transaction.RollbackAsync();
+                throw new Exception("Error while promoting the member", ex);
 
             }
-
         }
-        public void PromoteToAdmin(string actorId, string userId, Guid groupId)
+        public async Task PromoteToAdmin(string actorId, string userId, Guid groupId)
         {
-            var getCurrentRole = userGroupRepo.GetTableNoTracking()
-                     .First(ug => ug.GroupId == groupId && ug.UserId == userId).Role;
-            if (!userGroupRepo.IsGroupAdmin(actorId, groupId))
+
+            var members = userGroupRepo.GetTableAsTracking()
+                .Where(ug => ug.GroupId == groupId && (ug.UserId == userId || ug.UserId == actorId)).ToList();
+
+            var actor = members.FirstOrDefault(ug => ug.UserId == actorId);
+            var promotedUser = members.FirstOrDefault(ug => ug.UserId == userId);
+
+            if (actor == null || promotedUser == null || promotedUser.isMember == false)
+            {
+                throw new NullReferenceException("user not found");
+            }
+
+            if (actor.Role != GroupRole.Admin)
             {
                 throw new UnauthorizedAccessException("you are not authorized to promote this user");
             }
 
-            if (getCurrentRole == GroupRole.Admin)
+            if (promotedUser.Role == GroupRole.Admin)
             {
                 throw new Exception("user is already a admin");
             }
@@ -278,9 +296,7 @@ namespace WhatsappClone.Service.Implementation
             try
             {
 
-                userGroupRepo.GetTableNoTracking()
-                    .Where(ug => ug.GroupId == groupId && ug.UserId == userId)
-                    .ExecuteUpdate(g => g.SetProperty(p => p.Role, GroupRole.Admin));
+                promotedUser.Role = GroupRole.Admin;
 
                 var systemPromoteMessage = new
                 {
@@ -290,9 +306,9 @@ namespace WhatsappClone.Service.Implementation
                 };
 
                 var content = JsonSerializer.Serialize(systemPromoteMessage);
-                messagesService.AddSystemMessage(content, groupId, actorId, MessageType.Promote);
+                await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.Promote);
 
-                transaction.Commit();
+                await transaction.CommitAsync();
 
 
 
@@ -300,7 +316,7 @@ namespace WhatsappClone.Service.Implementation
             catch (Exception ex)
             {
 
-                transaction.Rollback();
+                await transaction.RollbackAsync();
                 throw new Exception("Error while promoting the member", ex);
 
             }
@@ -444,8 +460,74 @@ namespace WhatsappClone.Service.Implementation
 
         }
 
+        public async Task EditGroupPermissions(string actorId, Group updatedGroup)
+        {
+            var originalGroup = groupRepo.GetTableNoTracking().First(g => g.Id == updatedGroup.Id);
+            var transaction = userGroupRepo.BeginTransaction();
+            if (!userGroupRepo.IsGroupAdmin(actorId, originalGroup.Id))
+            {
+
+                throw new UnauthorizedAccessException("you are not authorized to edit group permissions");
+
+            }
+            try
+            {
+
+                if (updatedGroup.AllowSendMessages != originalGroup.AllowSendMessages)
+                {
+                    var systemMessage = new
+                    {
+                        type = GroupSystemMessage.SendMessageAllowed.ToString(),
+                        actorUserId = actorId,
+                        isAllowed = updatedGroup.AllowSendMessages
+                    };
+                    var content = JsonSerializer.Serialize(systemMessage);
+                    await messagesService.AddSystemMessage(content, originalGroup.Id, actorId, MessageType.GroupSettingsChanged);
+                }
+                if (updatedGroup.CanAddMembers != originalGroup.CanAddMembers)
+                {
+                    var systemMessage = new
+                    {
+                        type = GroupSystemMessage.AddMembersAllowed.ToString(),
+                        actorUserId = actorId,
+                        isAllowed = updatedGroup.CanAddMembers
+                    };
+                    var content = JsonSerializer.Serialize(systemMessage);
+                    await messagesService.AddSystemMessage(content, originalGroup.Id, actorId, MessageType.GroupSettingsChanged);
+                }
+                if (updatedGroup.EditGroupSettings != originalGroup.EditGroupSettings)
+                {
+                    var systemMessage = new
+                    {
+                        type = GroupSystemMessage.EditGroupAllowed.ToString(),
+                        actorUserId = actorId,
+                        isAllowed = updatedGroup.EditGroupSettings
+                    };
+                    var content = JsonSerializer.Serialize(systemMessage);
+                    await messagesService.AddSystemMessage(content, originalGroup.Id, actorId, MessageType.GroupSettingsChanged);
+                }
+
+
+                originalGroup.AllowSendMessages = updatedGroup.AllowSendMessages;
+                originalGroup.CanAddMembers = updatedGroup.CanAddMembers;
+                originalGroup.EditGroupSettings = updatedGroup.EditGroupSettings;
+                await groupRepo.UpdateAsync(originalGroup);
 
 
 
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+
+
+                throw new Exception("Error while updating Group's Settings", ex);
+
+            }
+
+
+
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace WhatsappClone.API.Controllers
     {
 
 
-        [HttpPost("send=group-message")]
+        [HttpPost("send-group-message")]
         [Authorize]
 
 
