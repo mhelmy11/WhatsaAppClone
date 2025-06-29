@@ -26,6 +26,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
                                                        , IRequestHandler<CreateInviteLinkCommand, Response<string>>
                                                        , IRequestHandler<ResetInviteLinkCommand, Response<string>>
                                                        , IRequestHandler<JoinGroupViaLinkCommand, Response<string>>
+                                                       , IRequestHandler<TogglePinGroupCommand, Response<string>>
 
 
     {
@@ -227,5 +228,22 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
             return Success("Joined Successfully");
         }
+
+        public async Task<Response<string>> Handle(TogglePinGroupCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await groupService.TogglePinGroup(request.groupId, actorId!, request.currentPinState);
+
+            return Success("Group Pinned Successfully");
+        }
+
+        ///TODO..............
+
+        //Mute Group // for mobile
+
+        //PinGroup
+
+
+        //Archive Group
     }
 }

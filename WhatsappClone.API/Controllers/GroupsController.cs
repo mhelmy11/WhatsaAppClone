@@ -157,5 +157,13 @@ namespace WhatsappClone.API.Controllers
             return ResponseResult(result);
         }
 
+        [HttpPut("pin-group")]
+        [Authorize]
+        public async Task<IActionResult> PinGroup([FromForm] TogglePinGroupCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
     }
 }

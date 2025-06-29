@@ -54,5 +54,8 @@ namespace WhatsappClone.Service.Abstract
         public Group GetGroupIdByInviteCode(string inviteCode);
 
 
+        public Task TogglePinGroup(Guid groupId, string actorId, bool currentState);
+
+
     }
 }

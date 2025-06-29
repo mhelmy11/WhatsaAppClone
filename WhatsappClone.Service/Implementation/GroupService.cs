@@ -651,5 +651,27 @@ namespace WhatsappClone.Service.Implementation
             }
             return group;
         }
+
+        public async Task TogglePinGroup(Guid groupId, string actorId, bool currentState)
+        {
+            var group = groupRepo.GetTableAsTracking().Include(g => g.ChatSettings).FirstOrDefault(g => g.Id == groupId);
+            if (group == null)
+            {
+                throw new Exception("Group not found");
+            }
+
+            var chatSettings = group.ChatSettings.FirstOrDefault(g => g.GroupId == groupId && actorId == g.UserId);
+            if (chatSettings == null)
+            {
+                group.ChatSettings.Add(new UserChatSettings { IsPinned = true, PinnedAt = DateTime.Now, GroupId = groupId, UserId = actorId, ReceiverId = null });
+            }
+
+            else
+            {
+                chatSettings.IsPinned = !currentState;
+                chatSettings.PinnedAt = DateTime.Now;
+            }
+            await groupRepo.UpdateAsync(group);
+        }
     }
 }

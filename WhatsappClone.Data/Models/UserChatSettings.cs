@@ -21,6 +21,8 @@ namespace WhatsappClone.Data.Models
         public Guid? GroupId { get; set; } //UserId or GroupId
         public bool IsPinned { get; set; } = false;
 
+
+
         public bool IsDeleted { get; set; } = false;
 
         public bool isMuted { get; set; } = false;
@@ -28,6 +30,7 @@ namespace WhatsappClone.Data.Models
         public bool IsArchived { get; set; } = false;
 
         public DateTime? MuteUntil { get; set; }
+        public DateTime? PinnedAt { get; set; }
 
         public virtual AppUser User { get; set; }
 
