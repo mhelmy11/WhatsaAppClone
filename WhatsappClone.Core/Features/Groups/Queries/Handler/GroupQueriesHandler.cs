@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -21,12 +22,14 @@ namespace WhatsappClone.Core.Features.Groups.Queries.Handler
         private readonly IMessagesService messagesService;
         private readonly IGroupService groupService;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IMapper mapper;
 
-        public GroupQueriesHandler(IMessagesService messagesService, IGroupService groupService, IHttpContextAccessor httpContextAccessor)
+        public GroupQueriesHandler(IMessagesService messagesService, IGroupService groupService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             this.messagesService = messagesService;
             this.groupService = groupService;
             this.httpContextAccessor = httpContextAccessor;
+            this.mapper = mapper;
         }
         public async Task<Response<List<ChatDTO>>> Handle(GetGroupListQuery request, CancellationToken cancellationToken)
         {
@@ -39,9 +42,16 @@ namespace WhatsappClone.Core.Features.Groups.Queries.Handler
 
         }
 
-        public Task<Response<GetGroupInviteInfoResult>> Handle(GetGroupInviteInfoQuery request, CancellationToken cancellationToken)
+        public async Task<Response<GetGroupInviteInfoResult>> Handle(GetGroupInviteInfoQuery request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var groupFromDB = groupService.GetGroupIdByInviteCode(request.inviteCode);
+
+            //mapping
+            var groupInfo = mapper.Map<GetGroupInviteInfoResult>(groupFromDB);
+
+            return Success(groupInfo);
+
+
         }
     }
 }

@@ -46,5 +46,13 @@ namespace WhatsappClone.Service.Abstract
 
         public Task EditGroupPermissions(string actorId, Group group);
 
+
+        public Task<string> GenerateInviteCode(Guid groupId, string actorId);
+
+        public Task JoinGroupViaInviteLink(string inviteCode, string actorId);
+
+        public Group GetGroupIdByInviteCode(string inviteCode);
+
+
     }
 }

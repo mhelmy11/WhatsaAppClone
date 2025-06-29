@@ -20,7 +20,8 @@ namespace WhatsappClone.Data.Enums
         AddMembersAllowed,
         EditGroupAllowed,
         GroupNameChanged,
-        GroupCreated
+        GroupCreated,
+        InviteViaLink
 
 
     }

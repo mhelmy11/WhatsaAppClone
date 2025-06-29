@@ -14,6 +14,8 @@ namespace WhatsappClone.Data.Models
         public string? GroupPictureUrl { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
 
+        public string? InviteCode { get; set; }
+
         public string CreatorId { get; set; }
 
         public bool CanAddMembers { get; set; } = true;
@@ -22,6 +24,8 @@ namespace WhatsappClone.Data.Models
 
         public bool AllowSendMessages { get; set; } = true;
         public bool ApproveMembers { get; set; } = false;
+
+        public long MembersCount { get; set; } = 0;
 
         public virtual AppUser Creator { get; set; }
 

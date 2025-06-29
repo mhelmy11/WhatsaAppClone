@@ -32,6 +32,7 @@ namespace WhatsappClone.Data.Enums
         GroupDescriptionChanged = 21,
         Promote = 22,
         Revoke = 23,
+        GroupMemberJoinedViaLink = 24,
 
 
     }

@@ -16,6 +16,8 @@ namespace WhatsappClone.Data.Models
         public string UserId { get; set; }
         public GroupRole Role { get; set; } // 0 = Member, 1 = Admin
         public DateTime AddedOn { get; set; } = DateTime.Now;
+        public DateTime? LeftAt { get; set; }
+
 
         public bool isMember { get; set; } = true;
 

@@ -201,19 +201,31 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
         }
 
-        public Task<Response<string>> Handle(CreateInviteLinkCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(CreateInviteLinkCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var code = await groupService.GenerateInviteCode(request.groupId, actorId);
+
+            return Success(code, "Invite Link Generated Successfully");
         }
 
-        public Task<Response<string>> Handle(ResetInviteLinkCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(ResetInviteLinkCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var code = await groupService.GenerateInviteCode(request.groupId, actorId);
+
+            return Success(code, "Invite Link Generated Successfully");
         }
 
-        public Task<Response<string>> Handle(JoinGroupViaLinkCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(JoinGroupViaLinkCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            await groupService.JoinGroupViaInviteLink(request.inviteCode, actorId!);
+
+            return Success("Joined Successfully");
         }
     }
 }

@@ -33,7 +33,6 @@
 		<Folder Include="Features\Messages\Queries\Handler\" />
 		<Folder Include="Features\Messages\Queries\Models\" />
 		<Folder Include="Features\Messages\Queries\Validation\" />
-		<Folder Include="Mapping\Groups\GroupQueriesMapping\" />
 	</ItemGroup>
 
 	<ItemGroup>

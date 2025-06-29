@@ -12,7 +12,7 @@ namespace WhatsappClone.Core.Features.Groups.Queries.Results
         public string GroupName { get; set; } = null!;
         public string? GroupPic { get; set; }
 
-        public int MembersCount { get; set; }
+        public long MembersCount { get; set; }
 
 
     }

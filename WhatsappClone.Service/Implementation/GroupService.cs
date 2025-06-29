@@ -1,6 +1,7 @@
 ﻿using AutoMapper.Execution;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,11 @@ namespace WhatsappClone.Service.Implementation
             {
                 throw new UnauthorizedAccessException("You are not authorized to add members to this group.");
             }
+            var group = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.Id == groupId);
+            if (group == null)
+            {
+                throw new Exception("Group not found");
+            }
 
             var transaction = userGroupRepo.BeginTransaction();
             try
@@ -49,6 +55,8 @@ namespace WhatsappClone.Service.Implementation
                     Role = GroupRole.Member // Default role for new members
                 }).ToList());
 
+                group.MembersCount += membersIDs.Count();
+                await groupRepo.UpdateAsync(group);
 
                 // add system message for each member added
                 foreach (var member in membersIDs)
@@ -77,7 +85,28 @@ namespace WhatsappClone.Service.Implementation
         }
         public async Task<UserGroup> AddMemberToGroup(UserGroup entity)
         {
-            return await userGroupRepo.AddAsync(entity);
+            var group = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.Id == entity.GroupId);
+            if (group == null)
+            {
+                throw new Exception("Group not found");
+            }
+            var transaction = groupRepo.BeginTransaction();
+            try
+            {
+                group.MembersCount++;
+                await groupRepo.UpdateAsync(group);
+                await transaction.CommitAsync();
+                return await userGroupRepo.AddAsync(entity);
+            }
+            catch (Exception ex)
+            {
+
+                await transaction.RollbackAsync();
+                throw new Exception("Error while adding a member", ex);
+
+
+
+            }
         }
         public async Task<Group> CreateGroup(Group entity, string actorId, List<string>? membersIDs)
         {
@@ -185,13 +214,21 @@ namespace WhatsappClone.Service.Implementation
         }
         public async Task LeaveGroup(string userId, Guid groupId)
         {
-            var groupname = groupRepo.GetTableNoTracking().Where(g => g.Id == groupId).Select(g => g.Name).FirstOrDefault();
+
+            var groupfromDB = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.Id == groupId);
+            if (groupfromDB == null)
+            {
+                throw new Exception("Group Not Found");
+            }
             var transaction = userGroupRepo.BeginTransaction();
             try
             {
                 var group = userGroupRepo.GetTableNoTracking()
                                          .Where(g => g.GroupId == groupId && userId == g.UserId)
                                          .ExecuteUpdate(p => p.SetProperty(g => g.isMember, false));
+
+                groupfromDB.MembersCount--;
+                await groupRepo.UpdateAsync(groupfromDB);
 
 
 
@@ -200,7 +237,7 @@ namespace WhatsappClone.Service.Implementation
                 {
                     type = GroupSystemMessage.MemberLeft.ToString(),
                     actorUserId = userId,
-                    groupName = groupname,
+                    groupName = groupfromDB.Name,
 
                 };
 
@@ -528,6 +565,91 @@ namespace WhatsappClone.Service.Implementation
 
 
 
+        }
+
+        public async Task<string> GenerateInviteCode(Guid groupId, string actorId)
+        {
+            //check if actor is admin
+            if (!userGroupRepo.IsGroupAdmin(actorId, groupId))
+            {
+                throw new UnauthorizedAccessException("you are not authorized to generate invite link");
+            }
+            //generate encoded code
+            bool isUnique = true;
+            string code;
+            do
+            {
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                var random = new Random();
+                code = new string(Enumerable.Repeat(chars, 20)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+
+                isUnique = groupRepo.GetTableNoTracking().Any(g => g.InviteCode == code && g.InviteCode != null);
+
+            } while (isUnique);
+            //add it to group table
+            var group = groupRepo.GetTableAsTracking().First(g => g.Id == groupId);
+            group.InviteCode = code;
+            await groupRepo.UpdateAsync(group);
+
+            return code;
+
+
+        }
+
+        public async Task JoinGroupViaInviteLink(string inviteCode, string actorId)
+        {
+            var group = groupRepo.GetTableAsTracking().FirstOrDefault(group => group.InviteCode == inviteCode);
+            if (group == null)
+            {
+
+                throw new Exception("Invalid Invite Link");
+            }
+            var transaction = groupRepo.BeginTransaction();
+            try
+            {
+
+                await userGroupRepo.AddAsync(new UserGroup
+                {
+                    Role = GroupRole.Member,
+                    GroupId = group.Id,
+                    UserId = actorId
+                });
+
+                group.MembersCount++;
+                await groupRepo.UpdateAsync(group);
+                //add system message
+                var systemMessage = new
+                {
+                    type = GroupSystemMessage.InviteViaLink.ToString(),
+                    actorUserId = actorId,
+                };
+                var content = JsonSerializer.Serialize(systemMessage);
+                await messagesService.AddSystemMessage(content, group.Id, actorId, MessageType.GroupMemberJoinedViaLink);
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+
+                await transaction.RollbackAsync();
+                throw new Exception("Error while joining the group via invite link ", ex);
+
+            }
+
+
+
+
+        }
+
+        public Group GetGroupIdByInviteCode(string inviteCode)
+        {
+            var group = groupRepo.GetTableNoTracking().FirstOrDefault(group => group.InviteCode == inviteCode);
+            if (group == null)
+            {
+
+                throw new Exception("Invalid Invite Link");
+            }
+            return group;
         }
     }
 }
