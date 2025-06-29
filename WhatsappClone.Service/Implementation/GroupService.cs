@@ -655,23 +655,43 @@ namespace WhatsappClone.Service.Implementation
         public async Task TogglePinGroup(Guid groupId, string actorId, bool currentState)
         {
             var group = groupRepo.GetTableAsTracking().Include(g => g.ChatSettings).FirstOrDefault(g => g.Id == groupId);
+
+            var transaction = groupRepo.BeginTransaction();
+
+
             if (group == null)
             {
                 throw new Exception("Group not found");
             }
-
-            var chatSettings = group.ChatSettings.FirstOrDefault(g => g.GroupId == groupId && actorId == g.UserId);
-            if (chatSettings == null)
+            if (!userGroupRepo.IsUserInGroup(actorId, groupId))
             {
-                group.ChatSettings.Add(new UserChatSettings { IsPinned = true, PinnedAt = DateTime.Now, GroupId = groupId, UserId = actorId, ReceiverId = null });
+                throw new Exception("Us is not a member in this group");
+
             }
 
-            else
+            try
             {
-                chatSettings.IsPinned = !currentState;
-                chatSettings.PinnedAt = DateTime.Now;
+                var chatSettings = group.ChatSettings.FirstOrDefault(g => g.GroupId == groupId && actorId == g.UserId);
+                if (chatSettings == null)
+                {
+                    group.ChatSettings.Add(new UserChatSettings { IsPinned = true, PinnedAt = DateTime.Now, GroupId = groupId, UserId = actorId, ReceiverId = null });
+                }
+
+                else
+                {
+                    chatSettings.IsPinned = !currentState;
+                    chatSettings.PinnedAt = DateTime.Now;
+                }
+                await groupRepo.UpdateAsync(group);
+                await transaction.CommitAsync();
+
             }
-            await groupRepo.UpdateAsync(group);
+            catch (Exception ex)
+            {
+
+                await transaction.RollbackAsync();
+                throw new Exception("error while updating pin state", ex);
+            }
         }
     }
 }
