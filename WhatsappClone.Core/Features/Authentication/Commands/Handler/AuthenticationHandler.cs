@@ -84,7 +84,7 @@ namespace WhatsappClone.Core.Features.Authentication.Commands.Handler
                 return BadRequest<JWTResult>("Invalid refresh token. Redirect to Login Page");
             }
 
-            if (refreshToken.ExpiryDate < DateTime.Now)
+            if (refreshToken.ExpiresAt < DateTime.Now)
             {
 
                 authenticationService.RevokeRefreshToken(request.RefreshToken);

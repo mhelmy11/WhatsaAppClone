@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure.Bases;
+using WhatsappClone.Infrastructure.Data;
 using WhatsappClone.Infrastructure.Interfaces;
 using WhatsappClone.Infrastructure.Repositories;
 
@@ -26,15 +28,31 @@ namespace WhatsappClone.Infrastructure
             services.AddScoped<IChat, ChatRepo>();
             services.AddScoped<IMessage, MessageRepo>();
             services.AddScoped<IGroup, GroupRepo>();
-            services.AddScoped<IMessageReadStatus, MessageReadStatusRepo>();
+             services.AddScoped<IMessageReadStatus, MessageReadStatusRepo>();
             services.AddScoped<IUserGroup, UserGroupRepo>();
             services.AddScoped<IRefreshToken, RefreshTokenRepo>();
             services.AddScoped<IUserContacts, UserContactsRepo>();
+            services.AddScoped<IStatusRepository, StatusRepository>();
             services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
-
             #endregion
 
-            #region Identity And DB
+            #region MongoDB
+            var mongoDbSettings = configuration.GetSection("MongoDbSettings");
+            var mongoConnectionString = mongoDbSettings["ConnectionString"];
+            var mongoDatabaseName = mongoDbSettings["DatabaseName"];
+
+            // Register MongoDB client
+            services.AddSingleton<IMongoClient>(new MongoClient(mongoConnectionString));
+
+            // Register MongoDB factory
+            services.AddSingleton<IMongoDBFactory>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                return new MongoDBFactory(client, mongoDatabaseName!);
+            });
+            #endregion
+
+            #region Identity And DBContext
             services.AddDbContext<Context>(options =>
              {
                  options.UseSqlServer(configuration.GetConnectionString("whatsapp"));
@@ -93,7 +111,7 @@ namespace WhatsappClone.Infrastructure
                     {
                         var token = context.Request.Query["access_token"];
                         var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(token) && (path.StartsWithSegments("/startChat")))
+                        if (!string.IsNullOrEmpty(token) && path.StartsWithSegments("/startChat"))
                         {
                             context.Token = token;
                         }

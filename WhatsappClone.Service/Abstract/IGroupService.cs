@@ -55,6 +55,7 @@ namespace WhatsappClone.Service.Abstract
 
 
         public Task TogglePinGroup(Guid groupId, string actorId, bool currentState);
+        public Task ToggleArchiveGroup(Guid groupId, string actorId, bool currentState);
 
 
     }

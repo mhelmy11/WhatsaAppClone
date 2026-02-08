@@ -1,4 +1,4 @@
-﻿using AutoMapper.Execution;
+using AutoMapper.Execution;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -39,7 +39,7 @@ namespace WhatsappClone.Service.Implementation
             {
                 throw new UnauthorizedAccessException("You are not authorized to add members to this group.");
             }
-            var group = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.Id == groupId);
+            var group = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.GroupId == groupId);
             if (group == null)
             {
                 throw new Exception("Group not found");
@@ -52,7 +52,7 @@ namespace WhatsappClone.Service.Implementation
                 {
                     GroupId = groupId,
                     UserId = memberId,
-                    Role = GroupRole.Member // Default role for new members
+                    Role = GroupRoleString.Member // Default role for new members
                 }).ToList());
 
                 group.MembersCount += membersIDs.Count();
@@ -64,14 +64,14 @@ namespace WhatsappClone.Service.Implementation
                     var systemMessage = new
                     {
 
-                        type = GroupSystemMessage.MemeberAdded.ToString(),
+                        type = SystemMessageType.MemberAdded,
                         actorUserId = actorId,
                         targetUserIds = member
                     };
 
                     var content = JsonSerializer.Serialize(systemMessage);
 
-                    await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.AddMember);
+                    await messagesService.AddSystemMessage(content, groupId, actorId, MessageTypeString.System);
                 }
 
                 await transaction.CommitAsync();
@@ -85,7 +85,7 @@ namespace WhatsappClone.Service.Implementation
         }
         public async Task<UserGroup> AddMemberToGroup(UserGroup entity)
         {
-            var group = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.Id == entity.GroupId);
+            var group = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.GroupId == entity.GroupId);
             if (group == null)
             {
                 throw new Exception("Group not found");
@@ -118,43 +118,45 @@ namespace WhatsappClone.Service.Implementation
                 var result = await groupRepo.AddAsync(entity);
                 await userGroupRepo.AddAsync(new UserGroup
                 {
-                    GroupId = entity.Id,
+                    GroupId = entity.GroupId,
                     UserId = actorId,
-                    Role = GroupRole.Admin // The creator is the admin of the group
+                    Role = GroupRoleString.Admin // The creator is the admin of the group
                 });
                 var systemMessageCreate = new
                 {
 
-                    type = GroupSystemMessage.GroupCreated.ToString(),
+                    type = SystemMessageType.MemberAdded,
                     actorUserId = actorId,
                     groupName = entity.Name,
                 };
                 var contentCreate = JsonSerializer.Serialize(systemMessageCreate);
 
-                await messagesService.AddSystemMessage(contentCreate, entity.Id, actorId, MessageType.GroupCreated);
+                await messagesService.AddSystemMessage(contentCreate, entity.GroupId, actorId, MessageTypeString.System);
 
                 // add Members
-
-                await userGroupRepo.AddRangeAsync(membersIDs.Select(memberId => new UserGroup
+                if (membersIDs != null && membersIDs.Count > 0)
                 {
-                    GroupId = entity.Id,
-                    UserId = memberId,
-                    Role = GroupRole.Member // Default role for new members
-                }).ToList());
-
-                foreach (var member in membersIDs)
-                {
-                    var systemMessage = new
+                    await userGroupRepo.AddRangeAsync(membersIDs.Select(memberId => new UserGroup
                     {
+                        GroupId = entity.GroupId,
+                        UserId = memberId,
+                        Role = GroupRoleString.Member // Default role for new members
+                    }).ToList());
 
-                        type = "MEMBER_ADDED",
-                        actorUserId = actorId,
-                        targetUserIds = member
-                    };
+                    foreach (var member in membersIDs)
+                    {
+                        var systemMessage = new
+                        {
 
-                    var content = JsonSerializer.Serialize(systemMessage);
+                            type = SystemMessageType.MemberAdded,
+                            actorUserId = actorId,
+                            targetUserIds = member
+                        };
 
-                    await messagesService.AddSystemMessage(content, entity.Id, actorId, MessageType.AddMember);
+                        var content = JsonSerializer.Serialize(systemMessage);
+
+                        await messagesService.AddSystemMessage(content, entity.GroupId, actorId, MessageTypeString.System);
+                    }
                 }
 
 
@@ -173,7 +175,7 @@ namespace WhatsappClone.Service.Implementation
         public Group GetGroupById(Guid groupId)
         {
             return groupRepo.GetTableNoTracking()
-                .First(g => g.Id == groupId);
+                .First(g => g.GroupId == groupId);
 
         }
         public List<Guid> GetGroupIdsOfUser(string userId)
@@ -189,23 +191,16 @@ namespace WhatsappClone.Service.Implementation
         }
         public List<ChatDTO> GetGroupsOfUser(string userId)
         {
-
-
-
-
-
-            var userGroupsIDs = GetGroupIdsOfUser(userId);                                   // retrieve the groups of a user by their userId
-            var groupMessagesIDs = messagesService.GetMessagesOfGroupsIDs(userGroupsIDs);    // retrieve the messages of the groups by their IDs
-            var messagesStatusesLookUp = messageStatusesService.GetMessageStatusesDict();    // messagesStatusesLookUp[1] -> return list of the recipient message status for the message with ID 1-> [user: 1 , status: seen , user: 2 , status: delivered... ]
+            var userGroupsIDs = GetGroupIdsOfUser(userId);
+            var groupMessagesIDs = messagesService.GetMessagesOfGroupsIDs(userGroupsIDs);
+            var messagesStatusesLookUp = messageStatusesService.GetMessageStatusesDict();
             var lastMessagesOfGroups = messagesService.GetLasMessageOfGroupsIDs(groupMessagesIDs, userId);
-
 
             return lastMessagesOfGroups;
         }
         public async Task<bool> IsUserAdmin(string userId, Guid groupId)
         {
-            return userGroupRepo.GetTableNoTracking().Any(ug => ug.UserId == userId && ug.GroupId == groupId && ug.Role == GroupRole.Admin);
-
+            return await Task.FromResult(userGroupRepo.GetTableNoTracking().Any(ug => ug.UserId == userId && ug.GroupId == groupId && ug.Role == GroupRoleString.Admin));
         }
         public bool IsUserInGroup(string userId, Guid groupId)
         {
@@ -215,7 +210,7 @@ namespace WhatsappClone.Service.Implementation
         public async Task LeaveGroup(string userId, Guid groupId)
         {
 
-            var groupfromDB = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.Id == groupId);
+            var groupfromDB = groupRepo.GetTableAsTracking().SingleOrDefault(g => g.GroupId == groupId);
             if (groupfromDB == null)
             {
                 throw new Exception("Group Not Found");
@@ -225,7 +220,7 @@ namespace WhatsappClone.Service.Implementation
             {
                 var group = userGroupRepo.GetTableNoTracking()
                                          .Where(g => g.GroupId == groupId && userId == g.UserId)
-                                         .ExecuteUpdate(p => p.SetProperty(g => g.isMember, false));
+                                         .ExecuteUpdate(p => p.SetProperty(g => g.IsApproved, false));
 
                 groupfromDB.MembersCount--;
                 await groupRepo.UpdateAsync(groupfromDB);
@@ -235,14 +230,14 @@ namespace WhatsappClone.Service.Implementation
                 // add system message for each member left
                 var systemRemoveMessage = new
                 {
-                    type = GroupSystemMessage.MemberLeft.ToString(),
+                    type = SystemMessageType.MemberLeft,
                     actorUserId = userId,
                     groupName = groupfromDB.Name,
 
                 };
 
                 var content = JsonSerializer.Serialize(systemRemoveMessage);
-                await messagesService.AddSystemMessage(content, groupId, userId, MessageType.GroupMemberLeft);
+                await messagesService.AddSystemMessage(content, groupId, userId, MessageTypeString.System);
                 await transaction.CommitAsync();
 
             }
@@ -261,17 +256,17 @@ namespace WhatsappClone.Service.Implementation
             var actor = members.FirstOrDefault(ug => ug.UserId == actorId);
             var revokedUser = members.FirstOrDefault(ug => ug.UserId == userId);
 
-            if (actor == null || revokedUser == null || revokedUser.isMember == false)
+            if (actor == null || revokedUser == null || revokedUser.IsApproved == false)
             {
                 throw new NullReferenceException("user not found");
             }
 
-            if (actor.Role != GroupRole.Admin)
+            if (actor.Role != GroupRoleString.Admin)
             {
                 throw new UnauthorizedAccessException("you are not authorized to revoke this user");
             }
 
-            if (revokedUser.Role == GroupRole.Member)
+            if (revokedUser.Role == GroupRoleString.Member)
             {
                 throw new Exception("user is already a member");
             }
@@ -280,17 +275,17 @@ namespace WhatsappClone.Service.Implementation
             try
             {
 
-                revokedUser.Role = GroupRole.Member;
+                revokedUser.Role = GroupRoleString.Member;
 
                 var systemRevokeMessage = new
                 {
-                    type = GroupSystemMessage.MemberRevoked.ToString(),
+                    type = SystemMessageType.MemberRevoked,
                     actorUserId = actorId,
                     targetUserId = userId
                 };
 
                 var content = JsonSerializer.Serialize(systemRevokeMessage);
-                await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.Revoke);
+                await messagesService.AddSystemMessage(content, groupId, actorId, MessageTypeString.System);
 
                 await transaction.CommitAsync();
 
@@ -314,17 +309,17 @@ namespace WhatsappClone.Service.Implementation
             var actor = members.FirstOrDefault(ug => ug.UserId == actorId);
             var promotedUser = members.FirstOrDefault(ug => ug.UserId == userId);
 
-            if (actor == null || promotedUser == null || promotedUser.isMember == false)
+            if (actor == null || promotedUser == null || promotedUser.IsApproved == false)
             {
                 throw new NullReferenceException("user not found");
             }
 
-            if (actor.Role != GroupRole.Admin)
+            if (actor.Role != GroupRoleString.Admin)
             {
                 throw new UnauthorizedAccessException("you are not authorized to promote this user");
             }
 
-            if (promotedUser.Role == GroupRole.Admin)
+            if (promotedUser.Role == GroupRoleString.Admin)
             {
                 throw new Exception("user is already a admin");
             }
@@ -333,17 +328,17 @@ namespace WhatsappClone.Service.Implementation
             try
             {
 
-                promotedUser.Role = GroupRole.Admin;
+                promotedUser.Role = GroupRoleString.Admin;
 
                 var systemPromoteMessage = new
                 {
-                    type = GroupSystemMessage.MemberPromoted.ToString(),
+                    type = SystemMessageType.MemberPromoted,
                     actorUserId = actorId,
                     targetUserId = userId
                 };
 
                 var content = JsonSerializer.Serialize(systemPromoteMessage);
-                await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.Promote);
+                await messagesService.AddSystemMessage(content, groupId, actorId, MessageTypeString.System);
 
                 await transaction.CommitAsync();
 
@@ -372,7 +367,7 @@ namespace WhatsappClone.Service.Implementation
             {
                 var group = userGroupRepo.GetTableNoTracking()
                                          .Where(g => g.GroupId == groupId && userIDs.Contains(g.UserId))
-                                         .ExecuteUpdate(p => p.SetProperty(g => g.isMember, false));
+                                         .ExecuteUpdate(p => p.SetProperty(g => g.IsApproved, false));
 
 
                 // add system message for each member removed
@@ -380,13 +375,13 @@ namespace WhatsappClone.Service.Implementation
                 {
                     var systemRemoveMessage = new
                     {
-                        type = GroupSystemMessage.MemberRemoved.ToString(),
+                        type = SystemMessageType.MemberRemoved,
                         actorUserId = actorId,
                         targetUserId = member
                     };
 
                     var content = JsonSerializer.Serialize(systemRemoveMessage);
-                    await messagesService.AddSystemMessage(content, groupId, actorId, MessageType.RemoveMember);
+                    await messagesService.AddSystemMessage(content, groupId, actorId, MessageTypeString.System);
                 }
                 await transaction.CommitAsync();
 
@@ -400,7 +395,7 @@ namespace WhatsappClone.Service.Implementation
         public async Task UpdateGroupDescription(Group entity, string actorId)
         {
             // Check if the actor is an admin of the group and update group picture is allowed
-            if (!userGroupRepo.IsUserInGroup(actorId, entity.Id) || !userGroupRepo.IsGroupAdmin(actorId, entity.Id) || !groupRepo.IsEditGroupAllowed(entity.Id))
+            if (!userGroupRepo.IsUserInGroup(actorId, entity.GroupId) || !userGroupRepo.IsGroupAdmin(actorId, entity.GroupId) || !groupRepo.IsEditGroupAllowed(entity.GroupId))
             {
                 throw new UnauthorizedAccessException("You are not authorized to update the group picture.");
             }
@@ -412,13 +407,13 @@ namespace WhatsappClone.Service.Implementation
                 // add system message for each member removed
                 var systemRemoveMessage = new
                 {
-                    type = GroupSystemMessage.GroupDescriptionChanged.ToString(),
+                    type = SystemMessageType.GroupDescriptionChanged,
                     actorUserId = actorId,
                     newGroupDesc = entity.Description,
                 };
 
                 var content = JsonSerializer.Serialize(systemRemoveMessage);
-                await messagesService.AddSystemMessage(content, entity.Id, actorId, MessageType.GroupDescriptionChanged);
+                await messagesService.AddSystemMessage(content, entity.GroupId, actorId, MessageTypeString.System);
                 await transaction.CommitAsync();
 
             }
@@ -431,7 +426,7 @@ namespace WhatsappClone.Service.Implementation
         public async Task UpdateGroupName(Group entity, string actorId, string oldName)
         {
             // Check if the actor is an admin of the group and update group picture is allowed
-            if (!userGroupRepo.IsUserInGroup(actorId, entity.Id) || !userGroupRepo.IsGroupAdmin(actorId, entity.Id) || !groupRepo.IsEditGroupAllowed(entity.Id))
+            if (!userGroupRepo.IsUserInGroup(actorId, entity.GroupId) || !userGroupRepo.IsGroupAdmin(actorId, entity.GroupId) || !groupRepo.IsEditGroupAllowed(entity.GroupId))
             {
                 throw new UnauthorizedAccessException("You are not authorized to update the group picture.");
             }
@@ -443,14 +438,14 @@ namespace WhatsappClone.Service.Implementation
                 // add system message for each member removed
                 var systemRemoveMessage = new
                 {
-                    type = GroupSystemMessage.GroupNameChanged.ToString(),
+                    type = SystemMessageType.GroupNameChanged,
                     actorUserId = actorId,
-                    newGroupPic = entity.GroupPictureUrl,
+                    newGroupPic = entity.PictureUrl,
                     oldGroupName = oldName
                 };
 
                 var content = JsonSerializer.Serialize(systemRemoveMessage);
-                await messagesService.AddSystemMessage(content, entity.Id, actorId, MessageType.GroupNameChanged);
+                await messagesService.AddSystemMessage(content, entity.GroupId, actorId, MessageTypeString.System);
                 await transaction.CommitAsync();
 
             }
@@ -465,7 +460,7 @@ namespace WhatsappClone.Service.Implementation
 
 
             // Check if the actor is an admin of the group and update group picture is allowed
-            if (!userGroupRepo.IsUserInGroup(actorId, entity.Id) || !userGroupRepo.IsGroupAdmin(actorId, entity.Id) || !groupRepo.IsEditGroupAllowed(entity.Id))
+            if (!userGroupRepo.IsUserInGroup(actorId, entity.GroupId) || !userGroupRepo.IsGroupAdmin(actorId, entity.GroupId) || !groupRepo.IsEditGroupAllowed(entity.GroupId))
             {
                 throw new UnauthorizedAccessException("You are not authorized to update the group picture.");
             }
@@ -478,14 +473,14 @@ namespace WhatsappClone.Service.Implementation
                 // add system message for each member removed
                 var systemRemoveMessage = new
                 {
-                    type = GroupSystemMessage.PicChanged.ToString(),
+                    type = SystemMessageType.PicChanged,
                     actorUserId = actorId,
-                    newGroupPic = entity.GroupPictureUrl,
+                    newGroupPic = entity.PictureUrl,
                     oldGroupPic = oldPic
                 };
 
                 var content = JsonSerializer.Serialize(systemRemoveMessage);
-                await messagesService.AddSystemMessage(content, entity.Id, actorId, MessageType.GroupPicChanged);
+                await messagesService.AddSystemMessage(content, entity.GroupId, actorId, MessageTypeString.System);
                 await transaction.CommitAsync();
 
             }
@@ -499,9 +494,9 @@ namespace WhatsappClone.Service.Implementation
 
         public async Task EditGroupPermissions(string actorId, Group updatedGroup)
         {
-            var originalGroup = groupRepo.GetTableNoTracking().First(g => g.Id == updatedGroup.Id);
+            var originalGroup = groupRepo.GetTableNoTracking().First(g => g.GroupId == updatedGroup.GroupId);
             var transaction = userGroupRepo.BeginTransaction();
-            if (!userGroupRepo.IsGroupAdmin(actorId, originalGroup.Id))
+            if (!userGroupRepo.IsGroupAdmin(actorId, originalGroup.GroupId))
             {
 
                 throw new UnauthorizedAccessException("you are not authorized to edit group permissions");
@@ -514,34 +509,34 @@ namespace WhatsappClone.Service.Implementation
                 {
                     var systemMessage = new
                     {
-                        type = GroupSystemMessage.SendMessageAllowed.ToString(),
+                        type = SystemMessageType.EditGroupAllowed,
                         actorUserId = actorId,
                         isAllowed = updatedGroup.AllowSendMessages
                     };
                     var content = JsonSerializer.Serialize(systemMessage);
-                    await messagesService.AddSystemMessage(content, originalGroup.Id, actorId, MessageType.GroupSettingsChanged);
+                    await messagesService.AddSystemMessage(content, originalGroup.GroupId, actorId, MessageTypeString.System);
                 }
                 if (updatedGroup.CanAddMembers != originalGroup.CanAddMembers)
                 {
                     var systemMessage = new
                     {
-                        type = GroupSystemMessage.AddMembersAllowed.ToString(),
+                        type = SystemMessageType.EditGroupAllowed,
                         actorUserId = actorId,
                         isAllowed = updatedGroup.CanAddMembers
                     };
                     var content = JsonSerializer.Serialize(systemMessage);
-                    await messagesService.AddSystemMessage(content, originalGroup.Id, actorId, MessageType.GroupSettingsChanged);
+                    await messagesService.AddSystemMessage(content, originalGroup.GroupId, actorId, MessageTypeString.System);
                 }
                 if (updatedGroup.EditGroupSettings != originalGroup.EditGroupSettings)
                 {
                     var systemMessage = new
                     {
-                        type = GroupSystemMessage.EditGroupAllowed.ToString(),
+                        type = SystemMessageType.EditGroupAllowed,
                         actorUserId = actorId,
                         isAllowed = updatedGroup.EditGroupSettings
                     };
                     var content = JsonSerializer.Serialize(systemMessage);
-                    await messagesService.AddSystemMessage(content, originalGroup.Id, actorId, MessageType.GroupSettingsChanged);
+                    await messagesService.AddSystemMessage(content, originalGroup.GroupId, actorId, MessageTypeString.System);
                 }
 
 
@@ -588,7 +583,7 @@ namespace WhatsappClone.Service.Implementation
 
             } while (isUnique);
             //add it to group table
-            var group = groupRepo.GetTableAsTracking().First(g => g.Id == groupId);
+            var group = groupRepo.GetTableAsTracking().First(g => g.GroupId == groupId);
             group.InviteCode = code;
             await groupRepo.UpdateAsync(group);
 
@@ -599,7 +594,7 @@ namespace WhatsappClone.Service.Implementation
 
         public async Task JoinGroupViaInviteLink(string inviteCode, string actorId)
         {
-            var group = groupRepo.GetTableAsTracking().FirstOrDefault(group => group.InviteCode == inviteCode);
+            var group = groupRepo.GetTableAsTracking().FirstOrDefault(g => g.InviteCode == inviteCode);
             if (group == null)
             {
 
@@ -611,8 +606,8 @@ namespace WhatsappClone.Service.Implementation
 
                 await userGroupRepo.AddAsync(new UserGroup
                 {
-                    Role = GroupRole.Member,
-                    GroupId = group.Id,
+                    Role = GroupRoleString.Member,
+                    GroupId = group.GroupId,
                     UserId = actorId
                 });
 
@@ -621,11 +616,11 @@ namespace WhatsappClone.Service.Implementation
                 //add system message
                 var systemMessage = new
                 {
-                    type = GroupSystemMessage.InviteViaLink.ToString(),
+                    type = SystemMessageType.UserAddedToGroup,
                     actorUserId = actorId,
                 };
                 var content = JsonSerializer.Serialize(systemMessage);
-                await messagesService.AddSystemMessage(content, group.Id, actorId, MessageType.GroupMemberJoinedViaLink);
+                await messagesService.AddSystemMessage(content, group.GroupId, actorId, MessageTypeString.System);
                 await transaction.CommitAsync();
             }
             catch (Exception ex)
@@ -643,7 +638,7 @@ namespace WhatsappClone.Service.Implementation
 
         public Group GetGroupIdByInviteCode(string inviteCode)
         {
-            var group = groupRepo.GetTableNoTracking().FirstOrDefault(group => group.InviteCode == inviteCode);
+            var group = groupRepo.GetTableNoTracking().FirstOrDefault(g => g.InviteCode == inviteCode);
             if (group == null)
             {
 
@@ -654,7 +649,7 @@ namespace WhatsappClone.Service.Implementation
 
         public async Task TogglePinGroup(Guid groupId, string actorId, bool currentState)
         {
-            var group = groupRepo.GetTableAsTracking().Include(g => g.ChatSettings).FirstOrDefault(g => g.Id == groupId);
+            var group = groupRepo.GetTableAsTracking().Include(g => g.ChatSettings).FirstOrDefault(g => g.GroupId == groupId);
 
             var transaction = groupRepo.BeginTransaction();
 
@@ -665,16 +660,17 @@ namespace WhatsappClone.Service.Implementation
             }
             if (!userGroupRepo.IsUserInGroup(actorId, groupId))
             {
-                throw new Exception("Us is not a member in this group");
+                throw new Exception("User is not a member in this group");
 
             }
 
             try
             {
-                var chatSettings = group.ChatSettings.FirstOrDefault(g => g.GroupId == groupId && actorId == g.UserId);
+                var chatSettings = group.ChatSettings?.FirstOrDefault(g => g.GroupId == groupId && actorId == g.UserId);
                 if (chatSettings == null)
                 {
-                    group.ChatSettings.Add(new UserChatSettings { IsPinned = true, PinnedAt = DateTime.Now, GroupId = groupId, UserId = actorId, ReceiverId = null });
+                    group.ChatSettings ??= new HashSet<UserChatSettings>();
+                    group.ChatSettings.Add(new UserChatSettings { IsPinned = true, PinnedAt = DateTime.Now, GroupId = groupId, UserId = actorId, ContactId = null });
                 }
 
                 else
@@ -691,6 +687,48 @@ namespace WhatsappClone.Service.Implementation
 
                 await transaction.RollbackAsync();
                 throw new Exception("error while updating pin state", ex);
+            }
+        }
+
+        public async Task ToggleArchiveGroup(Guid groupId, string actorId, bool currentState)
+        {
+            var group = groupRepo.GetTableAsTracking().Include(g => g.ChatSettings).FirstOrDefault(g => g.GroupId == groupId);
+
+            var transaction = groupRepo.BeginTransaction();
+
+
+            if (group == null)
+            {
+                throw new Exception("Group not found");
+            }
+            if (!userGroupRepo.IsUserInGroup(actorId, groupId))
+            {
+                throw new Exception("User is not a member in this group");
+
+            }
+
+            try
+            {
+                var chatSettings = group.ChatSettings?.FirstOrDefault(g => g.GroupId == groupId && actorId == g.UserId);
+                if (chatSettings == null)
+                {
+                    group.ChatSettings ??= new HashSet<UserChatSettings>();
+                    group.ChatSettings.Add(new UserChatSettings { IsArchived = true, GroupId = groupId, UserId = actorId, ContactId = null });
+                }
+
+                else
+                {
+                    chatSettings.IsArchived = !currentState;
+                }
+                await groupRepo.UpdateAsync(group);
+                await transaction.CommitAsync();
+
+            }
+            catch (Exception ex)
+            {
+
+                await transaction.RollbackAsync();
+                throw new Exception("error while updating archive state", ex);
             }
         }
     }

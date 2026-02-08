@@ -11,22 +11,15 @@ namespace WhatsappClone.Infrastructure;
 
 public class Context : IdentityDbContext<AppUser>
 {
-
     public virtual DbSet<Blacklist> Blacklists { get; set; }
     public virtual DbSet<TokenRefreshing> RefreshTokens { get; set; }
-    public virtual DbSet<Status> Statuses { get; set; }
+    // Status moved to MongoDB - use IMongoCollection<Status> instead
     public virtual DbSet<Attachments> Attachments { get; set; }
     public virtual DbSet<UserChatSettings> UserChatSettings { get; set; }
-
     public virtual DbSet<MessageReadStatus> MessageReadStatuses { get; set; }
-
-
     public virtual DbSet<Message> Messages { get; set; }
-
     public virtual DbSet<Group> Groups { get; set; }
-
     public virtual DbSet<UserConnection> UserConnections { get; set; }
-
     public virtual DbSet<UserGroup> UserGroups { get; set; }
     public virtual DbSet<UserContact> UserContacts { get; set; }
 
@@ -94,7 +87,7 @@ public class Context : IdentityDbContext<AppUser>
         modelBuilder.Entity<UserChatSettings>(entity =>
         {
             entity.HasOne(s => s.User).WithMany(u => u.ChatSettings).HasForeignKey(s => s.UserId);
-            entity.HasOne(s => s.Receiver).WithMany().HasForeignKey(s => s.ReceiverId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(s => s.Contact).WithMany().HasForeignKey(s => s.ContactId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(s => s.Group).WithMany(u => u.ChatSettings).HasForeignKey(s => s.GroupId);
 
 

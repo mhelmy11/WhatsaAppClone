@@ -16,7 +16,7 @@ namespace WhatsappClone.Service.Abstract
 
         public List<Guid> GetMessagesOfGroupsIDs(List<Guid> GroupsIDs);
         public List<ChatDTO> GetLasMessageOfGroupsIDs(List<Guid> GroupsIDs, string currentUserId);
-        public Task AddSystemMessage(string? content, Guid groupId, string actorId, MessageType messageType);
+        public Task AddSystemMessage(string? content, Guid groupId, string actorId, string messageType);
 
 
         public Task<Message> SendGroupMessage(string senderId, Guid groupId, List<IFormFile>? attachmentsDTO, string content);

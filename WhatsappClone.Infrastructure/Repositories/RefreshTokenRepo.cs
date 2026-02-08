@@ -21,13 +21,13 @@ namespace WhatsappClone.Infrastructure.Repositories
 
         public TokenRefreshing GetRefreshToken(string token)
         {
-            return dbContext.RefreshTokens.Include(r => r.User).FirstOrDefault(x => x.RefreshToken == token);
+            return dbContext.RefreshTokens.Include(r => r.User).FirstOrDefault(x => x.Token == token);
 
         }
 
         public void RevokeRefreshToken(string token)
         {
-            var refreshToken = dbContext.RefreshTokens.FirstOrDefault(x => x.RefreshToken == token);
+            var refreshToken = dbContext.RefreshTokens.FirstOrDefault(x => x.Token == token);
             refreshToken.IsRevoked = true;
             dbContext.RefreshTokens.Update(refreshToken);
         }

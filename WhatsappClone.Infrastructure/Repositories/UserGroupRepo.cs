@@ -21,7 +21,7 @@ namespace WhatsappClone.Infrastructure.Repositories
 
         public bool IsGroupAdmin(string userId, Guid groupId)
         {
-            return GetTableNoTracking().Any(ug => ug.UserId == userId && ug.GroupId == groupId && ug.Role == GroupRole.Admin);
+            return GetTableNoTracking().Any(ug => ug.UserId == userId && ug.GroupId == groupId && ug.Role == GroupRoleString.Admin);
         }
 
         public bool IsUserInGroup(string userId, Guid groupId)

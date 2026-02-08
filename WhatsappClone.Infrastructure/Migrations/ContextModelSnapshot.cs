@@ -514,6 +514,9 @@ namespace WhatsappClone.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ContactId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<Guid?>("GroupId")
                         .HasColumnType("uniqueidentifier");
 
@@ -532,9 +535,6 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Property<DateTime?>("PinnedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReceiverId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -544,9 +544,9 @@ namespace WhatsappClone.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GroupId");
+                    b.HasIndex("ContactId");
 
-                    b.HasIndex("ReceiverId");
+                    b.HasIndex("GroupId");
 
                     b.HasIndex("UserId");
 
@@ -794,14 +794,14 @@ namespace WhatsappClone.Infrastructure.Migrations
 
             modelBuilder.Entity("WhatsappClone.Data.Models.UserChatSettings", b =>
                 {
+                    b.HasOne("WhatsappClone.Data.Models.AppUser", "Contact")
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("WhatsappClone.Data.Models.Group", "Group")
                         .WithMany("ChatSettings")
                         .HasForeignKey("GroupId");
-
-                    b.HasOne("WhatsappClone.Data.Models.AppUser", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("WhatsappClone.Data.Models.AppUser", "User")
                         .WithMany("ChatSettings")
@@ -809,9 +809,9 @@ namespace WhatsappClone.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Group");
+                    b.Navigation("Contact");
 
-                    b.Navigation("Receiver");
+                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });

@@ -1,28 +1,29 @@
 ﻿using AutoMapper;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using WhatsappClone.Core.Features.Chats.Queries.Models;
 using WhatsappClone.Core.Bases;
+using WhatsappClone.Core.Features.Chats.Queries.Models;
+using WhatsappClone.Core.Features.Chats.Queries.Results;
+using WhatsappClone.Core.Wrapper;
+using WhatsappClone.Core.Wrappers;
+using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
-using MediatR;
-using WhatsappClone.Core.Features.Chats.Queries.Results;
-using WhatsappClone.Core.Wrapper;
-using System.Linq.Expressions;
-using WhatsappClone.Core.Wrappers;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 namespace WhatsappClone.Core.Features.Chats.Queries.Handler
 {
     public class ChatsQueryHandler : ResponseHandler, IRequestHandler<GetChatsQuery, Response<List<GetChatsResponse>>>
                                                     , IRequestHandler<GetChatByIdQuery, Response<GetChatByIdResponse>>
                                                     , IRequestHandler<GetPaginatedChatsQuery, PaginatedResult<GetPaginatedChatsResponse>>
-                                                    , IRequestHandler<GetChatListQuery, Response<List<GetChatListResult>>>
+                                                    , IRequestHandler<GetChatListQuery, Response<List<ChatDTO>>>
 
     {
         private readonly IChatService chatService;
@@ -74,11 +75,15 @@ namespace WhatsappClone.Core.Features.Chats.Queries.Handler
 
         }
 
-        public Task<Response<List<GetChatListResult>>> Handle(GetChatListQuery request, CancellationToken cancellationToken)
+        public async Task<Response<List<ChatDTO>>> Handle(GetChatListQuery request, CancellationToken cancellationToken)
         {
 
-            throw new NotImplementedException();
+            var id = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var msgs = chatService.GetChatListOfCurrentUSer(id);
+
+            return Success(msgs);
+            #endregion
         }
-        #endregion
     }
 }

@@ -21,20 +21,20 @@ namespace WhatsappClone.Infrastructure.Repositories
         public bool IsAddMembersAllowed(Guid groupId)
         {
             return GetTableNoTracking()
-                           .Any(g => g.Id == groupId && g.CanAddMembers);
+                           .Any(g => g.GroupId == groupId && g.CanAddMembers);
         }
 
         public bool IsEditGroupAllowed(Guid groupId)
         {
             return GetTableNoTracking()
-                           .Any(g => g.Id == groupId && g.EditGroupSettings);
+                           .Any(g => g.GroupId == groupId && g.EditGroupSettings);
 
         }
 
         public bool IsSendMessagesAllowed(Guid groupId)
         {
             return GetTableNoTracking()
-                .Any(g => g.Id == groupId && g.AllowSendMessages);
+                .Any(g => g.GroupId == groupId && g.AllowSendMessages);
         }
 
 
