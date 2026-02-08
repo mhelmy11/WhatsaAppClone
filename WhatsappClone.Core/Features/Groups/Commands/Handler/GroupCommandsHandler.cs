@@ -27,6 +27,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
                                                        , IRequestHandler<ResetInviteLinkCommand, Response<string>>
                                                        , IRequestHandler<JoinGroupViaLinkCommand, Response<string>>
                                                        , IRequestHandler<TogglePinGroupCommand, Response<string>>
+                                                       , IRequestHandler<ToggleArchiveGroupCommand, Response<string>>
 
 
     {
@@ -64,7 +65,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
 
                 var picUrl = await fileService.SaveFileAsync(request.GroupPictureUrl, "GroupPics");
-                group.GroupPictureUrl = picUrl;
+                group.PictureUrl = picUrl;
             }
 
             group.CreatorId = creatorId;
@@ -73,7 +74,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
             var createdGroup = await groupService.CreateGroup(group, creatorId, request.UserIDs);
 
 
-            return Success(createdGroup.Id, "Group Created Successfully");
+            return Success(createdGroup.GroupId, "Group Created Successfully");
 
         }
 
@@ -112,14 +113,14 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
             var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var group = groupService.GetGroupById(request.GroupId);
-            var oldPicUrl = group.GroupPictureUrl;
+            var oldPicUrl = group.PictureUrl;
 
 
             if (request.GroupProfilePic != null)
             {
 
                 var picUrl = await fileService.SaveFileAsync(request.GroupProfilePic, "GroupPics");
-                group.GroupPictureUrl = picUrl;
+                group.PictureUrl = picUrl;
             }
 
             await groupService.UpdateGroupPic(group, actorId!, oldPicUrl);
@@ -237,12 +238,16 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
             return Success("Group Pinned Successfully");
         }
 
+        public async Task<Response<string>> Handle(ToggleArchiveGroupCommand request, CancellationToken cancellationToken)
+        {
+            var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await groupService.ToggleArchiveGroup(request.groupId, actorId!, request.currentState);
+
+            return Success("Group Archived Successfully");
+        }
+
         ///TODO..............
-
-        //Mute Group // for mobile
-
-        //PinGroup
-
+        ///
 
         //Archive Group
     }

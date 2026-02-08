@@ -9,7 +9,7 @@ namespace WhatsappClone.Data.Helpers
 {
     public class MessageAttachmentsDTO
     {
-        public Attachment Type { get; set; }
+        // public Attachment Type { get; set; }
 
         public string Url { get; set; }
     }

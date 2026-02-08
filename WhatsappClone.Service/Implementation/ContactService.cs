@@ -76,7 +76,7 @@ namespace WhatsappClone.Service.Implementation
                 return true;
             }
 
-            return userContactsRepo.GetTableNoTracking().Any(x => x.UserId == userId && x.ContactId == Contact.Id);
+            return await Task.FromResult(userContactsRepo.GetTableNoTracking().Any(x => x.UserId == userId && x.ContactId == Contact.Id));
 
 
 

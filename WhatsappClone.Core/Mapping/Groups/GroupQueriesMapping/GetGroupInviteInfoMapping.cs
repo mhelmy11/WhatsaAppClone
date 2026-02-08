@@ -16,7 +16,7 @@ namespace WhatsappClone.Core.Mapping.Groups
         {
             CreateMap<Group, GetGroupInviteInfoResult>()
                 .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.GroupPic, opt => opt.MapFrom(src => src.GroupPictureUrl));
+                .ForMember(dest => dest.GroupPic, opt => opt.MapFrom(src => src.PictureUrl));
         }
 
 

@@ -24,7 +24,7 @@ namespace WhatsappClone.Infrastructure.Repositories
             return GetTableNoTracking()
                     .Where(uc => uc.UserId == userId)
                     .Include(uc => uc.Contact)
-                    .OrderBy(uc => uc.FullName)
+                    // .OrderBy(uc => uc.FullName)
                     .ToList();
         }
     }

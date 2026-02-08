@@ -81,23 +81,23 @@ namespace WhatsappClone.Service.Implementation
                 .GroupBy(m => m.GroupId!.Value)
                 .Select(x => new ChatDTO
                 {
-                    SenderName = x.OrderByDescending(m => m.SentAt).First().Sender.FullName,
-                    SenderId = x.OrderByDescending(m => m.SentAt).First().Sender.Id,
-                    Name = x.First().Group!.Name,
-                    Id = x.Key,
-                    PicUrl = x.First().Group!.GroupPictureUrl!,
-                    LastMessageContent = ResolveContent(x.OrderByDescending(m => m.SentAt).First()),
-                    SentAt = x.OrderByDescending(m => m.SentAt).First().SentAt,
-                    ImageCount = x.First().Attachments!.Where(a => a.Type == Attachment.Image).Count(),
-                    VideoCount = x.First().Attachments!.Where(a => a.Type == Attachment.Video).Count(),
+                    senderName = x.OrderByDescending(m => m.SentAt).First().Sender.FullName,
+                    senderId = x.OrderByDescending(m => m.SentAt).First().Sender.Id,
+                    chatName = x.First().Group!.Name,
+                    groupId = x.Key,
+                    // chatPic = x.First().Group!.GroupPictureUrl!,
+                    lastMessageContent = ResolveContent(x.OrderByDescending(m => m.SentAt).First()),
+                    lastMessageTime = x.OrderByDescending(m => m.SentAt).First().SentAt,
+                    // ImageCount = x.First().Attachments!.Where(a => a.Type == Attachment.Image).Count(),
+                    // VideoCount = x.First().Attachments!.Where(a => a.Type == Attachment.Video).Count(),
                     isGroup = true,
                     isMuted = x.First().Group!.ChatSettings!.Any(y => y.isMuted && y.UserId == currentUserId),
                     isPinned = x.First().Group!.ChatSettings!.Any(y => y.IsPinned && y.UserId == currentUserId),
                     isSystemMessage = x.OrderByDescending(m => m.SentAt).First().IsSystemMessage,
-                    MessageStatus = x.First().MessageReadStatuses!.Where(m => m.MessageId == x.First().Id).Select(v => v.Status).ToList()
+                    messageStatus = x.First().MessageReadStatuses!.First(m => m.MessageId == x.First().Id).Status,
 
                 })
-                .OrderByDescending(x => x.SentAt)
+                .OrderByDescending(x => x.lastMessageTime)
                 .AsSplitQuery();
 
 
@@ -115,7 +115,7 @@ namespace WhatsappClone.Service.Implementation
 
 
 
-        public async Task AddSystemMessage(string? content, Guid groupId, string actorId, MessageType messageType)
+        public async Task AddSystemMessage(string? content, Guid groupId, string actorId, string messageType)
         {
 
             await messageRepo.AddAsync(new Message { GroupId = groupId, SenderId = actorId, Content = content, IsSystemMessage = true, MessageType = messageType });
@@ -154,21 +154,21 @@ namespace WhatsappClone.Service.Implementation
                     GroupId = groupId,
                     SenderId = senderId,
                     Content = content,
-                    Attachments = attachmentsDTO?.Select(a => new Attachments
-                    {
-                        Type = a.ContentType switch
-                        {
-                            "image/jpeg" => Attachment.Image,
-                            "image/png" => Attachment.Image,
-                            "image/jpg" => Attachment.Image,
-                            "application/pdf" => Attachment.Document,
-                            "video/mp4" => Attachment.Video,
-                            _ => Attachment.None
-                        },
-                        Url = fileService.SaveFileAsync(a, $"Group_{groupId}").Result
-                    }).ToList(),
+                    // Attachments = attachmentsDTO?.Select(a => new Attachments
+                    // {
+                    //     Type = a.ContentType switch
+                    //     {
+                    //         "image/jpeg" => Attachment.Image,
+                    //         "image/png" => Attachment.Image,
+                    //         "image/jpg" => Attachment.Image,
+                    //         "application/pdf" => Attachment.Document,
+                    //         "video/mp4" => Attachment.Video,
+                    //         _ => Attachment.None
+                    //     },
+                    //     Url = fileService.SaveFileAsync(a, $"Group_{groupId}").Result
+                    // }).ToList(),
                     IsSystemMessage = false,
-                    MessageType = MessageType.Text,
+                    MessageType = MessageTypeString.Text,
                 });
 
                 await transaction.CommitAsync();

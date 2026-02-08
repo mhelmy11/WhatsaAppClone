@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MoMediatoR;
+using MongoDB.Driver;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
@@ -19,6 +20,7 @@ using WhatsappClone.Core.Filters;
 using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
+using WhatsappClone.Infrastructure.Data;
 using WhatsappClone.Service;
 
 namespace WhatsappClone.API
@@ -27,7 +29,7 @@ namespace WhatsappClone.API
     {
         public static void Main(string[] args)
         {
-            #region Serilog
+            #region Serilog Entry Point
             Log.Logger = new LoggerConfiguration()
                     .WriteTo.Console()
                     .Enrich.FromLogContext()
@@ -40,12 +42,8 @@ namespace WhatsappClone.API
             {
 
                 var builder = WebApplication.CreateBuilder(args);
-                //builder.Services.AddOpenApi("v1", options =>
-                //               {
-                //                   options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
-                //               });
 
-                #region Serilog
+                #region Serilog Configuration
                 builder.Host.UseSerilog((context, services, configuration) => configuration
                                .ReadFrom.Configuration(context.Configuration) // اقرأ الإعدادات من appsettings
                                .ReadFrom.Services(services) // اسمح بحقن خدمات أخرى في الـ sinks
@@ -55,52 +53,14 @@ namespace WhatsappClone.API
                 // Add services to the container.
 
                 builder.Services.AddControllers();
-
-
-                // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-
                 builder.Services.AddEndpointsApiExplorer();
-                builder.Services.AddSwaggerGen(options =>
-                {
-
-                    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                    {
-                        Name = "Authorization", // اسم الـ Header
-                        Type = SecuritySchemeType.Http, // نوع المخطط
-                        Scheme = "bearer", // يجب أن تكون "bearer" (بحروف صغيرة)
-                        BearerFormat = "JWT", // نوضح أن الصيغة هي JWT
-                        In = ParameterLocation.Header, // مكان التوكن في الـ Header
-                        Description = "Please enter a valid token. \n\n" +
-                                      "Enter 'Bearer' [space] and then your token in the text input below.\n\n" +
-                                      "Example: \"Bearer 12345abcdef\""
-                    });
-
-                    // 2. تطبيق مخطط الأمان على كل العمليات التي تحتاج لمصادقة
-                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer" // يجب أن يتطابق مع الاسم في AddSecurityDefinition
-                            }
-                        },
-                        new string[] {}
-                    }
-    });
-                });
+                builder.Services.AddSwaggerGen();
                 builder.Services.AddSignalR();
-                builder.Services.AddTransient<IAuthorizationHandler, SessionNotRevokedHandler>();
-                //builder.Services.AddScoped<UnitOfWork>();
-
+                // builder.Services.AddTransient<IAuthorizationHandler, SessionNotRevokedHandler>();
                 builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
                 builder.Services.AddCoreDependencies();
                 builder.Services.AddModuleInfrastructureDependencies(builder.Configuration);
                 builder.Services.AddModuleServiceDependencies();
-
-                // إضافة الـ Policy
                 builder.Services.AddAuthorization(options =>
                 {
                     options.DefaultPolicy = new AuthorizationPolicyBuilder()
@@ -108,7 +68,6 @@ namespace WhatsappClone.API
                            .AddRequirements(new SessionNotRevokedRequirement()) // نضيف شرطنا المخصص إليه
                            .Build();
                 });
-
                 builder.Services.AddCors(options =>
                 {
                     options.AddPolicy("CorsPolicy", builder =>
@@ -120,34 +79,29 @@ namespace WhatsappClone.API
                             ;
                     });
                 });
-
-
                 builder.Services.Configure<HostOptions>(options =>
                 {
                     options.ShutdownTimeout = TimeSpan.FromSeconds(60);
                 });
-
-                //builder.Services.AddScoped<UserRepo>();
-
-                //builder.Services.AddTransient<AuthFilter>();
-
 
 
 
 
 
                 var app = builder.Build();
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger(options =>
+                    {
+                        options.RouteTemplate = "openapi/{documentName}.json";
+                    });
+                    app.MapScalarApiReference().WithName("v1");
+                }
 
                 app.UseMiddleware<ErrorHandlerMiddleware>();
                 app.UseSerilogRequestLogging();
-                if (app.Environment.IsDevelopment())
-                {
-                    app.UseSwagger();
-                    app.UseSwaggerUI();
-                    //app.MapScalarApiReference();
-                    //app.MapOpenApi();
 
-                }
+
 
                 app.UseStaticFiles();
 

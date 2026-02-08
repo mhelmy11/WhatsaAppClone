@@ -39,9 +39,9 @@ namespace WhatsappClone.Service.Implementation
             var GeneratedRefreshToken = GenerateRefreshToken(user);
             var refreshToken = new TokenRefreshing
             {
-                CreationDate = DateTime.UtcNow,
-                RefreshToken = GeneratedRefreshToken.Token,
-                ExpiryDate = GeneratedRefreshToken.Expiration,
+                CreationDate = GeneratedRefreshToken.Expiration,
+                Token = GeneratedRefreshToken.Token,
+                ExpiresAt = GeneratedRefreshToken.Expiration,
                 IsRevoked = false,
                 User = user,
                 UserId = user.Id

@@ -1,0 +1,219 @@
+{
+  "database": "whatsapp_clone",
+  "collections": [
+    {
+      "name": "messages",
+      "description": "Main messages collection (direct + group)",
+      "schema": {
+        "_id": "ObjectId",
+        "chatType": "direct|group",
+        "chatId": "UUID",
+        "senderId": "string",
+        "receiverId": "string|null",
+        "groupId": "UUID|null",
+        "content": "string|null",
+        "messageType": "text|image|video|audio|file|system|location|sticker",
+        "isSystemMessage": false,
+        "attachments": [
+          {
+            "attachmentId": "UUID",
+            "type": "image|video|audio|file",
+            "url": "string",
+            "name": "string",
+            "size": 12345,
+            "mime": "string",
+            "width": 0,
+            "height": 0,
+            "duration": 0
+          }
+        ],
+        "reactions": [
+          { "userId": "string", "emoji": "string", "at": "ISODate" }
+        ],
+        "readStatus": [
+          {
+            "userId": "string",
+            "status": "sent|delivered|read",
+            "at": "ISODate"
+          }
+        ],
+        "createdAt": "ISODate",
+        "editedAt": "ISODate|null",
+        "isEdited": false,
+        "isDeleted": false,
+        "deletedAt": "ISODate|null",
+        "deletedBy": "string|null",
+        "deleteType": "soft|hard|null",
+        "linkPreview": {
+          "url": "string",
+          "title": "string",
+          "description": "string",
+          "imageUrl": "string",
+          "siteName": "string",
+          "fetchedAt": "ISODate"
+        },
+        "poll": {
+          "question": "string|null",
+          "options": [{ "optionId": "UUID", "text": "string", "count": 0 }],
+          "allowMultiple": false,
+          "votes": [{ "userId": "string", "optionIds": ["UUID"], "votedAt": "ISODate" }],
+          "closedAt": "ISODate|null"
+        },
+        "isDraft": false,
+        "metadata": {
+          "replyToMessageId": "ObjectId|null",
+          "isForwarded": false
+        }
+      },
+      "indexes": [
+        { "fields": { "chatId": 1, "createdAt": -1 } },
+        { "fields": { "senderId": 1, "receiverId": 1, "createdAt": -1 } },
+        { "fields": { "groupId": 1, "createdAt": -1 } },
+        { "fields": { "isDraft": 1, "chatId": 1 } }
+      ]
+    },
+    {
+      "name": "message_threads",
+      "description": "Message thread roots",
+      "schema": {
+        "_id": "ObjectId",
+        "threadId": "UUID",
+        "chatId": "UUID",
+        "rootMessageId": "ObjectId",
+        "createdBy": "string",
+        "createdAt": "ISODate",
+        "messageCount": 0
+      },
+      "indexes": [
+        { "fields": { "chatId": 1, "rootMessageId": 1 }, "unique": true },
+        { "fields": { "chatId": 1, "createdAt": -1 } }
+      ]
+    },
+    {
+      "name": "message_mentions",
+      "description": "@mention tracking with read status",
+      "schema": {
+        "_id": "ObjectId",
+        "messageId": "ObjectId",
+        "chatId": "UUID",
+        "mentionedUserId": "string",
+        "mentionedAt": "ISODate",
+        "isRead": false,
+        "readAt": "ISODate|null"
+      },
+      "indexes": [
+        { "fields": { "mentionedUserId": 1, "mentionedAt": -1 } },
+        { "fields": { "messageId": 1, "mentionedUserId": 1 }, "unique": true }
+      ]
+    },
+    {
+      "name": "scheduled_messages",
+      "description": "Messages scheduled for future sending",
+      "schema": {
+        "_id": "ObjectId",
+        "chatId": "UUID",
+        "senderId": "string",
+        "content": "string|null",
+        "messageType": "text|image|video|audio|file",
+        "attachments": [],
+        "scheduledAt": "ISODate",
+        "status": "pending|sent|failed|canceled",
+        "createdAt": "ISODate"
+      },
+      "indexes": [
+        { "fields": { "status": 1, "scheduledAt": 1 } },
+        { "fields": { "chatId": 1, "scheduledAt": -1 } }
+      ]
+    },
+    {
+      "name": "message_search",
+      "description": "Optimized for full-text search",
+      "schema": {
+        "_id": "ObjectId",
+        "messageId": "ObjectId",
+        "chatId": "UUID",
+        "senderId": "string",
+        "content": "string",
+        "tokens": ["string"],
+        "createdAt": "ISODate"
+      },
+      "indexes": [
+        { "fields": { "chatId": 1, "createdAt": -1 } },
+        { "fields": { "content": "text" } }
+      ]
+    },
+    {
+      "name": "drafts",
+      "description": "DEPRECATED: Draft messages now stored in messages collection with isDraft=true",
+      "schema": {
+        "_id": "ObjectId",
+        "chatId": "UUID",
+        "userId": "string",
+        "content": "string",
+        "updatedAt": "ISODate"
+      },
+      "indexes": [{ "fields": { "chatId": 1, "userId": 1 }, "unique": true }]
+    },
+    {
+      "name": "message_media_index",
+      "description": "Quick media lookup",
+      "schema": {
+        "_id": "ObjectId",
+        "messageId": "ObjectId",
+        "chatId": "UUID",
+        "senderId": "string",
+        "mediaType": "image|video|audio|file|sticker",
+        "url": "string",
+        "createdAt": "ISODate"
+      },
+      "indexes": [
+        { "fields": { "chatId": 1, "mediaType": 1, "createdAt": -1 } },
+        { "fields": { "messageId": 1 }, "unique": true }
+      ]
+    },
+    {
+      "name": "starred_messages",
+      "description": "User-starred messages",
+      "schema": {
+        "_id": "ObjectId",
+        "messageId": "ObjectId",
+        "chatId": "UUID",
+        "userId": "string",
+        "starredAt": "ISODate",
+        "isActive": true
+      },
+      "indexes": [
+        { "fields": { "userId": 1, "starredAt": -1 } },
+        { "fields": { "messageId": 1, "userId": 1 }, "unique": true }
+      ]
+    },
+    {
+      "name": "statuses",
+      "description": "User status/stories (24-hour expiry)",
+      "schema": {
+        "_id": "ObjectId",
+        "userId": "string",
+        "content": "string|null",
+        "mediaUrl": "string|null",
+        "mediaType": "text|image|video",
+        "backgroundColor": "string|null",
+        "fontStyle": "string|null",
+        "createdAt": "ISODate",
+        "expiresAt": "ISODate",
+        "viewCount": 0,
+        "views": [
+          {
+            "userId": "string",
+            "viewedAt": "ISODate"
+          }
+        ],
+        "isActive": true
+      },
+      "indexes": [
+        { "fields": { "userId": 1, "createdAt": -1 } },
+        { "fields": { "expiresAt": 1 }, "expireAfterSeconds": 0 },
+        { "fields": { "isActive": 1, "expiresAt": 1 } }
+      ]
+    }
+  ]
+}

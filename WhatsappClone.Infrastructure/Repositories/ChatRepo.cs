@@ -21,6 +21,6 @@ namespace WhatsappClone.Infrastructure.Repositories
         }
 
         public async Task<List<Chat>> GetChatsAsync()
-            => new List<Chat>();
+            => await Task.FromResult(new List<Chat>());
     }
 }

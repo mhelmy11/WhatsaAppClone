@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace WhatsappClone.Data.Models
 {
+
+
+    [Obsolete("MessageReaction model is currently used for MongoDB storage.")]
     public class MessageReaction
     {
         public long Id { get; set; }

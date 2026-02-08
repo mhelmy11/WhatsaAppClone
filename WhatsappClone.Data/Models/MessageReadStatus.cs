@@ -7,13 +7,15 @@ using WhatsappClone.Data.Enums;
 
 namespace WhatsappClone.Data.Models
 {
+
+    [Obsolete("MessageReadStatus model is currently used for MongoDB storage.")]
     public class MessageReadStatus
     {
 
 
         public Guid MessageId { get; set; }
         public string UserId { get; set; }
-        public MessageStatus Status { get; set; } // e.g., 1=Delivered, 2=Read
+        public string Status { get; set; } // e.g., 1=Delivered, 2=Read
 
         public DateTime? StatusTimestamp { get; set; } = DateTime.UtcNow; // Time when the status was updated
 

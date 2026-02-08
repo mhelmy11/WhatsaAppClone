@@ -24,15 +24,8 @@ namespace WhatsappClone.Core
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 
-
-            // 2. تسجيل Fluent Validation Validators:
-            // بنقول لـ Fluent Validation إنه يدور ويلاقي كل الـ Validators (زي CreateChatValidator)
-            // اللي موجودة في الـ Assembly الحالي ويسجلها.
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
-            // 3. تسجيل الـ ValidationBehavior في MediatR Pipeline:
-            // بنقول لـ MediatR إن أي أمر أو استعلام (IPipelineBehavior<,>) بيعدي،
-            // يعدي الأول على الـ ValidationBehavior بتاعنا.
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 
