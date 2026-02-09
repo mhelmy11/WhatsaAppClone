@@ -8,7 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Contacts.Commands.Models;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
 

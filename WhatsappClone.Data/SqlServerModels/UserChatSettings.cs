@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WhatsappClone.Data.Models
+namespace WhatsappClone.Data.SqlServerModels
 {
     /// <summary>
     /// User-specific chat settings and preferences

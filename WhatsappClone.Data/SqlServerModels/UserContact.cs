@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WhatsappClone.Data.Models
+namespace WhatsappClone.Data.SqlServerModels
 {
     /// <summary>
     /// User's contact list entry

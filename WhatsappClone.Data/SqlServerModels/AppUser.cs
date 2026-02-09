@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using WhatsappClone.Data.Enums;
 
-namespace WhatsappClone.Data.Models
+namespace WhatsappClone.Data.SqlServerModels
 {
     public class AppUser : IdentityUser
     {
@@ -92,7 +92,7 @@ namespace WhatsappClone.Data.Models
         public virtual ICollection<UserConnection> UserConnections { get; set; } = new HashSet<UserConnection>();
 
         /// <summary>JWT refresh tokens for authentication</summary>
-        public virtual ICollection<TokenRefreshing> UserRefreshTokens { get; set; } = new HashSet<TokenRefreshing>();
+        public virtual ICollection<RefreshTokenAudit> UserRefreshTokens { get; set; } = new HashSet<RefreshTokenAudit>();
 
         // ============ MONGODB COLLECTIONS ============
         // Note: These collections are NOT stored in this model but referenced by userId

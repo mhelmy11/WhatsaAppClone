@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure.Interfaces;
 using WhatsappClone.Service.Abstract;
 
@@ -13,11 +13,11 @@ namespace WhatsappClone.Service.Implementation
 {
     public class ContactService : IContactsService
     {
-        private readonly IUserContacts userContactsRepo;
+        private readonly IUserContactRepository userContactsRepo;
         private readonly IChatService chatService;
         private readonly UserManager<AppUser> userManager;
 
-        public ContactService(IUserContacts userContactsRepo, IChatService chatService, UserManager<AppUser> userManager)
+        public ContactService(IUserContactRepository userContactsRepo, IChatService chatService, UserManager<AppUser> userManager)
         {
             this.userContactsRepo = userContactsRepo;
             this.chatService = chatService;
@@ -36,7 +36,7 @@ namespace WhatsappClone.Service.Implementation
             {
                 ReceiverId = userId,
                 SenderId = contactId,
-                ChatName = $"{FName} {LName}",
+                // ChatName = $"{FName} {LName}",
             });
             return contact;
         }
@@ -64,19 +64,21 @@ namespace WhatsappClone.Service.Implementation
 
         public List<UserContact> GetContacts(string currentUserId)
         {
-            var contacts = userContactsRepo.GetContactsOrderedByAlpha(currentUserId);
-            return contacts;
+            // var contacts = userContactsRepo.GetContactsOrderedByAlpha(currentUserId);
+            // return contacts;
+            return new();
         }
 
         public async Task<bool> IsContactAdded(string userId, string phoneNumber)
         {
-            var Contact = userManager.FindByPhoneNumber(phoneNumber);
-            if (Contact == null)
-            {
-                return true;
-            }
+            // var Contact = userManager.FindByPhoneNumber(phoneNumber);
+            // if (Contact == null)
+            // {
+            //     return true;
+            // }
 
-            return await Task.FromResult(userContactsRepo.GetTableNoTracking().Any(x => x.UserId == userId && x.ContactId == Contact.Id));
+            // return await Task.FromResult(userContactsRepo.GetTableNoTracking().Any(x => x.UserId == userId && x.ContactId == Contact.Id));
+            return true;
 
 
 

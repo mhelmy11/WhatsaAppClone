@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Users.Commands.Models;
 using WhatsappClone.Core.Features.Users.Commands.Results;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure.Interfaces;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
@@ -57,7 +57,7 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
                 {
                     // Save the profile picture and get the URL
                     var picUrl = await fileService.SaveFileAsync(request.ProfilePic, "ProfilePics");
-                    newUser.PicUrl = picUrl;
+                    newUser.ProfilePicUrl = picUrl;
                 }
 
 
@@ -162,7 +162,7 @@ namespace WhatsappClone.Core.Features.Users.Commands.Handler
             {
                 // Save the profile picture and get the URL
                 var picUrl = await fileService.SaveFileAsync(request.ProfilePic, "ProfilePics");
-                updatedUser.PicUrl = picUrl;
+                updatedUser.ProfilePicUrl = picUrl;
             }
 
             var response = mapper.Map<EditMeResult>(updatedUser);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Contacts.Commands.Models;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 
 namespace WhatsappClone.Core.Mapping.Contact
 {
@@ -14,9 +14,7 @@ namespace WhatsappClone.Core.Mapping.Contact
         {
             CreateMap<EditContactCommand, UserContact>()
                 .ForMember(dest => dest.ContactId, opt => opt.MapFrom(src => src.contactId))
-                .ForMember(dest => dest.LNAme, opt => opt.MapFrom(src => src.LName))
-                .ForMember(dest => dest.FName, opt => opt.MapFrom(src => src.FName))
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FName} {src.LName}".Trim()));
+                .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => $"{src.FName} {src.LName}".Trim()));
         }
     }
 }

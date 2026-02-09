@@ -12,9 +12,9 @@ namespace WhatsappClone.Service.Implementation
 {
     public class TransactionService : ITransactionService
     {
-        private readonly Context _dbContext;
+        private readonly SqlDBContext _dbContext;
 
-        public TransactionService(Context dbContext)
+        public TransactionService(SqlDBContext dbContext)
         {
             _dbContext = dbContext;
         }

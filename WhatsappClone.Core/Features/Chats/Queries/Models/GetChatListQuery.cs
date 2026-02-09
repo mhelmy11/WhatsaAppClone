@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Chats.Queries.Results;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
 
 namespace WhatsappClone.Core.Features.Chats.Queries.Models
 {

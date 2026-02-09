@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
-using WhatsappClone.Data.Models;
 using MediatR;
 using WhatsappClone.Core.Features.Chats.Queries.Results;
 

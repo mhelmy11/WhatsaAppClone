@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Users.Queries.Models;
 using WhatsappClone.Core.Features.Users.Queries.Results;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 
 namespace WhatsappClone.Core.Features.Users.Queries.Handler
 {

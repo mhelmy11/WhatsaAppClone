@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using WhatsappClone.Data.Enums;
 
-namespace WhatsappClone.Data.Models
+namespace WhatsappClone.Data.SqlServerModels
 {
     /// <summary>
     /// Chat model for direct and group conversations

@@ -23,7 +23,6 @@ namespace WhatsappClone.Service
             services.AddScoped<IRequirementsService, RequirementsService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IMessagesService, MessagesService>();
-            services.AddScoped<IMessageStatusesService, MessageStatusesService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IContactsService, ContactService>();

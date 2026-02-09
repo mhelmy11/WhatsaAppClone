@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Users.Commands.Models;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Service.Implementation;
 
 namespace WhatsappClone.Core.Features.Users.Commands.Validation

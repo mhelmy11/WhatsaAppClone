@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 
 namespace WhatsappClone.Service.Abstract
 {
@@ -17,7 +17,7 @@ namespace WhatsappClone.Service.Abstract
 
         public RefreshToken GenerateRefreshToken(AppUser user);
 
-        public TokenRefreshing GetRefreshToken(string token);
+        public RefreshTokenAudit GetRefreshToken(string token);
 
         public void RevokeRefreshToken(string token);
 
