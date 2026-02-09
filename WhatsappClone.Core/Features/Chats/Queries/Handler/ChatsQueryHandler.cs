@@ -14,7 +14,6 @@ using WhatsappClone.Core.Features.Chats.Queries.Results;
 using WhatsappClone.Core.Wrapper;
 using WhatsappClone.Core.Wrappers;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
 

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Enums;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.MongoModels;
 
 namespace WhatsappClone.Service.Abstract
 {

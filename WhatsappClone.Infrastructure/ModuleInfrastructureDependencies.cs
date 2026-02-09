@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure.Bases;
 using WhatsappClone.Infrastructure.Data;
 using WhatsappClone.Infrastructure.Interfaces;
@@ -25,15 +25,15 @@ namespace WhatsappClone.Infrastructure
         public static IServiceCollection AddModuleInfrastructureDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             #region CustomServices
-            services.AddScoped<IChat, ChatRepo>();
-            services.AddScoped<IMessage, MessageRepo>();
-            services.AddScoped<IGroup, GroupRepo>();
-             services.AddScoped<IMessageReadStatus, MessageReadStatusRepo>();
-            services.AddScoped<IUserGroup, UserGroupRepo>();
-            services.AddScoped<IRefreshToken, RefreshTokenRepo>();
-            services.AddScoped<IUserContacts, UserContactsRepo>();
-            services.AddScoped<IStatusRepository, StatusRepository>();
-            services.AddScoped(typeof(IRepo<>), typeof(Repo<>));
+            services.AddScoped<IChatRepository, ChatRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IGroupRepository, GroupRepository>();
+            services.AddScoped<IUserGroupRepository, UserGroupRepository>();
+            services.AddScoped<IRefreshTokenAuditRepository, RefreshTokenAuditRepository>();
+            services.AddScoped<IUserContactRepository, UserContactRepository>();
+            services.AddScoped<IStoryRepository, StoryRepository>();
+            services.AddScoped(typeof(ISqlBaseRepository<>), typeof(SqlBaseRepository<>));
+            services.AddScoped(typeof(IMongoBaseRepository<>), typeof(MongoBaseRepository<>));
             #endregion
 
             #region MongoDB
@@ -53,7 +53,7 @@ namespace WhatsappClone.Infrastructure
             #endregion
 
             #region Identity And DBContext
-            services.AddDbContext<Context>(options =>
+            services.AddDbContext<SqlDBContext>(options =>
              {
                  options.UseSqlServer(configuration.GetConnectionString("whatsapp"));
              });
@@ -71,7 +71,7 @@ namespace WhatsappClone.Infrastructure
                     options.SignIn.RequireConfirmedEmail = true; // Require email confirmation for sign-in
                 }
 
-                ).AddEntityFrameworkStores<Context>().AddDefaultTokenProviders(); ;
+                ).AddEntityFrameworkStores<SqlDBContext>().AddDefaultTokenProviders(); ;
 
             #endregion
 

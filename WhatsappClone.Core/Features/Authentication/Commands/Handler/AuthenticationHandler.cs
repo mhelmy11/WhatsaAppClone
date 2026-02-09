@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Authentication.Commands.Models;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
 

@@ -10,9 +10,9 @@ namespace WhatsappClone.Service.Implementation
 {
     public class RequirementsService : IRequirementsService
     {
-        private readonly IRefreshToken refreshTokenRepo;
+        private readonly IRefreshTokenAuditRepository refreshTokenRepo;
 
-        public RequirementsService(IRefreshToken refreshTokenRepo)
+        public RequirementsService(IRefreshTokenAuditRepository refreshTokenRepo)
         {
             this.refreshTokenRepo = refreshTokenRepo;
         }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Contacts.Commands.Models;
 using WhatsappClone.Core.Features.Contacts.Commands.Results;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
 
@@ -48,13 +48,13 @@ namespace WhatsappClone.Core.Features.Contacts.Commands.Handler
 
 
 
-            var addedContact = await ContactsService.AddContactAsync(new UserContact { ContactId = ContactId, UserId = CurrentUserId, FName = request.FName, LNAme = request.LName, FullName = $"{request.FName} {request.LName}".Trim() });
+            var addedContact = await ContactsService.AddContactAsync(new UserContact { ContactId = ContactId, UserId = CurrentUserId, DisplayName = $"{request.FName} {request.LName}".Trim() });
 
             return Success(new AddContactResult
             {
                 Id = addedContact.ContactId,
                 PhoneNumber = contact.PhoneNumber,
-                ChatName = $"{request.FName} {request.LName}"
+                ChatName = addedContact.DisplayName
             }, "Contact Added. Chat now");
 
         }

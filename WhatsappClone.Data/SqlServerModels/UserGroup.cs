@@ -1,7 +1,7 @@
 ﻿using System;
 using WhatsappClone.Data.Enums;
 
-namespace WhatsappClone.Data.Models
+namespace WhatsappClone.Data.SqlServerModels
 {
     /// <summary>
     /// Group membership record

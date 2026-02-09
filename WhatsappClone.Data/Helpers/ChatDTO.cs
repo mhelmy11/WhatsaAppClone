@@ -1,6 +1,4 @@
 ﻿using WhatsappClone.Data.Enums;
-using WhatsappClone.Data.Models;
-
 namespace WhatsappClone.Data.Helpers
 {
 

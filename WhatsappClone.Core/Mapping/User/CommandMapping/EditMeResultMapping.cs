@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Users.Commands.Models;
 using WhatsappClone.Core.Features.Users.Commands.Results;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 
 
 namespace WhatsappClone.Core.Mapping.User

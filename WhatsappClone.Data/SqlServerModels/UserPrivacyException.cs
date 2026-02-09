@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace WhatsappClone.Data.Models
+namespace WhatsappClone.Data.SqlServerModels
 {
     /// <summary>
     /// Privacy exceptions for "My Contacts Except" rules.

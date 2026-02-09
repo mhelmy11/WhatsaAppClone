@@ -6,7 +6,7 @@ using System.Security.Claims;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Features.Groups.Commands.Models;
 using WhatsappClone.Data.Enums;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Core.Features.Groups.Commands.Handler
@@ -65,7 +65,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
 
 
                 var picUrl = await fileService.SaveFileAsync(request.GroupPictureUrl, "GroupPics");
-                group.PictureUrl = picUrl;
+                group.IconUrl = picUrl;
             }
 
             group.CreatorId = creatorId;
@@ -74,7 +74,7 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
             var createdGroup = await groupService.CreateGroup(group, creatorId, request.UserIDs);
 
 
-            return Success(createdGroup.GroupId, "Group Created Successfully");
+            return Success(createdGroup.Id, "Group Created Successfully");
 
         }
 
@@ -113,14 +113,14 @@ namespace WhatsappClone.Core.Features.Groups.Commands.Handler
             var actorId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var group = groupService.GetGroupById(request.GroupId);
-            var oldPicUrl = group.PictureUrl;
+            var oldPicUrl = group.IconUrl;
 
 
             if (request.GroupProfilePic != null)
             {
 
                 var picUrl = await fileService.SaveFileAsync(request.GroupProfilePic, "GroupPics");
-                group.PictureUrl = picUrl;
+                group.IconUrl = picUrl;
             }
 
             await groupService.UpdateGroupPic(group, actorId!, oldPicUrl);

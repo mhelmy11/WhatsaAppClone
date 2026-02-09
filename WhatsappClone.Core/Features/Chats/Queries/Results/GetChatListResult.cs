@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Enums;
-using WhatsappClone.Data.Models;
 
 namespace WhatsappClone.Core.Features.Chats.Queries.Results
 {
-    public class GetChatListResult : Message
+    public class GetChatListResult
     {
         //public string? contactId { get; set; }
         //public Guid? groupId { get; set; }

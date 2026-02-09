@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Features.Groups.Queries.Results;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 
 namespace WhatsappClone.Core.Mapping.Groups
 {
@@ -16,7 +16,7 @@ namespace WhatsappClone.Core.Mapping.Groups
         {
             CreateMap<Group, GetGroupInviteInfoResult>()
                 .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.GroupPic, opt => opt.MapFrom(src => src.PictureUrl));
+                .ForMember(dest => dest.GroupPic, opt => opt.MapFrom(src => src.IconUrl));
         }
 
 

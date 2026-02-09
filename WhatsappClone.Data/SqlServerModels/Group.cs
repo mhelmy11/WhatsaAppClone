@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WhatsappClone.Data.Models
+namespace WhatsappClone.Data.SqlServerModels
 {
     /// <summary>
     /// Group model for group chat management

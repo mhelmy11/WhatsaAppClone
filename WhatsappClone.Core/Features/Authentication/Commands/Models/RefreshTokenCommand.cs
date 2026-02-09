@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
 
 namespace WhatsappClone.Core.Features.Authentication.Commands.Models
 {

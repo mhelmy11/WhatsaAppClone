@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Enums;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure;
 
 namespace WhatsappClone.Service.Abstract

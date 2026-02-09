@@ -18,7 +18,7 @@ using WhatsappClone.Core.Features.Chats.Queries.Handler;
 using WhatsappClone.Core.Features.Chats.Queries.Models;
 using WhatsappClone.Core.Filters;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.Models;
+using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Infrastructure.Data;
 using WhatsappClone.Service;
@@ -115,7 +115,7 @@ namespace WhatsappClone.API
                 app.Lifetime.ApplicationStopping.Register(() =>
                 {
                     using var scope = app.Services.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<Context>();
+                    var context = scope.ServiceProvider.GetRequiredService<SqlDBContext>();
                     context.Database.ExecuteSqlRaw("DELETE FROM UserConnections");
                     Console.WriteLine("Table UserConnections cleared before shutdown.");
                 });
