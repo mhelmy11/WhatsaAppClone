@@ -14,6 +14,7 @@ using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure.Bases;
 using WhatsappClone.Infrastructure.Data;
+using WhatsappClone.Infrastructure.Helpers;
 using WhatsappClone.Infrastructure.Interfaces;
 using WhatsappClone.Infrastructure.Repositories;
 
@@ -37,18 +38,24 @@ namespace WhatsappClone.Infrastructure
             #endregion
 
             #region MongoDB
-            var mongoDbSettings = configuration.GetSection("MongoDbSettings");
-            var mongoConnectionString = mongoDbSettings["ConnectionString"];
-            var mongoDatabaseName = mongoDbSettings["DatabaseName"];
+
+
+
+
+
+
+            
+            services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));//then we can inject IOptions<MongoDbSettings> to get the settings values
+            var MongoDBSettings = configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
 
             // Register MongoDB client
-            services.AddSingleton<IMongoClient>(new MongoClient(mongoConnectionString));
+            services.AddSingleton<IMongoClient>(new MongoClient(MongoDBSettings.ConnectionString));
 
             // Register MongoDB factory
             services.AddSingleton<IMongoDBFactory>(sp =>
             {
                 var client = sp.GetRequiredService<IMongoClient>();
-                return new MongoDBFactory(client, mongoDatabaseName!);
+                return new MongoDBFactory(client, MongoDBSettings.DatabaseName);
             });
             #endregion
 
@@ -77,9 +84,9 @@ namespace WhatsappClone.Infrastructure
 
 
             #region JWT
-            var JwtSettings = new JwtSettings();
-            configuration.GetSection("jwtSettings").Bind(JwtSettings);
-            services.AddSingleton(JwtSettings);
+            services.Configure<JwtSettings>(configuration.GetSection("jwtSettings"));//then we can inject IOptions<JwtSettings> to get the settings values
+
+            var JwtSettings = configuration.GetSection("jwtSettings").Get<JwtSettings>();
             #endregion
 
 
