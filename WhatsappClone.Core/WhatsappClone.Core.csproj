@@ -1,16 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Remove="Features\Authentication\Queries\Results\**" />
-		<EmbeddedResource Remove="Features\Authentication\Queries\Results\**" />
-		<None Remove="Features\Authentication\Queries\Results\**" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\WhatsappClone.Data\WhatsappClone.Data.csproj" />
@@ -18,27 +12,62 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Features\Authentication\Queries\Handler\" />
-		<Folder Include="Features\Authentication\Queries\Models\" />
-		<Folder Include="Features\Blacklists\Commands\Handler\" />
-		<Folder Include="Features\Blacklists\Commands\Models\" />
-		<Folder Include="Features\Blacklists\Commands\Validation\" />
-		<Folder Include="Features\Blacklists\Queries\Handler\" />
-		<Folder Include="Features\Blacklists\Queries\Models\" />
-		<Folder Include="Features\Blacklists\Queries\Results\" />
-		<Folder Include="Features\Blacklists\Queries\Validation\" />
+		<Folder Include="Features\Contacts\Queries\GetContactInfo\" />
+		<Folder Include="Features\Conversations\Commands\ArchiveChat\" />
+		<Folder Include="Features\Conversations\Commands\FavChat\" />
+		<Folder Include="Features\Conversations\Queries\GetChatByPhone\" />
+		<Folder Include="Features\Identity\Commands\ForgetPassword\" />
+		<Folder Include="Features\Identity\Commands\ResetPassword\" />
+		<Folder Include="Features\Identity\Commands\RefreshToken\" />
+		<Folder Include="Features\Contacts\Queries\GetMyContacts\" />
+		<Folder Include="Features\Contacts\Commands\BlockContact\" />
+		<Folder Include="Features\Contacts\Commands\AddContact\" />
+		<Folder Include="Features\Contacts\Commands\EditContact\" />
+		<Folder Include="Features\Contacts\Commands\DeleteContact\" />
+		<Folder Include="Features\Contacts\Commands\UnblockContact\" />
+		<Folder Include="Features\Conversations\Queries\GetRecentChats\" />
+		<Folder Include="Features\Conversations\Queries\GetChatHistory\" />
+		<Folder Include="Features\Conversations\Commands\ClearChat\" />
+		<Folder Include="Features\Conversations\Commands\DeleteChat\" />
+		<Folder Include="Features\Conversations\Commands\PinChat\" />
+		<Folder Include="Features\Groups\Commands\CreateGroup\" />
+		<Folder Include="Features\Groups\Commands\AddGroupMembers\" />
+		<Folder Include="Features\Groups\Commands\CreateInviteLink\" />
+		<Folder Include="Features\Groups\Commands\PromoteToAdmin\" />
+		<Folder Include="Features\Groups\Commands\RemoveGroupMember\" />
+		<Folder Include="Features\Groups\Commands\UpdateGroupInfo\" />
 		<Folder Include="Features\Groups\Queries\Validation\" />
-		<Folder Include="Features\Messages\Queries\Results\" />
-		<Folder Include="Features\Contacts\Queries\Validation\" />
-		<Folder Include="Features\Messages\Queries\Handler\" />
-		<Folder Include="Features\Messages\Queries\Models\" />
-		<Folder Include="Features\Messages\Queries\Validation\" />
+		<Folder Include="Features\Media\Commands\UploadMedia\" />
+		<Folder Include="Features\Media\Queries\" />
+		<Folder Include="Features\Messages\Commands\EditMessage\" />
+		<Folder Include="Features\Messages\Commands\DeleteMessage\" />
+		<Folder Include="Features\Messages\Commands\MarkAsDelivered\" />
+		<Folder Include="Features\Messages\Commands\MarkAsRead\" />
+		<Folder Include="Features\Messages\Commands\ReplyToMessage\" />
+		<Folder Include="Features\Messages\Commands\ReactToMessage\" />
+		<Folder Include="Features\Messages\Commands\SendMessage\" />
+		<Folder Include="Features\Messages\Queries\" />
+		<Folder Include="Features\Presence\Commands\SendTypingIndicator\" />
+		<Folder Include="Features\Presence\Commands\UpdateOnlineStatus\" />
+		<Folder Include="Features\Presence\Queries\" />
+		<Folder Include="Features\Stories\Commands\CreateStory\" />
+		<Folder Include="Features\Stories\Commands\DeleteStory\" />
+		<Folder Include="Features\Stories\Commands\EditStory\" />
+		<Folder Include="Features\Stories\Commands\MarkStoryAsSeen\" />
+		<Folder Include="Features\Stories\Queries\GetRecentStories\" />
+		<Folder Include="Features\Stories\Queries\GetStoryViewers\" />
+		<Folder Include="Features\Users\Queries\GetMyProfile\" />
+		<Folder Include="Features\Users\Commands\UpdatePrivacySettings\" />
+		<Folder Include="Features\Users\Commands\UpdateProfile\" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="14.0.0" />
 		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+		<PackageReference Include="IdGen" Version="3.0.7" />
+		<PackageReference Include="IdGen.Configuration" Version="3.0.7" />
+		<PackageReference Include="IdGen.DependencyInjection" Version="3.0.7" />
 		<PackageReference Include="MediatR" Version="12.5.0" />
 		<PackageReference Include="MoMediator" Version="2.0.3" />
 	</ItemGroup>

@@ -60,7 +60,7 @@ namespace WhatsappClone.API
                 builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
                 builder.Services.AddCoreDependencies();
                 builder.Services.AddModuleInfrastructureDependencies(builder.Configuration);
-                builder.Services.AddModuleServiceDependencies();
+                builder.Services.AddModuleServiceDependencies((builder.Configuration));
                 builder.Services.AddAuthorization(options =>
                 {
                     options.DefaultPolicy = new AuthorizationPolicyBuilder()

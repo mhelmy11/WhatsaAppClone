@@ -120,6 +120,9 @@ namespace WhatsappClone.Data.MongoModels
         [BsonElement("isForwarded")]
         public bool IsForwarded { get; set; } = false;
 
+        [BsonElement("isMention")]
+        public bool IsMention { get; set; } = false;
+
         [BsonElement("systemEventType")]
         public string? SystemEventType { get; set; }
 

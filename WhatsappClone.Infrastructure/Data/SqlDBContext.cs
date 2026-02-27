@@ -5,21 +5,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WhatsappClone.Data.SqlServerModels;
+using WhatsappClone.Data.Models;
 
 namespace WhatsappClone.Infrastructure;
 
-public class SqlDBContext : IdentityDbContext<AppUser>
+public class SqlDBContext : IdentityDbContext<User,Role,long>
 {
-    public virtual DbSet<AppUser> AppUsers { get; set; }
-    public virtual DbSet<Blacklist> Blacklists { get; set; }
+    public virtual DbSet<BlockedUser> BlockedUsers { get; set; }
     public virtual DbSet<RefreshTokenAudit> RefreshTokenAudits { get; set; }
-    public virtual DbSet<UserChatSettings> UserChatSettings { get; set; }
     public virtual DbSet<Group> Groups { get; set; }
     public virtual DbSet<UserConnection> UserConnections { get; set; }
-    public virtual DbSet<UserGroup> UserGroups { get; set; }
-    public virtual DbSet<UserContact> UserContacts { get; set; }
-    public virtual DbSet<Chat> Chats { get; set; }
+    public virtual DbSet<GroupMember> GroupMembers { get; set; }
+    public virtual DbSet<GroupJoinRequest> GroupJoinRequests { get; set; }
+    public virtual DbSet<Contact> Contacts { get; set; }
 
 
     public SqlDBContext(DbContextOptions<SqlDBContext> options) : base(options)
@@ -30,68 +28,46 @@ public class SqlDBContext : IdentityDbContext<AppUser>
     {
         base.OnModelCreating(modelBuilder);
 
-        // ============ AppUser Configuration ============
-        modelBuilder.Entity<AppUser>(entity =>
+        // ============ User Configuration ============
+        modelBuilder.Entity<User>(entity =>
         {
-            entity.HasIndex(e => e.IsActive);
             entity.HasIndex(e => e.PhoneNumber);
-            entity.HasIndex(e => e.LastSeen);
+            entity.HasIndex(e => e.Email);
         });
 
-        // ============ Blacklist Configuration ============
-        modelBuilder.Entity<Blacklist>(entity =>
+         //============ Blacklist Configuration ============
+        modelBuilder.Entity<BlockedUser>(entity =>
         {
-            entity.HasKey(e => new { e.UserId, e.BlockedUserId })
-                .HasName("PK_Blacklist");
-            entity.HasIndex(e => e.BlockedUserId, "IX_Blacklists_BlockedUserId");
+            entity.HasKey(e => new { e.UserId, e.BlockedUserId });
+            entity.HasIndex(e => e.BlockedUserId);
 
             entity.HasOne(d => d.User)
                 .WithMany(p => p.BlockedUsers)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("FK_Blacklists_AspNetUsers2");
+                .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(d => d.BlockedUser)
-                .WithMany(p => p.BlockedByUsers)
-                .HasForeignKey(d => d.BlockedUserId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("FK_Blacklists_AspNetUsers");
+            entity.HasOne(d=>d.Blocked)
+            .WithMany(p=>p.BlockedBy)
+            .HasForeignKey(e=>e.BlockedUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         });
 
-        // ============ Chat Configuration ============
-        modelBuilder.Entity<Chat>(entity =>
-        {
-            entity.HasIndex(e => e.SenderId);
-            entity.HasIndex(e => e.ReceiverId);
-            entity.HasIndex(e => e.GroupId).HasFilter("[ChatType] = 'Group'");
-            entity.HasIndex(e => e.LastMessageTime).HasFilter("[IsDeleted] = 0");
-            entity.HasIndex(e => e.IsDeleted);
-
-            entity.HasOne(e => e.Sender)
-                .WithMany()
-                .HasForeignKey(e => e.SenderId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasOne(e => e.Receiver)
-                .WithMany()
-                .HasForeignKey(e => e.ReceiverId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasOne(e => e.Group)
-                .WithMany()
-                .HasForeignKey(e => e.GroupId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
 
         // ============ Group Configuration ============
         modelBuilder.Entity<Group>(entity =>
         {
-            entity.HasIndex(e => e.CreatorId);
-            entity.HasIndex(e => e.InviteCode).IsUnique();
+            entity.HasIndex(e => e.InviteLink).IsUnique();
 
             entity.HasOne(e => e.Creator)
-                .WithMany()
-                .HasForeignKey(e => e.CreatorId)
+                .WithMany(e=>e.CreatedGroups)
+                .HasForeignKey(e => e.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            entity.HasMany(e => e.JoinRequests)
+                .WithOne(e=>e.Group)
+                .HasForeignKey(e => e.GroupId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
@@ -104,50 +80,30 @@ public class SqlDBContext : IdentityDbContext<AppUser>
             entity.HasIndex(e => e.IsRevoked);
 
             entity.HasOne(e => e.User)
-                .WithMany(u => u.UserRefreshTokens)
+                .WithMany(u => u.RefreshTokenAudits)
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ============ UserChatSettings Configuration ============
-        modelBuilder.Entity<UserChatSettings>(entity =>
+     
+
+        // ============ Contact Configuration ============
+        modelBuilder.Entity<Contact>(entity =>
         {
-            entity.HasIndex(e => e.UserId);
-            entity.HasIndex(e => e.ChatId);
-            entity.HasIndex(e => new { e.UserId, e.ChatId });
-            entity.HasIndex(e => e.IsPinned);
-            entity.HasIndex(e => e.IsArchived);
-            entity.HasIndex(e => e.IsFavorite);
-            entity.HasIndex(e => e.IsDeleted);
+            entity.HasKey(c => new { c.UserId, c.ContactUserId });
 
-            entity.HasOne(s => s.User)
-                .WithMany(u => u.ChatSettings)
-                .HasForeignKey(s => s.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(s => s.Chat)
-                .WithMany()
-                .HasForeignKey(s => s.ChatId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        // ============ UserContact Configuration ============
-        modelBuilder.Entity<UserContact>(entity =>
-        {
-            entity.HasKey(c => new { c.UserId, c.ContactId });
-
-            entity.HasIndex(c => c.ContactId);
+            entity.HasIndex(c => c.ContactUserId);
             entity.HasIndex(c => c.UserId);
-            entity.HasIndex(c => new { c.UserId, c.ContactId });
+            entity.HasIndex(c => new { c.UserId, c.ContactUserId });
 
             entity.HasOne(c => c.User)
                 .WithMany(u => u.Contacts)
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(c => c.Contact)
-                .WithMany(u => u.ContactsOf)
-                .HasForeignKey(c => c.ContactId)
+            entity.HasOne(c => c.ContactUser)
+                .WithMany(u => u.ContactOf)
+                .HasForeignKey(c => c.ContactUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
@@ -162,36 +118,28 @@ public class SqlDBContext : IdentityDbContext<AppUser>
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ============ UserGroup Configuration ============
-        modelBuilder.Entity<UserGroup>(entity =>
+        // ============ GroupMember Configuration ============
+        modelBuilder.Entity<GroupMember>(entity =>
         {
             entity.HasKey(ug => new { ug.GroupId, ug.UserId });
 
             entity.HasIndex(ug => ug.UserId);
-            entity.HasIndex(ug => ug.IsMember);
-            entity.HasIndex(ug => new { ug.GroupId, ug.IsMember });
             entity.HasIndex(ug => ug.Role);
 
             entity.HasOne(ug => ug.Group)
-                .WithMany(g => g.UserGroups)
+                .WithMany(g => g.Members)
                 .HasForeignKey(ug => ug.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(ug => ug.User)
-                .WithMany(u => u.UserGroups)
+                .WithMany(u => u.GroupMemberships)
                 .HasForeignKey(ug => ug.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }
 
 
-    //{
-    //"type":"MEMBER_ADDED",
-    //"actorUserId":"474a5eb7-c051-4ef4-aa6d-01245d374f82"
-    //,"targetUserIds":["474a5eb7-c051-4ef4-aa6d-01245d374f82"
-    //,"f4a60247-6a19-4f2d-a050-65e91013b704"]}
-
-
+    
 
 }
 

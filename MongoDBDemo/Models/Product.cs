@@ -1,9 +1,12 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDBDemo.Helpers;
 
 namespace MongoDBDemo.Models;
 
+
+[BsonCollection("products")]
 public class Product
 {
 

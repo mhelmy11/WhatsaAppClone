@@ -1,6 +1,7 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDBDemo.Helpers;
 
 namespace MongoDBDemo.Models;
 
@@ -12,6 +13,8 @@ public class OrderItem
     public decimal Price { get; set; }
 }
 
+
+[BsonCollection("orders")]
 public class Order
 {
     [BsonId]

@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using IdGen.DependencyInjection;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using MoMediatoR;
 using System.Reflection;
@@ -19,6 +21,7 @@ namespace WhatsappClone.Core
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
 
+            services.AddIdGen(1);
 
             // Register AutoMapper
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -30,6 +33,10 @@ namespace WhatsappClone.Core
 
 
             services.AddTransient<SeesionNotRevokedRequirementHandler>();
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromMinutes(5); // OTP is revoked after 5 min
+            });
 
             return services;
         }

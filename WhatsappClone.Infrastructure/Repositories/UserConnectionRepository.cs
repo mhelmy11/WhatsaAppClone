@@ -1,5 +1,5 @@
 using System;
-using WhatsappClone.Data.SqlServerModels;
+using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure.Bases;
 using WhatsappClone.Infrastructure.Interfaces;
 

@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CodeAnalysis.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Concurrent;
@@ -10,7 +12,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
+using WhatsappClone.Data.Models;
 using WhatsappClone.Data.SqlServerModels;
+using WhatsappClone.Infrastructure;
 using WhatsappClone.Infrastructure.Interfaces;
 using WhatsappClone.Infrastructure.Repositories;
 using WhatsappClone.Service.Abstract;
@@ -21,19 +25,21 @@ public class AuthenticationService : IAuthenticationService
 {
     #region Fields
     private readonly JwtSettings jwtSettings;
+    private readonly SqlDBContext sqlDBContext;
 
     public IRefreshTokenAuditRepository RefreshTokenRepo { get; }
     #endregion
     #region Constructors
-    public AuthenticationService(JwtSettings jwtSettings, IRefreshTokenAuditRepository refreshTokenRepo)
+    public AuthenticationService(IOptions<JwtSettings> jwtSettings, IRefreshTokenAuditRepository refreshTokenRepo , SqlDBContext sqlDBContext )
     {
 
-        this.jwtSettings = jwtSettings;
+        this.jwtSettings = jwtSettings.Value;
         RefreshTokenRepo = refreshTokenRepo;
+        this.sqlDBContext = sqlDBContext;
     }
     #endregion        {
     #region Implementations
-    public async Task<JWTResult> GetTokenAfterLogging(AppUser user)
+    public async Task<JWTResult> GetTokenAfterLogin(User user)
     {
 
         var GeneratedRefreshToken = GenerateRefreshToken(user);
@@ -47,38 +53,14 @@ public class AuthenticationService : IAuthenticationService
             UserId = user.Id
         };
 
-
         //Saving to database....
-        await RefreshTokenRepo.AddAsync(refreshToken);
+        await sqlDBContext.AddAsync(refreshToken);
 
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
-        var hashing = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-        var exp = DateTime.UtcNow.AddMinutes(5);
-        var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.MobilePhone, user.PhoneNumber!),
-                new Claim("TID",refreshToken.Id.ToString())
-
-
-            };
-
-        var jwt = new JwtSecurityToken(
-
-            issuer: jwtSettings.Issuer,
-            audience: jwtSettings.Audience,
-            claims: claims,
-            expires: exp,
-            signingCredentials: hashing
-            );
-
-        var token = new JwtSecurityTokenHandler().WriteToken(jwt);
-        var accessToken = new AccessToken { Token = token, Expiration = exp };
+        var accessToken = GenerateAccessToken(user, refreshToken.Id.ToString());
 
         return new JWTResult() { AccessToken = accessToken, RefreshToken = GeneratedRefreshToken };
     }
-    public RefreshToken GenerateRefreshToken(AppUser user)
+    public RefreshToken GenerateRefreshToken(User user)
     {
         var refreshToken = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 
@@ -86,25 +68,30 @@ public class AuthenticationService : IAuthenticationService
         {
             Token = refreshToken,
             Expiration = DateTime.UtcNow.AddDays(7),
-            PhoneNumber = user.PhoneNumber
+            PhoneNumber = user.PhoneNumber,
+            
         };
     }
-    public AccessToken GenerateAccessToken(AppUser user)
+    public AccessToken GenerateAccessToken(User user , string? TID)
     {
 
         var generatedRefreshToken = GenerateRefreshToken(user);
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
         var hashing = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-        var exp = DateTime.UtcNow.AddMinutes(1);
-        var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
+        var exp = DateTime.UtcNow.AddMinutes(10);
+        var claims = new List<Claim> { 
+            
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName!),
                 new Claim(ClaimTypes.MobilePhone, user.PhoneNumber!),
-                new Claim("TID",generatedRefreshToken.Id.ToString())
+                
 
 
             };
+        if (TID != null)
+        {
+            claims.Add(new Claim("TID", TID));
+        }
 
         var jwt = new JwtSecurityToken(
 
@@ -116,18 +103,17 @@ public class AuthenticationService : IAuthenticationService
             );
 
         var token = new JwtSecurityTokenHandler().WriteToken(jwt);
-        return new AccessToken { Token = token, Expiration = exp };
+        return new AccessToken { Token = token, Expiration = exp , UserId = user.Id.ToString() };
     }
-
     public RefreshTokenAudit GetRefreshToken(string token)
     {
-        return RefreshTokenRepo.GetRefreshToken(token);
+        return sqlDBContext.RefreshTokenAudits.FirstOrDefault(r=>r.Token == token)!;
     }
-
-
     public void RevokeRefreshToken(string token)
     {
-        RefreshTokenRepo.RevokeRefreshToken(token);
+        var refreshToken = sqlDBContext.RefreshTokenAudits.FirstOrDefault(x => x.Token == token);
+        refreshToken.IsRevoked = true;
+        sqlDBContext.RefreshTokenAudits.Update(refreshToken);
     }
 
 

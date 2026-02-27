@@ -29,12 +29,14 @@ public class MongoBaseRepository<T> : IMongoBaseRepository<T> where T : MongoBas
     public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, CancellationToken cancellationToken = default)
     {
         var query = filter != null ? _collection.Find(filter) : _collection.Find(_ => true);
-        return await query.ToListAsync(cancellationToken);
+        var results = await query.ToListAsync(cancellationToken);
+        return results;
     }
 
     public async Task<T?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        return await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
+        var result = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
+        return result;
     }
 
     public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)

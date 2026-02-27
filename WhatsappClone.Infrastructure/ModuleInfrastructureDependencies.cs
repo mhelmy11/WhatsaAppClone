@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
+using WhatsappClone.Data.Models;
 using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure.Bases;
 using WhatsappClone.Infrastructure.Data;
@@ -38,13 +39,6 @@ namespace WhatsappClone.Infrastructure
             #endregion
 
             #region MongoDB
-
-
-
-
-
-
-            
             services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));//then we can inject IOptions<MongoDbSettings> to get the settings values
             var MongoDBSettings = configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
 
@@ -64,8 +58,8 @@ namespace WhatsappClone.Infrastructure
              {
                  options.UseSqlServer(configuration.GetConnectionString("whatsapp"));
              });
-
-            services.AddIdentity<AppUser, IdentityRole>(
+            services.AddDataProtection();
+            services.AddIdentity<User, Role>(
 
                 options =>
                 {

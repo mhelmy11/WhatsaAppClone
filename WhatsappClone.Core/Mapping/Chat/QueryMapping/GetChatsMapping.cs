@@ -14,7 +14,7 @@ public partial class ChatProfile
     public void GetChatsMapping()
     {
         CreateMap<Chat, GetChatsResponse>(MemberList.Destination)
-        .ForMember(dest => dest.ReceiverProfilePic, opt => opt.MapFrom(src => src.Receiver.ProfilePicUrl));
+        .ForMember(dest => dest.ChatImage, opt => opt.MapFrom(src => src.Receiver.ProfilePicUrl));
 
     }
 

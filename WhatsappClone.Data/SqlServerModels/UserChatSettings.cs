@@ -16,23 +16,29 @@ namespace WhatsappClone.Data.SqlServerModels
         /// <summary>Chat ID (foreign key to Chat table)</summary>
         public Guid ChatId { get; set; }
 
+        public long UnreadMessagesCount { get; set; }
+
+        public string ChatName { get; set; } // CONTACT name (overrides default)
+
+        public string LastReadMessageId { get; set; } // MongoDB ObjectId of last read message for this chat
+
         /// <summary>Is this chat pinned to top of list</summary>
         public bool IsPinned { get; set; } = false;
 
         /// <summary>When this chat was pinned</summary>
-        public DateTime? PinnedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? PinnedAt { get; set; } = null;
 
         /// <summary>Is this chat archived (hidden from main list)</summary>
         public bool IsArchived { get; set; } = false;
 
         /// <summary>When this chat was archived</summary>
-        public DateTime? ArchivedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? ArchivedAt { get; set; } = null;
 
         /// <summary>Is this chat marked as favorite/starred</summary>
         public bool IsFavorite { get; set; } = false;
 
         /// <summary>When this chat was marked as favorite</summary>
-        public DateTime? FavoritedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? FavoritedAt { get; set; } = null;
 
         /// <summary>Is this chat soft-deleted for this user</summary>
         public bool IsDeleted { get; set; } = false;
@@ -43,7 +49,7 @@ namespace WhatsappClone.Data.SqlServerModels
         public bool IsMuted { get; set; } = false;
 
         /// <summary>Mute notifications until this timestamp</summary>
-        public DateTime? MutedUntil { get; set; } = DateTime.UtcNow;
+        public DateTime? MutedUntil { get; set; } = null;
 
         // ============ SQL SERVER RELATIONSHIPS ============
 

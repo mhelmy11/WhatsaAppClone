@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WhatsappClone.Core.Features.Groups.Commands.Models;
 using WhatsappClone.Data.SqlServerModels;
 
 namespace WhatsappClone.Core.Mapping.Groups
@@ -13,7 +12,6 @@ namespace WhatsappClone.Core.Mapping.Groups
     {
         public void EditGroupPermissionsMapping()
         {
-            CreateMap<EditGroupPermissionsCommand, Group>();
         }
 
     }

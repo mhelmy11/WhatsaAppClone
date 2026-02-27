@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WhatsappClone.API.Base;
-using WhatsappClone.Core.Features.Users.Commands.Models;
-using WhatsappClone.Core.Features.Users.Queries.Models;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.API.Controllers
@@ -16,48 +14,48 @@ namespace WhatsappClone.API.Controllers
 
 
 
-        [HttpPost]
-        public async Task<IActionResult> Register([FromForm] AddUserCommand command)
-        {
+        //[HttpPost]
+        //public async Task<IActionResult> Register([FromForm] AddUserCommand command)
+        //{
 
 
-            var result = await mediator.Send(command);
+        //    var result = await mediator.Send(command);
 
-            return ResponseResult(result);
-        }
-
-
-        [HttpPost("forget-password")]
-        public async Task<IActionResult> ForgetPassword([FromForm] ForgetPasswordCommand command)
-        {
-            var result = await mediator.Send(command);
-            return ResponseResult(result);
-        }
-
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordCommand command)
-        {
-            var result = await mediator.Send(command);
-            return ResponseResult(result);
-        }
+        //    return ResponseResult(result);
+        //}
 
 
-        [HttpGet("Me")]
-        [Authorize]
-        public async Task<IActionResult> GetMe()
-        {
-            var result = await mediator.Send(new GetMeQuery());
-            return ResponseResult(result);
-        }
+        //[HttpPost("forget-password")]
+        //public async Task<IActionResult> ForgetPassword([FromForm] ForgetPasswordCommand command)
+        //{
+        //    var result = await mediator.Send(command);
+        //    return ResponseResult(result);
+        //}
+
+        //[HttpPost("reset-password")]
+        //public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordCommand command)
+        //{
+        //    var result = await mediator.Send(command);
+        //    return ResponseResult(result);
+        //}
 
 
-        [HttpPut("Me")]
-        [Authorize]
-        public async Task<IActionResult> EditMe([FromForm] EditMeCommand command)
-        {
-            var result = await mediator.Send(command);
-            return ResponseResult(result);
-        }
+        //[HttpGet("Me")]
+        //[Authorize]
+        //public async Task<IActionResult> GetMe()
+        //{
+        //    var result = await mediator.Send(new GetMeQuery());
+        //    return ResponseResult(result);
+        //}
+
+
+        //[HttpPut("Me")]
+        //[Authorize]
+        //public async Task<IActionResult> EditMe([FromForm] EditMeCommand command)
+        //{
+        //    var result = await mediator.Send(command);
+        //    return ResponseResult(result);
+        //}
 
     }
 }

@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using WhatsappClone.Data.Enums;
+using WhatsappClone.Data.Models;
+using WhatsappClone.Data.MongoModels;
 
 namespace WhatsappClone.Data.SqlServerModels
 {
-    public class AppUser : IdentityUser
+    public class AppUser
     {
         /// <summary>User's full display name in the system</summary>
         public string FullName { get; set; }
@@ -83,7 +85,6 @@ namespace WhatsappClone.Data.SqlServerModels
         public virtual ICollection<UserGroup> UserGroups { get; set; } = new HashSet<UserGroup>();
 
         /// <summary>Chat settings for direct and group chats</summary>
-        public virtual ICollection<UserChatSettings> ChatSettings { get; set; } = new HashSet<UserChatSettings>();
 
         /// <summary>Privacy exceptions for "My Contacts Except" rules</summary>
         public virtual ICollection<UserPrivacyException> PrivacyExceptions { get; set; } = new HashSet<UserPrivacyException>();

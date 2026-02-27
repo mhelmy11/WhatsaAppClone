@@ -1,6 +1,7 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDBDemo.Database;
 using MongoDBDemo.Models;
 
 namespace MongoDBDemo.Services;
@@ -11,10 +12,10 @@ public class ProductService
     private readonly IMongoCollection<Product> _products;
     private readonly IMongoCollection<Order> _orders;
 
-    public ProductService(IMongoDatabase database)
+    public ProductService(MongoDbContext mongoDbContext)
     {
-        _products = database.GetCollection<Product>("Products");
-        _orders = database.GetCollection<Order>("Orders");
+        _products = mongoDbContext.GetCollection<Product>();
+        _orders = mongoDbContext.GetCollection<Order>();
     }
 
     public async Task CreateAsync(Product newProduct) =>

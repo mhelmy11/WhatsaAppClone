@@ -16,12 +16,10 @@ namespace WhatsappClone.Core.Features.Chats.Commands.Handler
     public class ChatsCommandHandler : ResponseHandler, IRequestHandler<CreateChatCommand, Response<string>>
 
     {
-        private readonly IChatService chatService;
         private readonly IMapper mapper;
 
-        public ChatsCommandHandler(IChatService chatService, IMapper mapper)
+        public ChatsCommandHandler(IMapper mapper)
         {
-            this.chatService = chatService;
             this.mapper = mapper;
         }
 

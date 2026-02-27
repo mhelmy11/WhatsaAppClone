@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using WhatsappClone.API.Base;
-using WhatsappClone.Core.Features.Messages.Commands.Models;
-
 namespace WhatsappClone.API.Controllers
 {
     [Route("api/[controller]")]
@@ -13,15 +11,15 @@ namespace WhatsappClone.API.Controllers
     {
 
 
-        [HttpPost("send-group-message")]
-        [Authorize]
+        //[HttpPost("send-group-message")]
+        //[Authorize]
 
 
-        public async Task<IActionResult> SendGroupMessage([FromForm] SendGroupMessageCommand command)
-        {
-            var result = await mediator.Send(command);
-            return ResponseResult(result);
-        }
+        //public async Task<IActionResult> SendGroupMessage([FromForm] SendGroupMessageCommand command)
+        //{
+        //    var result = await mediator.Send(command);
+        //    return ResponseResult(result);
+        //}
 
     }
 }

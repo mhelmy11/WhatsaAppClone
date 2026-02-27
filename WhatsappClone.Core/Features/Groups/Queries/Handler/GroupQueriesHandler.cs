@@ -19,37 +19,27 @@ namespace WhatsappClone.Core.Features.Groups.Queries.Handler
                                         , IRequestHandler<GetGroupListQuery, Response<List<ChatDTO>>>
                                         , IRequestHandler<GetGroupInviteInfoQuery, Response<GetGroupInviteInfoResult>>
     {
-        private readonly IMessagesService messagesService;
-        private readonly IGroupService groupService;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IMapper mapper;
 
-        public GroupQueriesHandler(IMessagesService messagesService, IGroupService groupService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public GroupQueriesHandler(IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
-            this.messagesService = messagesService;
-            this.groupService = groupService;
+
             this.httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
         }
         public async Task<Response<List<ChatDTO>>> Handle(GetGroupListQuery request, CancellationToken cancellationToken)
         {
+            throw new NotImplementedException();
 
-            var currentuserId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var groupsIDs = groupService.GetGroupIdsOfUser(currentuserId);
-            var lastMessages = messagesService.GetLasMessageOfGroupsIDs(groupsIDs, currentuserId);
-
-            return Success(lastMessages, "Group List retrieved successfully");
 
         }
 
         public async Task<Response<GetGroupInviteInfoResult>> Handle(GetGroupInviteInfoQuery request, CancellationToken cancellationToken)
         {
-            var groupFromDB = groupService.GetGroupIdByInviteCode(request.inviteCode);
 
-            //mapping
-            var groupInfo = mapper.Map<GetGroupInviteInfoResult>(groupFromDB);
+            throw new NotImplementedException();
 
-            return Success(groupInfo);
 
 
         }
