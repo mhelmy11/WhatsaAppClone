@@ -45,7 +45,7 @@ public class AuthenticationService : IAuthenticationService
         var GeneratedRefreshToken = GenerateRefreshToken(user);
         var refreshToken = new RefreshTokenAudit
         {
-            CreatedAt = GeneratedRefreshToken.Expiration,
+            CreatedAt = DateTime.UtcNow,
             Token = GeneratedRefreshToken.Token,
             ExpiresAt = GeneratedRefreshToken.Expiration,
             IsRevoked = false,
@@ -55,6 +55,7 @@ public class AuthenticationService : IAuthenticationService
 
         //Saving to database....
         await sqlDBContext.AddAsync(refreshToken);
+        await sqlDBContext.SaveChangesAsync();
 
         var accessToken = GenerateAccessToken(user, refreshToken.Id.ToString());
 

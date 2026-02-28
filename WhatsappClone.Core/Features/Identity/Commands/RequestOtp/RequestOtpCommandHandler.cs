@@ -62,7 +62,7 @@ namespace WhatsappClone.Core.Features.Identity.Commands
             //send it via email service
             await emailService.SendEmailAsync(request.Email , "OTP Verification" , $"Your code is {otp}");
 
-            return Success("OTP Send Successfully ");
+            return Success("OTP Send Successfully");
         }
     }
 }

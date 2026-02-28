@@ -26,12 +26,13 @@ namespace WhatsappClone.Core.Features.Identity.Commands
         {
             var user = await userManager.FindByEmailAsync(request.Email);
             var result =  await userManager.VerifyTwoFactorTokenAsync(user, "Email", request.Otp);
-            if (result)
+            if (!result)
             {
-                var tokens = await authenticationService.GetTokenAfterLogin(user);
-                return Success(new VerifyOtpResult { tokens = tokens});
+                return BadRequest<VerifyOtpResult>("Verification failed");
             }
-            return BadRequest<VerifyOtpResult>();
+
+            var tokens = await authenticationService.GetTokenAfterLogin(user);
+            return Success(new VerifyOtpResult { tokens = tokens},"Verified");
 
            
             

@@ -16,9 +16,7 @@
 		<Folder Include="Features\Conversations\Commands\ArchiveChat\" />
 		<Folder Include="Features\Conversations\Commands\FavChat\" />
 		<Folder Include="Features\Conversations\Queries\GetChatByPhone\" />
-		<Folder Include="Features\Identity\Commands\ForgetPassword\" />
 		<Folder Include="Features\Identity\Commands\ResetPassword\" />
-		<Folder Include="Features\Identity\Commands\RefreshToken\" />
 		<Folder Include="Features\Contacts\Queries\GetMyContacts\" />
 		<Folder Include="Features\Contacts\Commands\BlockContact\" />
 		<Folder Include="Features\Contacts\Commands\AddContact\" />

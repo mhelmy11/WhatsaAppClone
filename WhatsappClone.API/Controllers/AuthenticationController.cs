@@ -29,14 +29,13 @@ namespace WhatsappClone.API.Controllers
         //}
 
 
-        //[HttpPost("refresh-token")]
-        //public async Task<IActionResult> RefreshToken(RefreshTokenCommand command)
-        //{
-        //    // Assuming UserContext.User is set with the current user context
-        //    var result = await mediator.Send(command);
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenCommand command)
+        {
+            var result = await mediator.Send(command);
 
-        //    return ResponseResult(result);
-        //}
+            return ResponseResult(result);
+        }
 
 
         [HttpPost("request-otp")]
