@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using PhoneNumbers;
+﻿using PhoneNumbers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

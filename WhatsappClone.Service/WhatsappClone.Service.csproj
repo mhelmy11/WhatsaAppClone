@@ -18,8 +18,4 @@
 		<ProjectReference Include="..\WhatsappClone.Infrastructure\WhatsappClone.Infrastructure.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Helpers\" />
-	</ItemGroup>
-
 </Project>

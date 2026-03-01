@@ -40,11 +40,11 @@ namespace WhatsappClone.Core.Features.Identity.Commands
             //get refresh token from db
             var refreshTokenFromDb = await dBContext.RefreshTokenAudits.Where(rt=>rt.Token == request.RefreshToken).FirstOrDefaultAsync();
            
-            if (refreshTokenFromDb == null || refreshTokenFromDb.ExpiresAt > DateTime.UtcNow ) 
+            if (refreshTokenFromDb == null || refreshTokenFromDb.ExpiresAt < DateTime.UtcNow ) 
             {
                 return BadRequest<RefreshTokenResult>("Invalid Refresh Token");
             }
-            if (!refreshTokenFromDb.IsRevoked)
+            if (refreshTokenFromDb.IsRevoked)
             {
                 dBContext.Remove(refreshTokenFromDb);
                 await dBContext.SaveChangesAsync();
@@ -58,8 +58,8 @@ namespace WhatsappClone.Core.Features.Identity.Commands
 
 
             //generate new refresh + access tokens
-
-            var tokens = await authenticationService.GetTokenAfterLogin(refreshTokenFromDb.User);
+            var user = await userManager.FindByIdAsync(refreshTokenFromDb.UserId.ToString());
+            var tokens = await authenticationService.GetTokenAfterLogin(user);
 
             return Success(new RefreshTokenResult { tokens = tokens });
 

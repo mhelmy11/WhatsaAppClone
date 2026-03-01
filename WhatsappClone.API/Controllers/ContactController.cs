@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WhatsappClone.API.Base;
+using WhatsappClone.Core.Features.Contacts.Commands;
+using WhatsappClone.Core.Features.Contacts.Queries;
+using WhatsappClone.Core.Features.Users.Queries;
 
 namespace WhatsappClone.API.Controllers
 {
@@ -10,23 +13,21 @@ namespace WhatsappClone.API.Controllers
     [ApiController]
     public class ContactController : AppControllerBase
     {
-        //[HttpPost("add-contact")]
+        [HttpPost("add-contact")]
         //[Authorize]
+        public async Task<IActionResult> AddContact([FromQuery] AddContactCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
 
-        //public async Task<IActionResult> AddContact([FromForm] AddContactCommand command)
-        //{
-        //    var result = await mediator.Send(command);
-        //    return ResponseResult(result);
-        //}
 
-
-        //[HttpGet("get-contacts")]
-        //[Authorize]
-        //public async Task<IActionResult> GetContacts()
-        //{
-        //    var result = await mediator.Send(new GetContactsQuery());
-        //    return ResponseResult(result);
-        //}
+        [HttpGet("check-contact-exists")]
+        public async Task<IActionResult> CheckContactExists([FromQuery] CheckContactExistsQuery query)
+        {
+            var result = await mediator.Send(query);
+            return ResponseResult(result);
+        }
 
 
 
