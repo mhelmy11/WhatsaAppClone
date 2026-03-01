@@ -16,10 +16,8 @@
 		<Folder Include="Features\Conversations\Commands\ArchiveChat\" />
 		<Folder Include="Features\Conversations\Commands\FavChat\" />
 		<Folder Include="Features\Conversations\Queries\GetChatByPhone\" />
-		<Folder Include="Features\Identity\Commands\ResetPassword\" />
 		<Folder Include="Features\Contacts\Queries\GetMyContacts\" />
 		<Folder Include="Features\Contacts\Commands\BlockContact\" />
-		<Folder Include="Features\Contacts\Commands\AddContact\" />
 		<Folder Include="Features\Contacts\Commands\EditContact\" />
 		<Folder Include="Features\Contacts\Commands\DeleteContact\" />
 		<Folder Include="Features\Contacts\Commands\UnblockContact\" />
@@ -66,6 +64,7 @@
 		<PackageReference Include="IdGen" Version="3.0.7" />
 		<PackageReference Include="IdGen.Configuration" Version="3.0.7" />
 		<PackageReference Include="IdGen.DependencyInjection" Version="3.0.7" />
+		<PackageReference Include="libphonenumber-csharp" Version="9.0.25" />
 		<PackageReference Include="MediatR" Version="12.5.0" />
 		<PackageReference Include="MoMediator" Version="2.0.3" />
 	</ItemGroup>

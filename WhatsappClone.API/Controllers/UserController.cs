@@ -3,26 +3,27 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WhatsappClone.API.Base;
+using WhatsappClone.Core.Features.Users.Queries;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : AppControllerBase
+    public class UserController : AppControllerBase
     {
 
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> Register([FromForm] AddUserCommand command)
-        //{
+        [HttpGet]
+        public async Task<IActionResult> CheckUserExists([FromQuery] CheckUserExistsQuery command)
+        {
 
 
-        //    var result = await mediator.Send(command);
+            var result = await mediator.Send(command);
 
-        //    return ResponseResult(result);
-        //}
+            return ResponseResult(result);
+        }
 
 
         //[HttpPost("forget-password")]

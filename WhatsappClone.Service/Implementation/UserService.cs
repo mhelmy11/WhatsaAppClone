@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,9 @@ namespace WhatsappClone.Service.Implementation
     public static class UserService
     {
 
-        public static User FindByPhoneNumber(this UserManager<User> userManager, string PhoneNumber)
+        public static async Task<User> FindByPhoneNumber(this UserManager<User> userManager, string CountryCode, string PhoneNumber)
         {
-            var User = userManager.Users.FirstOrDefault(u => u.PhoneNumber == PhoneNumber);
+            var User = await userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == PhoneNumber && u.CountryCode == CountryCode);
 
             return User;
         }
