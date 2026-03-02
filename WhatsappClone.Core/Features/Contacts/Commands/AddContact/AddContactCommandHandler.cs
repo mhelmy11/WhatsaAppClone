@@ -11,6 +11,7 @@ using WhatsappClone.Core.Bases;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Service.Implementation;
+using WhatsappClone.Service.Helpers;
 
 namespace WhatsappClone.Core.Features.Contacts.Commands
 {

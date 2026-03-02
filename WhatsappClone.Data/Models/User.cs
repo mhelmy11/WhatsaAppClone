@@ -19,9 +19,10 @@ namespace WhatsappClone.Data.Models
         public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedAt { get; set; }
         public bool AllowReadReceipts { get; set; } = true;
-        public string WhoCanSeeMyStory { get; set; } = "Everyone";
+        public string WhoCanSeeMyStory { get; set; } = "Contacts";
         public string WhoCanAddMeToGroups { get; set; } = "Everyone";
         public string WhoCanSeeMyLastSeen { get; set; } = "Everyone";
+        public string WhoCanSeeMyOnlineStatus { get; set; } = "Everyone";
         public string WhoCanViewProfilePic { get; set; } = "Everyone";
         public string PreferredLanguage { get; set; } = "English";
         public string ThemePreference { get; set; } = "Light";

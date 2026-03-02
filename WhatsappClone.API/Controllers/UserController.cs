@@ -15,11 +15,18 @@ namespace WhatsappClone.API.Controllers
 
 
 
-        [HttpGet]
+        [HttpGet("check-user-exists")]
         public async Task<IActionResult> CheckUserExists([FromQuery] CheckUserExistsQuery command)
         {
 
 
+            var result = await mediator.Send(command);
+
+            return ResponseResult(result);
+        }
+        [HttpGet("get-user-profile")]
+        public async Task<IActionResult> GetUserProfile([FromQuery] GetProfileQuery command)
+        {
             var result = await mediator.Send(command);
 
             return ResponseResult(result);

@@ -8,7 +8,7 @@ using WhatsappClone.Infrastructure;
 
 namespace WhatsappClone.Service.Helpers
 {
-    public static class ContactsExtentions
+    public static class ContactExtenstions
     {
 
         public static async Task<bool> CheckContactExistsAsync(
@@ -25,6 +25,14 @@ namespace WhatsappClone.Service.Helpers
             }
 
             return await db.Contacts.AnyAsync(u => u.UserId.ToString() == currentUserId && u.ContactUserId == contact.Id, ct);
+        }
+        public static async Task<bool> CheckContactExistsByIdAsync(
+        this SqlDBContext db,
+        string currentUserId,
+        string targetUserId,
+        CancellationToken ct = default)
+        {
+            return await db.Contacts.AnyAsync(u => u.UserId.ToString() == currentUserId && u.ContactUserId.ToString() == targetUserId, ct);
         }
     }
 }
