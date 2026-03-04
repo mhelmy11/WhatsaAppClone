@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WhatsappClone.Infrastructure;
 
@@ -11,9 +12,11 @@ using WhatsappClone.Infrastructure;
 namespace WhatsappClone.Infrastructure.Migrations
 {
     [DbContext(typeof(SqlDBContext))]
-    partial class SqlDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260304200048_addPrivacyTable2")]
+    partial class addPrivacyTable2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -311,8 +314,11 @@ namespace WhatsappClone.Infrastructure.Migrations
 
             modelBuilder.Entity("WhatsappClone.Data.Models.PrivacyException", b =>
                 {
-                    b.Property<long>("OwnerUserId")
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<long>("ExcludedContactId")
                         .HasColumnType("bigint");
@@ -326,9 +332,14 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Property<bool>("IsExcludedFromStatus")
                         .HasColumnType("bit");
 
-                    b.HasKey("OwnerUserId", "ExcludedContactId");
+                    b.Property<long>("OwnerUserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ExcludedContactId");
+
+                    b.HasIndex("OwnerUserId");
 
                     b.ToTable("PrivacyException");
                 });

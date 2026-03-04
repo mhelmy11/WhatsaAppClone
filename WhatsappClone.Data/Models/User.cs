@@ -39,6 +39,8 @@ namespace WhatsappClone.Data.Models
         public ICollection<BlockedUser> BlockedBy { get; set; }
         public ICollection<Group> CreatedGroups { get; set; }
         public ICollection<GroupMember> GroupMemberships { get; set; }
+
+        public UserPrivacySetting PrivacySettings { get; set; }
     }
 
 

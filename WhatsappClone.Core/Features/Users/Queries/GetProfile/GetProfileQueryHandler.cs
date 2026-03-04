@@ -23,68 +23,122 @@ namespace WhatsappClone.Core.Features.Users.Queries
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly PhoneNumberService phoneNumberService;
         private readonly SqlDBContext dBContext;
-        private readonly IMongoDBFactory mongoDB;
 
         public GetProfileQueryHandler(
             UserManager<User> userManager,
             IHttpContextAccessor httpContextAccessor,
-            SqlDBContext dBContext,
-            IMongoDBFactory mongoDB
+            SqlDBContext dBContext
 
             )
         {
             this.userManager = userManager;
             this.httpContextAccessor = httpContextAccessor;
             this.dBContext = dBContext;
-            this.mongoDB = mongoDB;
         }
         public async Task<Response<GetProfileResult>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
         {
+
             var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
-
-            if (currentUser.Id.ToString() == request.UserId)
+            if (currentUser.Id == long.Parse(request.UserId))
             {
-                return Success(new GetProfileResult() { Name = "me(You)" });
-            }
-            var targetUser = await userManager.FindByIdAsync(request.UserId);
-            var presenceCollection = mongoDB.GetCollection<Presence>();
-            var filter = Builders<Presence>.Filter.Eq(f => f.UserId, targetUser.Id);
-            var projection = Builders<Presence>.Projection.Expression(p => p.CanViewProfilePicMyContactsExcept);
-            var targetUserProfileExceptionList = await presenceCollection.Find(filter).Project(projection).FirstOrDefaultAsync() ?? new();
-            if (targetUser == null)
-            {
-                return BadRequest<GetProfileResult>("User is not found");
+                return Success(new GetProfileResult() { Name = "me(You)", ProfilePic = currentUser.ProfilePicUrl });
             }
 
-            var getMyProfileResult = new GetProfileResult();
-            getMyProfileResult.CountryCode = targetUser.CountryCode;
-            getMyProfileResult.PhoneNumber = targetUser.PhoneNumber!;
-            getMyProfileResult.About = targetUser.About;
+            long targetUserId = long.Parse(request.UserId);
 
-
-
-            //check if targetUser exists as contact for currentUser
-            var isTargetContactForCurrent = await dBContext.CheckContactExistsByIdAsync(currentUser.Id.ToString(), targetUser.Id.ToString(), cancellationToken);
-            var isCurrentContactForTarget = await dBContext.CheckContactExistsByIdAsync(targetUser.Id.ToString(), currentUser.Id.ToString(), cancellationToken);
-            if (!isTargetContactForCurrent)
+            var targetData = await dBContext.Users
+            .AsNoTracking()
+            .Where(u => u.Id == targetUserId)
+            .Select(u => new
             {
-                getMyProfileResult.IsContact = false;
-                getMyProfileResult.Name = targetUser.UserName!;
+                u.CountryCode,
+                u.PhoneNumber,
+                u.About,
+                u.UserName,
+                u.ProfilePicUrl,
+                Privacy = u.PrivacySettings.ProfilePicPrivacy,
+                AmIInHisContacts = dBContext.Contacts
+                    .Any(c => c.UserId == targetUserId && c.ContactUserId == currentUser.Id),
+                MySavedContact = dBContext.Contacts
+                    .FirstOrDefault(c => c.UserId == currentUser.Id && c.ContactUserId == targetUserId),
+                AmIExcludedFromPic = u.PrivacySettings.PrivacyExceptions
+                    .Any(e => e.IsExcludedFromProfilePic &&e.ExcludedContactId == currentUser.Id)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
 
+            if (targetData == null)
+            {
+                return BadRequest<GetProfileResult>("User not found.");
             }
-            getMyProfileResult.Name = (await dBContext.Contacts.FirstOrDefaultAsync(c=> c.UserId == currentUser.Id && c.ContactUserId == targetUser.Id)).ContactName;
-            //check profile pic privacy for targetUser either contact or not
-            // show it only if privacy is (everyone | Contacts)
-            var profilePicPrivacy = targetUser.WhoCanViewProfilePic;
-            getMyProfileResult.ProfilePic = profilePicPrivacy switch
+            var result = new GetProfileResult
             {
-                "Everyone" => targetUser.ProfilePicUrl,
-                "Contacts" => isCurrentContactForTarget ? profilePicPrivacy : "default",
-                "MyContactsExcept" => isCurrentContactForTarget && !targetUserProfileExceptionList.Any(c => c == currentUser.Id) ? targetUser.ProfilePicUrl : "default"  ,
-                _ => "default"
+                CountryCode = targetData.CountryCode,
+                PhoneNumber = targetData.PhoneNumber!,
+                About = targetData.About,
+                Name = targetData.MySavedContact != null ? targetData.MySavedContact.ContactName : targetData.UserName!,
+                IsContact = targetData.MySavedContact != null
             };
 
-            return Success(getMyProfileResult);
+            result.ProfilePic = targetData.Privacy switch
+            {
+                PrivacyLevel.Everyone => targetData.ProfilePicUrl,
+
+                PrivacyLevel.MyContacts when targetData.AmIInHisContacts => targetData.ProfilePicUrl,
+
+                PrivacyLevel.MyContactsExcept when targetData.AmIInHisContacts && !targetData.AmIExcludedFromPic => targetData.ProfilePicUrl,
+
+                _ => "default_avatar_url"
+            };
+
+            return Success(result);
+
+
+
+
+
+
+
+            //var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
+
+            //if (currentUser.Id == long.Parse(request.UserId))
+            //{
+            //    return Success(new GetProfileResult() { Name = "me(You)" , ProfilePic = currentUser.ProfilePicUrl });
+            //}
+            //var targetUser = await dBContext.Users.Include(c => c.PrivacySettings).ThenInclude(p => p.PrivacyExceptions).FirstOrDefaultAsync(u => u.Id == long.Parse(request.UserId)); 
+            //if (targetUser == null)
+            //{
+            //    return BadRequest<GetProfileResult>("User is not found");
+            //}
+
+            //var getMyProfileResult = new GetProfileResult();
+            //getMyProfileResult.CountryCode = targetUser.CountryCode;
+            //getMyProfileResult.PhoneNumber = targetUser.PhoneNumber!;
+            //getMyProfileResult.About = targetUser.About;
+
+
+
+            ////check if targetUser exists as contact for currentUser
+            //var isTargetContactForCurrent = await dBContext.CheckContactExistsByIdAsync(currentUser.Id.ToString(), targetUser.Id.ToString(), cancellationToken);
+            //var isCurrentContactForTarget = await dBContext.CheckContactExistsByIdAsync(targetUser.Id.ToString(), currentUser.Id.ToString(), cancellationToken);
+            //if (!isTargetContactForCurrent)
+            //{
+            //    getMyProfileResult.IsContact = false;
+            //    getMyProfileResult.Name = targetUser.UserName!; // DisplayName
+
+            //}
+            //getMyProfileResult.Name = (await dBContext.Contacts.FirstOrDefaultAsync(c=> c.UserId == currentUser.Id && c.ContactUserId == targetUser.Id)).ContactName;
+            ////check profile pic privacy for targetUser either contact or not
+            //// show it only if privacy is (everyone | Contacts)
+            //var profilePicPrivacy = targetUser.PrivacySettings.ProfilePicPrivacy;
+            //getMyProfileResult.ProfilePic = profilePicPrivacy switch
+            //{
+            //    PrivacyLevel.Everyone => targetUser.ProfilePicUrl,
+            //    PrivacyLevel.MyContacts => isCurrentContactForTarget ? targetUser.ProfilePicUrl : "default",
+            //   PrivacyLevel.MyContactsExcept => isCurrentContactForTarget && !targetUser.PrivacySettings.PrivacyExceptions.Any(p => long.Parse(p.ExcludedContactId) == currentUser.Id) ? targetUser.ProfilePicUrl : "default"  ,
+            //    _ => "default"
+            //};
+
+            //return Success(getMyProfileResult);
 
 
 

@@ -18,6 +18,7 @@ public class SqlDBContext : IdentityDbContext<User,Role,long>
     public virtual DbSet<GroupMember> GroupMembers { get; set; }
     public virtual DbSet<GroupJoinRequest> GroupJoinRequests { get; set; }
     public virtual DbSet<Contact> Contacts { get; set; }
+    public virtual DbSet<UserPrivacySetting> UserPrivacySettings { get; set; }
 
 
     public SqlDBContext(DbContextOptions<SqlDBContext> options) : base(options)
@@ -35,7 +36,27 @@ public class SqlDBContext : IdentityDbContext<User,Role,long>
             entity.HasIndex(e => e.Email);
         });
 
-         //============ Blacklist Configuration ============
+        modelBuilder.Entity<UserPrivacySetting>(entity =>
+        {
+            entity.HasKey(e => e.UserId);
+            entity.HasOne(x => x.User)
+                   .WithOne(u => u.PrivacySettings)
+                   .HasForeignKey<UserPrivacySetting>(x => x.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+        });
+        modelBuilder.Entity<PrivacyException>(entity =>
+        {
+            entity.HasKey(k => new { k.OwnerUserId , k.ExcludedContactId });
+            entity.HasOne(x=>x.OwnerSettings)
+                   .WithMany(p => p.PrivacyExceptions)
+                   .HasForeignKey(x => x.OwnerUserId)
+                   .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(x => x.ExcludedContactId);
+
+        });
+
+        //============ Blacklist Configuration ============
         modelBuilder.Entity<BlockedUser>(entity =>
         {
             entity.HasKey(e => new { e.UserId, e.BlockedUserId });
