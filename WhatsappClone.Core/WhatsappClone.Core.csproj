@@ -17,9 +17,7 @@
 		<Folder Include="Features\Conversations\Commands\FavChat\" />
 		<Folder Include="Features\Conversations\Queries\GetChatByPhone\" />
 		<Folder Include="Features\Contacts\Queries\GetMyContacts\" />
-		<Folder Include="Features\Contacts\Commands\BlockContact\" />
 		<Folder Include="Features\Contacts\Commands\EditContact\" />
-		<Folder Include="Features\Contacts\Commands\UnblockContact\" />
 		<Folder Include="Features\Conversations\Queries\GetRecentChats\" />
 		<Folder Include="Features\Conversations\Queries\GetChatHistory\" />
 		<Folder Include="Features\Conversations\Commands\ClearChat\" />
@@ -57,6 +55,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="EFCore.BulkExtensions" Version="9.0.2" />
 		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
 		<PackageReference Include="IdGen" Version="3.0.7" />

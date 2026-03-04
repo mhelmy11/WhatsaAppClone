@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WhatsappClone.API.Base;
+using WhatsappClone.Core.Features.Users.Commands.BlockUser;
+using WhatsappClone.Core.Features.Users.Commands.UnblockUser;
 using WhatsappClone.Core.Features.Users.Queries;
 using WhatsappClone.Service.Abstract;
 
@@ -33,12 +35,19 @@ namespace WhatsappClone.API.Controllers
         }
 
 
-        //[HttpPost("forget-password")]
-        //public async Task<IActionResult> ForgetPassword([FromForm] ForgetPasswordCommand command)
-        //{
-        //    var result = await mediator.Send(command);
-        //    return ResponseResult(result);
-        //}
+        [HttpPost("block-user")]
+        public async Task<IActionResult> BlockUser([FromForm] BlockUserCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+        [HttpPost("unblock-user")]
+        public async Task<IActionResult> UnblockUser([FromForm] UnblockUserCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
 
         //[HttpPost("reset-password")]
         //public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordCommand command)
