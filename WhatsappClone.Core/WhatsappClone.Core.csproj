@@ -19,7 +19,6 @@
 		<Folder Include="Features\Contacts\Queries\GetMyContacts\" />
 		<Folder Include="Features\Contacts\Commands\BlockContact\" />
 		<Folder Include="Features\Contacts\Commands\EditContact\" />
-		<Folder Include="Features\Contacts\Commands\DeleteContact\" />
 		<Folder Include="Features\Contacts\Commands\UnblockContact\" />
 		<Folder Include="Features\Conversations\Queries\GetRecentChats\" />
 		<Folder Include="Features\Conversations\Queries\GetChatHistory\" />

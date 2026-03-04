@@ -29,33 +29,6 @@ namespace WhatsappClone.Data.Models
         [BsonElement("devices")]
         public List<PresenceDevice> Devices { get; set; } = new();
 
-        [BsonElement("last_seen_privacy")]
-        public string LastSeenPrivacy { get; set; } = "everyone"; // everyone, contacts, nobody
-
-        [BsonElement("onlineStatus_privacy")]
-
-        public string OnlineStatusPrivacy { get; set; } = "everyone"; // everyone, contacts, nobody
-
-        [BsonElement("lastSeen_MyContactsExcept")]
-        public List<long>? CanSeeMyLastSeenMyContactsExcept { get; set; } = new();
-
-
-        [BsonElement("profile_pic_privacy")]
-        public string ProfilePicPrivacy { get; set; } = "everyone"; // everyone, contacts, nobody
-
-        [BsonElement("profilePic_MyContactsExcept")]
-        public List<long>? CanViewProfilePicMyContactsExcept { get; set; } = new();
-
-
-        [BsonElement("status_privacy")]
-        public string StatusPrivacy { get; set; } = "contacts"; //contacts
-
-        [BsonElement("status_MyContactsExcept")]
-        public List<long>? CanViewStatusMyContactsExcept { get; set; } = new();
-
-        [BsonElement("status_OnlyShareWith")]
-        public List<long>? CanViewStatusOnlyShareWith { get; set; } = new();
-
         [BsonElement("read_receipts")]
         public bool ReadReceipts { get; set; } = true;
 

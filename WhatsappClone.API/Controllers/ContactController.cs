@@ -47,5 +47,11 @@ namespace WhatsappClone.API.Controllers
         //    var result = await mediator.Send(command);
         //    return ResponseResult(result);
         //}
+        [HttpDelete("delete-contact")]
+        public async Task<IActionResult> DeleteContact(DeleteContactCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
     }
 }
