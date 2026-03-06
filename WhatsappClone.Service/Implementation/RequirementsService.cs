@@ -1,26 +1,27 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WhatsappClone.Infrastructure.Interfaces;
+using WhatsappClone.Infrastructure;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Service.Implementation
 {
     public class RequirementsService : IRequirementsService
     {
-        private readonly IRefreshTokenAuditRepository refreshTokenRepo;
+        private readonly SqlDBContext dBContext;
 
-        public RequirementsService(IRefreshTokenAuditRepository refreshTokenRepo)
+        public RequirementsService( SqlDBContext dBContext )
         {
-            this.refreshTokenRepo = refreshTokenRepo;
+            this.dBContext = dBContext;
         }
 
 
         public async Task<bool> IsSessionRevoked(int tid)
         {
-            var refreshToken = await refreshTokenRepo.GetByIdAsync(tid);
+            var refreshToken = await dBContext.RefreshTokenAudits.FirstOrDefaultAsync(r=>r.Id == tid);
             if (refreshToken == null)
             {
                 return false;

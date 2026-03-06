@@ -13,11 +13,10 @@ namespace WhatsappClone.Core.Filters
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            // هنا ممكن نضيف منطق التحقق من الصلاحيات
-            if (!context.HttpContext.User.HasClaim("Permission", "RequiredPermission"))
-            {
-                context.Result = new ForbidResult();
-            }
+            //if (!context.HttpContext.User.HasClaim("Permission", "RequiredPermission"))
+            //{
+            //    context.Result = new ForbidResult();
+            //}
 
         }
     }

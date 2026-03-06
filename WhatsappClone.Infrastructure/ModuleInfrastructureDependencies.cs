@@ -12,12 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
-using WhatsappClone.Data.SqlServerModels;
-using WhatsappClone.Infrastructure.Bases;
 using WhatsappClone.Infrastructure.Data;
 using WhatsappClone.Infrastructure.Helpers;
-using WhatsappClone.Infrastructure.Interfaces;
-using WhatsappClone.Infrastructure.Repositories;
 
 namespace WhatsappClone.Infrastructure
 {
@@ -26,17 +22,6 @@ namespace WhatsappClone.Infrastructure
 
         public static IServiceCollection AddModuleInfrastructureDependencies(this IServiceCollection services, IConfiguration configuration)
         {
-            #region CustomServices
-            services.AddScoped<IChatRepository, ChatRepository>();
-            services.AddScoped<IMessageRepository, MessageRepository>();
-            services.AddScoped<IGroupRepository, GroupRepository>();
-            services.AddScoped<IUserGroupRepository, UserGroupRepository>();
-            services.AddScoped<IRefreshTokenAuditRepository, RefreshTokenAuditRepository>();
-            services.AddScoped<IUserContactRepository, UserContactRepository>();
-            services.AddScoped<IStoryRepository, StoryRepository>();
-            services.AddScoped(typeof(ISqlBaseRepository<>), typeof(SqlBaseRepository<>));
-            services.AddScoped(typeof(IMongoBaseRepository<>), typeof(MongoBaseRepository<>));
-            #endregion
 
             #region MongoDB
             services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));//then we can inject IOptions<MongoDbSettings> to get the settings values

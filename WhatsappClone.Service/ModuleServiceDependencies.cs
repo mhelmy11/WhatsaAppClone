@@ -6,8 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Infrastructure.Interfaces;
-using WhatsappClone.Infrastructure.Repositories;
 using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Implementation;
 

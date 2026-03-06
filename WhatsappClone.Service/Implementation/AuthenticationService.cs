@@ -13,10 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
 using WhatsappClone.Data.Models;
-using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure;
-using WhatsappClone.Infrastructure.Interfaces;
-using WhatsappClone.Infrastructure.Repositories;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Service.Implementation;
@@ -26,15 +23,12 @@ public class AuthenticationService : IAuthenticationService
     #region Fields
     private readonly JwtSettings jwtSettings;
     private readonly SqlDBContext sqlDBContext;
-
-    public IRefreshTokenAuditRepository RefreshTokenRepo { get; }
     #endregion
     #region Constructors
-    public AuthenticationService(IOptions<JwtSettings> jwtSettings, IRefreshTokenAuditRepository refreshTokenRepo , SqlDBContext sqlDBContext )
+    public AuthenticationService(IOptions<JwtSettings> jwtSettings, SqlDBContext sqlDBContext )
     {
 
         this.jwtSettings = jwtSettings.Value;
-        RefreshTokenRepo = refreshTokenRepo;
         this.sqlDBContext = sqlDBContext;
     }
     #endregion        {

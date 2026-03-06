@@ -18,7 +18,6 @@ using WhatsappClone.Core.Features.Chats.Queries.Handler;
 using WhatsappClone.Core.Features.Chats.Queries.Models;
 using WhatsappClone.Core.Filters;
 using WhatsappClone.Data.Helpers;
-using WhatsappClone.Data.SqlServerModels;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Infrastructure.Data;
 using WhatsappClone.Service;

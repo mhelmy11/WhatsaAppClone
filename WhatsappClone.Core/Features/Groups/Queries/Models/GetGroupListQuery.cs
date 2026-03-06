@@ -9,7 +9,7 @@ using WhatsappClone.Data.Helpers;
 
 namespace WhatsappClone.Core.Features.Groups.Queries.Models
 {
-    public class GetGroupListQuery : IRequest<Response<List<ChatDTO>>>
+    public class GetGroupListQuery
     {
     }
 }

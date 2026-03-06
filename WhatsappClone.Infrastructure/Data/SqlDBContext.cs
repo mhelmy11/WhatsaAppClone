@@ -19,6 +19,7 @@ public class SqlDBContext : IdentityDbContext<User,Role,long>
     public virtual DbSet<GroupJoinRequest> GroupJoinRequests { get; set; }
     public virtual DbSet<Contact> Contacts { get; set; }
     public virtual DbSet<UserPrivacySetting> UserPrivacySettings { get; set; }
+    public virtual DbSet<PrivacyException>  PrivacyExceptions { get; set; }
 
 
     public SqlDBContext(DbContextOptions<SqlDBContext> options) : base(options)
