@@ -5,6 +5,7 @@ using System.Security.Claims;
 using WhatsappClone.API.Base;
 using WhatsappClone.Core.Features.Users.Commands.BlockUser;
 using WhatsappClone.Core.Features.Users.Commands.UnblockUser;
+using WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings;
 using WhatsappClone.Core.Features.Users.Queries;
 using WhatsappClone.Service.Abstract;
 
@@ -49,12 +50,12 @@ namespace WhatsappClone.API.Controllers
             return ResponseResult(result);
         }
 
-        //[HttpPost("reset-password")]
-        //public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordCommand command)
-        //{
-        //    var result = await mediator.Send(command);
-        //    return ResponseResult(result);
-        //}
+        [HttpPut("update-privacy-settings")]
+        public async Task<IActionResult> UpdatePrivacySettings(UpdatePrivacySettingsCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
 
 
         //[HttpGet("Me")]

@@ -49,7 +49,6 @@
 		<Folder Include="Features\Stories\Commands\MarkStoryAsSeen\" />
 		<Folder Include="Features\Stories\Queries\GetRecentStories\" />
 		<Folder Include="Features\Stories\Queries\GetStoryViewers\" />
-		<Folder Include="Features\Users\Commands\UpdatePrivacySettings\" />
 		<Folder Include="Features\Users\Commands\UpdateProfile\" />
 	</ItemGroup>
 

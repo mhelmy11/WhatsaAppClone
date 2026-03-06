@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WhatsappClone.Infrastructure;
 
@@ -11,9 +12,11 @@ using WhatsappClone.Infrastructure;
 namespace WhatsappClone.Infrastructure.Migrations
 {
     [DbContext(typeof(SqlDBContext))]
-    partial class SqlDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260306210246_updatePrivacyTable")]
+    partial class updatePrivacyTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -323,16 +326,10 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Property<bool>("IsExcludedFromLastSeen")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsExcludedFromOnlineStatus")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsExcludedFromProfilePic")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsExcludedFromStatus")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsIncludedInStatus")
                         .HasColumnType("bit");
 
                     b.HasKey("OwnerUserId", "ExcludedContactId");
@@ -591,9 +588,6 @@ namespace WhatsappClone.Infrastructure.Migrations
                     b.Property<string>("ProfilePicPrivacy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("ReadReceipts")
-                        .HasColumnType("bit");
 
                     b.Property<string>("StatusPrivacy")
                         .IsRequired()
