@@ -33,6 +33,10 @@ namespace WhatsappClone.Core.Features.Contacts.Queries.GetMyContacts
             var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
             var cursor = CursorHelper.Decode<ContactCursor>(request.Cursor);
             var query = dBContext.Contacts.AsNoTracking().Where(c => c.UserId == currentUser.Id);
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                query = query.Where(c => c.ContactName.Contains(request.SearchTerm));
+            }
 
             if (cursor != null)
             {

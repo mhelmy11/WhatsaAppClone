@@ -9,7 +9,7 @@ using WhatsappClone.Core.Wrappers;
 
 namespace WhatsappClone.Core.Features.Contacts.Queries.GetMyContacts
 {
-    public record GetMyContactsQuery(string? Cursor , int Limit) : IRequest<Response<CursorPagedResult<GetMyContactsResult>>>
+    public record GetMyContactsQuery(string? Cursor , int Limit , string? SearchTerm) : IRequest<Response<CursorPagedResult<GetMyContactsResult>>>
     {
     }
 
