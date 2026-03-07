@@ -8,13 +8,12 @@ using WhatsappClone.API.Base;
 using WhatsappClone.Core.Filters;
 
 //using MoMediatoR;
-using WhatsappClone.Core.Features.Chats.Queries.Models;
 
 namespace WhatsappClone.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChatController : AppControllerBase
+    public class ConversationController : AppControllerBase
     {
 
 

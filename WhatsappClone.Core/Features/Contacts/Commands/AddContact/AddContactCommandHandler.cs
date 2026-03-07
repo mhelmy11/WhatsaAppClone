@@ -33,7 +33,7 @@ namespace WhatsappClone.Core.Features.Contacts.Commands
         public async Task<Response<string>> Handle(AddContactCommand request, CancellationToken cancellationToken)
         {
             var (cleanedCountryCode, CleanedNationalNumber) = phoneNumberService.CleanPhoneNumber(request.CountryCode, request.PhoneNumber);
-            var contactName = String.IsNullOrEmpty(request.FullName) ? $"{cleanedCountryCode + CleanedNationalNumber}" : request.FullName.Trim();
+            var contactName = (request.FirstName is null && request.LastName is null) ? $"{cleanedCountryCode + CleanedNationalNumber}" : request.FullName.Trim();
             var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
             var contact = await userManager.FindByPhoneNumber(cleanedCountryCode, CleanedNationalNumber);
             if (contact == null)

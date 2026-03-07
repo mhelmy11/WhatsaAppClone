@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WhatsappClone.Core.Features.Contacts.Queries.GetMyContacts
+{
+    public record GetMyContactsResult(long ContactUserId , string ContactName , string? About  , string? ProfilePicUrl)
+    {
+
+    }
+}

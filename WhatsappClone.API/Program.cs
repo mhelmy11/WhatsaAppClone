@@ -14,8 +14,6 @@ using System.Reflection;
 using WhatsappClone.API.Base;
 using WhatsappClone.API.Requirements.Handlers;
 using WhatsappClone.Core;
-using WhatsappClone.Core.Features.Chats.Queries.Handler;
-using WhatsappClone.Core.Features.Chats.Queries.Models;
 using WhatsappClone.Core.Filters;
 using WhatsappClone.Data.Helpers;
 using WhatsappClone.Infrastructure;

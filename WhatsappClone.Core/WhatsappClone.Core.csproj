@@ -12,12 +12,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Features\Contacts\Queries\GetContactInfo\" />
 		<Folder Include="Features\Conversations\Commands\ArchiveChat\" />
 		<Folder Include="Features\Conversations\Commands\FavChat\" />
 		<Folder Include="Features\Conversations\Queries\GetChatByPhone\" />
-		<Folder Include="Features\Contacts\Queries\GetMyContacts\" />
-		<Folder Include="Features\Contacts\Commands\EditContact\" />
 		<Folder Include="Features\Conversations\Queries\GetRecentChats\" />
 		<Folder Include="Features\Conversations\Queries\GetChatHistory\" />
 		<Folder Include="Features\Conversations\Commands\ClearChat\" />
