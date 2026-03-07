@@ -12,6 +12,7 @@ using WhatsappClone.Core.Bases;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Infrastructure.Data;
+using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Helpers;
 using WhatsappClone.Service.Implementation;
 
@@ -23,23 +24,29 @@ namespace WhatsappClone.Core.Features.Users.Queries
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly PhoneNumberService phoneNumberService;
         private readonly SqlDBContext dBContext;
+        private readonly ICurrentUserService currentUserService;
 
         public GetProfileQueryHandler(
             UserManager<User> userManager,
             IHttpContextAccessor httpContextAccessor,
-            SqlDBContext dBContext
+            SqlDBContext dBContext,
+            ICurrentUserService currentUserService
 
             )
         {
             this.userManager = userManager;
             this.httpContextAccessor = httpContextAccessor;
             this.dBContext = dBContext;
+            this.currentUserService = currentUserService;
         }
         public async Task<Response<GetProfileResult>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
         {
 
-            var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
-            if (currentUser.Id == long.Parse(request.UserId))
+            var currentUserId = currentUserService.UserId;
+            var currentUser = await dBContext.Users.Where(u => u.Id == currentUserId).Select(u => new{ u.ProfilePicUrl })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (currentUserId == long.Parse(request.UserId))
             {
                 return Success(new GetProfileResult() { Name = "me(You)", ProfilePic = currentUser.ProfilePicUrl });
             }
@@ -58,11 +65,11 @@ namespace WhatsappClone.Core.Features.Users.Queries
                 u.ProfilePicUrl,
                 Privacy = u.PrivacySettings.ProfilePicPrivacy,
                 AmIInHisContacts = dBContext.Contacts
-                    .Any(c => c.UserId == targetUserId && c.ContactUserId == currentUser.Id),
+                    .Any(c => c.UserId == targetUserId && c.ContactUserId == currentUserId),
                 MySavedContact = dBContext.Contacts
-                    .FirstOrDefault(c => c.UserId == currentUser.Id && c.ContactUserId == targetUserId),
+                    .FirstOrDefault(c => c.UserId == currentUserId && c.ContactUserId == targetUserId),
                 AmIExcludedFromPic = u.PrivacySettings.PrivacyExceptions
-                    .Any(e => e.IsExcludedFromProfilePic &&e.ExcludedContactId == currentUser.Id)
+                    .Any(e => e.IsExcludedFromProfilePic &&e.ExcludedContactId == currentUserId)
             })
             .FirstOrDefaultAsync(cancellationToken);
 

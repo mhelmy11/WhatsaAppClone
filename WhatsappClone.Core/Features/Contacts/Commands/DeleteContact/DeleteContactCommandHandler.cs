@@ -10,32 +10,29 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
+using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Helpers;
 namespace WhatsappClone.Core.Features.Contacts.Commands
 {
     public class DeleteContactCommandHandler : ResponseHandler, IRequestHandler<DeleteContactCommand, Response<string>>
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly SqlDBContext dBContext;
-        private readonly UserManager<User> userManager;
+        private readonly ICurrentUserService currentUserService;
 
         public DeleteContactCommandHandler(
-            IHttpContextAccessor httpContextAccessor,
             SqlDBContext dBContext,
-            UserManager<User> userManager
-
+            ICurrentUserService currentUserService
             ) 
         {
-            this.httpContextAccessor = httpContextAccessor;
             this.dBContext = dBContext;
-            this.userManager = userManager;
+            this.currentUserService = currentUserService;
         }
         public async Task<Response<string>> Handle(DeleteContactCommand request, CancellationToken ct)
         {
-            var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
+            var currentUserId =currentUserService.UserId;
 
             int deletedRows = await dBContext.Contacts
-                            .Where(c => c.UserId == currentUser.Id && c.ContactUserId == long.Parse(request.ContactId))
+                            .Where(c => c.UserId == currentUserId && c.ContactUserId == long.Parse(request.ContactId))
                             .ExecuteDeleteAsync(ct);
 
             if (deletedRows == 0)

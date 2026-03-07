@@ -12,29 +12,35 @@ using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Service.Implementation;
 using WhatsappClone.Service.Helpers;
+using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Core.Features.Contacts.Commands
 {
     public class AddContactCommandHandler : ResponseHandler,
         IRequestHandler<AddContactCommand, Response<string>>
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly SqlDBContext dBContext;
         private readonly PhoneNumberService phoneNumberService;
         private readonly UserManager<User> userManager;
+        private readonly ICurrentUserService currentUserService;
 
-        public AddContactCommandHandler(IHttpContextAccessor httpContextAccessor, SqlDBContext dBContext, PhoneNumberService phoneNumberService, UserManager<User> userManager)
+        public AddContactCommandHandler(
+            SqlDBContext dBContext,
+            PhoneNumberService phoneNumberService,
+            UserManager<User> userManager,  
+            ICurrentUserService currentUserService
+            )
         {
-            this.httpContextAccessor = httpContextAccessor;
             this.dBContext = dBContext;
             this.phoneNumberService = phoneNumberService;
             this.userManager = userManager;
+            this.currentUserService = currentUserService;
         }
         public async Task<Response<string>> Handle(AddContactCommand request, CancellationToken cancellationToken)
         {
             var (cleanedCountryCode, CleanedNationalNumber) = phoneNumberService.CleanPhoneNumber(request.CountryCode, request.PhoneNumber);
             var contactName = (request.FirstName is null && request.LastName is null) ? $"{cleanedCountryCode + CleanedNationalNumber}" : request.FullName.Trim();
-            var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
+            var currentUserId = currentUserService.UserId; 
             var contact = await userManager.FindByPhoneNumber(cleanedCountryCode, CleanedNationalNumber);
             if (contact == null)
             {
@@ -42,7 +48,7 @@ namespace WhatsappClone.Core.Features.Contacts.Commands
             }
             //check if contact already exists
 
-            var contactFromDb = await dBContext.Contacts.FirstOrDefaultAsync(c => c.UserId == currentUser.Id && c.ContactUserId == contact.Id);
+            var contactFromDb = await dBContext.Contacts.FirstOrDefaultAsync(c => c.UserId == currentUserId && c.ContactUserId == contact.Id);
 
             if (contactFromDb is not null)
             {
@@ -60,7 +66,7 @@ namespace WhatsappClone.Core.Features.Contacts.Commands
                 ContactName = contactName,
                 AddedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                UserId = currentUser.Id,
+                UserId = currentUserId,
                 ContactUserId = contact.Id,
 
             };

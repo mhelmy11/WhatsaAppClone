@@ -11,6 +11,7 @@ using WhatsappClone.Core.Bases;
 using WhatsappClone.Core.Wrappers;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
+using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Helpers;
 using WhatsappClone.Service.Helpers.WhatsappClone.Shared.Extensions;
 
@@ -19,20 +20,22 @@ namespace WhatsappClone.Core.Features.Contacts.Queries.GetMyContacts
     internal class GetMyContactsQueryHandler : ResponseHandler, IRequestHandler<GetMyContactsQuery, Response<CursorPagedResult<GetMyContactsResult>>>
     {
         private readonly SqlDBContext dBContext;
-        private readonly UserManager<User> userManager;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ICurrentUserService currentUserService;
+
         public record ContactCursor(string Name, long Id);
-        public GetMyContactsQueryHandler(SqlDBContext dBContext , UserManager<User> userManager , IHttpContextAccessor httpContextAccessor)
+        public GetMyContactsQueryHandler(
+            SqlDBContext dBContext,
+            ICurrentUserService currentUserService
+        )
         {
             this.dBContext = dBContext;
-            this.userManager = userManager;
-            this.httpContextAccessor = httpContextAccessor;
+            this.currentUserService = currentUserService;
         }
         public async Task<Response<CursorPagedResult<GetMyContactsResult>>> Handle(GetMyContactsQuery request, CancellationToken cancellationToken)
         {
-            var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
+            var currentUserId = currentUserService.UserId;
             var cursor = CursorHelper.Decode<ContactCursor>(request.Cursor);
-            var query = dBContext.Contacts.AsNoTracking().Where(c => c.UserId == currentUser.Id);
+            var query = dBContext.Contacts.AsNoTracking().Where(c => c.UserId == currentUserId);
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 query = query.Where(c => c.ContactName.Contains(request.SearchTerm));
@@ -59,11 +62,11 @@ namespace WhatsappClone.Core.Features.Contacts.Queries.GetMyContacts
                         PicPrivacyLevel = c.ContactUser.PrivacySettings.ProfilePicPrivacy,
                         AboutPrivacyLevel = c.ContactUser.PrivacySettings.AboutPrivacy,
 
-                        AmIInHisContacts = c.ContactUser.Contacts.Any(hisContact => hisContact.ContactUserId == currentUser.Id),
+                        AmIInHisContacts = c.ContactUser.Contacts.Any(hisContact => hisContact.ContactUserId == currentUserId),
 
-                        AmIExcludedFromPic = c.ContactUser.PrivacySettings.PrivacyExceptions.Any(e =>e.ExcludedContactId == currentUser.Id && e.IsExcludedFromProfilePic),
+                        AmIExcludedFromPic = c.ContactUser.PrivacySettings.PrivacyExceptions.Any(e =>e.ExcludedContactId == currentUserId && e.IsExcludedFromProfilePic),
 
-                        AmIExcludedFromAbout = c.ContactUser.PrivacySettings.PrivacyExceptions.Any(e => e.ExcludedContactId == currentUser.Id && e.IsExcludedFromAbout)
+                        AmIExcludedFromAbout = c.ContactUser.PrivacySettings.PrivacyExceptions.Any(e => e.ExcludedContactId == currentUserId && e.IsExcludedFromAbout)
                     })
                     .ToListAsync(cancellationToken);
 

@@ -12,6 +12,7 @@ using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Service.Helpers;
 using EFCore.BulkExtensions;
+using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings
 {
@@ -20,23 +21,26 @@ namespace WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings
         private readonly UserManager<User> userManager;
         private readonly SqlDBContext dBContext;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ICurrentUserService currentUserService;
 
         public UpdatePrivacySettingsCommandHandler(
             UserManager<User> userManager,
             SqlDBContext dBContext,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            ICurrentUserService currentUserService
             )
         {
             this.userManager = userManager;
             this.dBContext = dBContext;
             this.httpContextAccessor = httpContextAccessor;
+            this.currentUserService = currentUserService;
         }
         public async Task<Response<string>> Handle(UpdatePrivacySettingsCommand request, CancellationToken cancellationToken)
         {
-            var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
+            var currentUserId = currentUserService.UserId;
             var currentUserPrivacySettings = await dBContext.UserPrivacySettings
                 .Include(p => p.PrivacyExceptions)
-                .FirstOrDefaultAsync(u => u.UserId == currentUser.Id , cancellationToken);
+                .FirstOrDefaultAsync(u => u.UserId == currentUserId , cancellationToken);
 
 
             if(currentUserPrivacySettings is null)
@@ -53,13 +57,13 @@ namespace WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings
                 if(request.AboutPrivacy.MyContactsExcept is not null && request.AboutPrivacy.WhoCanSeeMyAbout == PrivacyLevel.MyContactsExcept)
                 {
                     await dBContext.PrivacyExceptions
-                    .Where(e => e.OwnerUserId == currentUser.Id)
+                    .Where(e => e.OwnerUserId == currentUserId)
                     .ExecuteUpdateAsync(s => s.SetProperty(e => e.IsExcludedFromAbout, false), cancellationToken);
 
 
                     var exceptionsToUpsert = request.AboutPrivacy.MyContactsExcept.Select(contactId => new PrivacyException
                     {
-                        OwnerUserId = currentUser.Id,
+                        OwnerUserId = currentUserId,
                         ExcludedContactId = contactId,
                         IsExcludedFromAbout = true,
                     }).ToList();
@@ -84,13 +88,13 @@ namespace WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings
                 if(request.ProfilePicturePrivacy.MyContactsExcept is not null && request.ProfilePicturePrivacy.WhoCanSeeMyProfilePicture == PrivacyLevel.MyContactsExcept)
                 {
                     await dBContext.PrivacyExceptions
-                  .Where(e => e.OwnerUserId == currentUser.Id)
+                  .Where(e => e.OwnerUserId == currentUserId)
                   .ExecuteUpdateAsync(s => s.SetProperty(e => e.IsExcludedFromProfilePic, false), cancellationToken);
 
 
                     var exceptionsToUpsert = request.ProfilePicturePrivacy.MyContactsExcept.Select(contactId => new PrivacyException
                     {
-                        OwnerUserId = currentUser.Id,
+                        OwnerUserId = currentUserId,
                         ExcludedContactId = contactId,
                         IsExcludedFromProfilePic = true,
                     }).ToList();
@@ -115,13 +119,13 @@ namespace WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings
                 if(request.StatusPrivacy.MyContactsExcept is not null && request.StatusPrivacy.WhoCanSeeMyStatus == PrivacyLevel.MyContactsExcept)
                 {
                     await dBContext.PrivacyExceptions
-                .Where(e => e.OwnerUserId == currentUser.Id)
+                .Where(e => e.OwnerUserId == currentUserId)
                 .ExecuteUpdateAsync(s => s.SetProperty(e => e.IsExcludedFromStatus, false), cancellationToken);
 
 
                     var exceptionsToUpsert = request.StatusPrivacy.MyContactsExcept.Select(contactId => new PrivacyException
                     {
-                        OwnerUserId = currentUser.Id,
+                        OwnerUserId = currentUserId,
                         ExcludedContactId = contactId,
                         IsExcludedFromStatus = true,
                     }).ToList();
@@ -139,13 +143,13 @@ namespace WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings
                 if (request.StatusPrivacy.OnlyShareWith is not null && request.StatusPrivacy.WhoCanSeeMyStatus == PrivacyLevel.OnlyShareWith)
                 {
                     await dBContext.PrivacyExceptions
-             .Where(e => e.OwnerUserId == currentUser.Id)
+             .Where(e => e.OwnerUserId == currentUserId)
              .ExecuteUpdateAsync(s => s.SetProperty(e => e.IsIncludedInStatus, false), cancellationToken);
 
 
                     var exceptionsToUpsert = request.StatusPrivacy.OnlyShareWith.Select(contactId => new PrivacyException
                     {
-                        OwnerUserId = currentUser.Id,
+                        OwnerUserId = currentUserId,
                         ExcludedContactId = contactId,
                         IsIncludedInStatus = true,
                     }).ToList();
@@ -170,13 +174,13 @@ namespace WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings
                     if (request.LastseenAndOnline.MyContactsExcept is not null && request.LastseenAndOnline.WhoCanSeeMyLastseen == PrivacyLevel.MyContactsExcept)
                     {
                         await dBContext.PrivacyExceptions
-                    .Where(e => e.OwnerUserId == currentUser.Id)
+                    .Where(e => e.OwnerUserId == currentUserId)
                     .ExecuteUpdateAsync(s => s.SetProperty(e => e.IsExcludedFromLastSeen, false), cancellationToken);
 
 
                         var exceptionsToUpsert = request.LastseenAndOnline.MyContactsExcept.Select(contactId => new PrivacyException
                         {
-                            OwnerUserId = currentUser.Id,
+                            OwnerUserId = currentUserId,
                             ExcludedContactId = contactId,
                             IsExcludedFromLastSeen = true,
                         }).ToList();
@@ -199,13 +203,13 @@ namespace WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings
                     if (request.LastseenAndOnline.WhoCanSeeWhenIAmOnline == PrivacyLevel.SameAsLastseen && request.LastseenAndOnline.MyContactsExcept is not null)
                     {
                         await dBContext.PrivacyExceptions
-                        .Where(e => e.OwnerUserId == currentUser.Id)
+                        .Where(e => e.OwnerUserId == currentUserId)
                         .ExecuteUpdateAsync(s => s.SetProperty(e => e.IsExcludedFromOnlineStatus, false), cancellationToken);
 
 
                         var exceptionsToUpsert = request.LastseenAndOnline.MyContactsExcept.Select(contactId => new PrivacyException
                         {
-                            OwnerUserId = currentUser.Id,
+                            OwnerUserId = currentUserId,
                             ExcludedContactId = contactId,
                             IsExcludedFromOnlineStatus = true,
                         }).ToList();

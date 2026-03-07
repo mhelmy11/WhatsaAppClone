@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +10,22 @@ using System.Threading.Tasks;
 using WhatsappClone.Core.Bases;
 using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
+using WhatsappClone.Service.Abstract;
 using WhatsappClone.Service.Helpers;
-using Microsoft.EntityFrameworkCore;
+using WhatsappClone.Service.Implementation;
 
 namespace WhatsappClone.Core.Features.Users.Commands.UnblockUser
 {
-    public class UnblockUserCommandHandler(UserManager<User> userManager , SqlDBContext dBContext , IHttpContextAccessor httpContextAccessor) : ResponseHandler, IRequestHandler< UnblockUserCommand , Response<string>>
+    public class UnblockUserCommandHandler(SqlDBContext dBContext , ICurrentUserService currentUserService) : ResponseHandler, IRequestHandler< UnblockUserCommand , Response<string>>
     {
+        private readonly ICurrentUserService currentUserService = currentUserService;
+
         public async Task<Response<string>> Handle(UnblockUserCommand request, CancellationToken ct)
         {
-            var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
+            var currentUserId = currentUserService.UserId;
 
             int deletedRows = await dBContext.BlockedUsers
-                            .Where(c => c.UserId == currentUser.Id && c.BlockedUserId == long.Parse(request.BlockedUserId))
+                            .Where(c => c.UserId == currentUserId && c.BlockedUserId == long.Parse(request.BlockedUserId))
                             .ExecuteDeleteAsync(ct);
 
             if (deletedRows == 0)

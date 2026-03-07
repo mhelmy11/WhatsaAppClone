@@ -18,22 +18,22 @@ namespace WhatsappClone.Core.Features.Identity.Commands
 {
     public class RefreshTokenCommandHandler : ResponseHandler, IRequestHandler<RefreshTokenCommand, Response<RefreshTokenResult>>
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly SqlDBContext dBContext;
         private readonly UserManager<User> userManager;
         private readonly IAuthenticationService authenticationService;
+        private readonly ICurrentUserService currentUserService;
 
         public RefreshTokenCommandHandler(
-            IHttpContextAccessor httpContextAccessor ,
             SqlDBContext dBContext ,
             UserManager<User> userManager ,
-            IAuthenticationService authenticationService
+            IAuthenticationService authenticationService,
+            ICurrentUserService currentUserService
             )
         {
-            this.httpContextAccessor = httpContextAccessor;
             this.dBContext = dBContext;
             this.userManager = userManager;
             this.authenticationService = authenticationService;
+            this.currentUserService = currentUserService;
         }
         public async Task<Response<RefreshTokenResult>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {

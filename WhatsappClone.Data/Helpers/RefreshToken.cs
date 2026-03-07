@@ -12,6 +12,6 @@ namespace WhatsappClone.Data.Helpers
 
         public DateTime Expiration { get; set; }
 
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 }

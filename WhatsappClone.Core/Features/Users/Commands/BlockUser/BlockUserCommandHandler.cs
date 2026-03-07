@@ -11,19 +11,22 @@ using WhatsappClone.Data.Models;
 using WhatsappClone.Infrastructure;
 using WhatsappClone.Service.Helpers;
 using EFCore.BulkExtensions;
+using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Core.Features.Users.Commands.BlockUser
 {
-    public class BlockUserCommandHandler(UserManager<User> userManager , SqlDBContext dBContext , IHttpContextAccessor httpContextAccessor) : ResponseHandler, IRequestHandler< BlockUserCommand , Response<string>>
+    public class BlockUserCommandHandler(SqlDBContext dBContext , ICurrentUserService currentUserService) : ResponseHandler, IRequestHandler< BlockUserCommand , Response<string>>
     {
+        private readonly ICurrentUserService currentUserService = currentUserService;
+
         public async Task<Response<string>> Handle(BlockUserCommand request, CancellationToken ct)
         {
-            var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
+            var currentUserId = currentUserService.UserId ;
 
             await dBContext.BulkInsertOrUpdateAsync(new List<BlockedUser> { new BlockedUser
             {
                 BlockedUserId = long.Parse(request.BlockedUserId),
-                UserId = currentUser.Id,
+                UserId = currentUserId,
                 BlockedAt = DateTime.UtcNow,
             } });
 
