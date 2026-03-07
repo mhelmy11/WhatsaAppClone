@@ -29,17 +29,17 @@ namespace WhatsappClone.Service.Helpers
                 };
             }
 
-            public static string CanViewLastSeen(this string about ,string privacyLevel, bool amIInHisContacts, bool amIExcluded)
+            public static bool CanViewLastSeen(this string about ,string privacyLevel, bool amIInHisContacts, bool amIExcluded)
             {
                 return privacyLevel switch
                 {
-                    PrivacyLevel.Everyone => about,
+                    PrivacyLevel.Everyone => true,
 
-                    PrivacyLevel.MyContacts when amIInHisContacts => about,
+                    PrivacyLevel.MyContacts when amIInHisContacts => true,
 
-                    PrivacyLevel.MyContactsExcept when amIInHisContacts && !amIExcluded => about,
+                    PrivacyLevel.MyContactsExcept when amIInHisContacts && !amIExcluded => true,
 
-                    _ => ""
+                    _ => false
                 };
             }
         }

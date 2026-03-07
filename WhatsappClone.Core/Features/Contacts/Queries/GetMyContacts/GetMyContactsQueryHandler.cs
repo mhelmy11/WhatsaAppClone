@@ -55,19 +55,11 @@ namespace WhatsappClone.Core.Features.Contacts.Queries.GetMyContacts
                         PicPrivacyLevel = c.ContactUser.PrivacySettings.ProfilePicPrivacy,
                         AboutPrivacyLevel = c.ContactUser.PrivacySettings.AboutPrivacy,
 
-                        AmIInHisContacts = dBContext.Contacts.Any(hisContact =>
-                            hisContact.UserId == c.ContactUserId &&
-                            hisContact.ContactUserId == currentUser.Id),
+                        AmIInHisContacts = c.ContactUser.Contacts.Any(hisContact => hisContact.ContactUserId == currentUser.Id),
 
-                        AmIExcludedFromPic = dBContext.PrivacyExceptions.Any(e =>
-                            e.OwnerUserId == c.ContactUserId &&
-                            e.ExcludedContactId == currentUser.Id &&
-                            e.IsExcludedFromProfilePic),
+                        AmIExcludedFromPic = c.ContactUser.PrivacySettings.PrivacyExceptions.Any(e =>e.ExcludedContactId == currentUser.Id && e.IsExcludedFromProfilePic),
 
-                        AmIExcludedFromAbout = dBContext.PrivacyExceptions.Any(e =>
-                            e.OwnerUserId == c.ContactUserId &&
-                            e.ExcludedContactId == currentUser.Id &&
-                            e.IsExcludedFromAbout)
+                        AmIExcludedFromAbout = c.ContactUser.PrivacySettings.PrivacyExceptions.Any(e => e.ExcludedContactId == currentUser.Id && e.IsExcludedFromAbout)
                     })
                     .ToListAsync(cancellationToken);
 
@@ -75,7 +67,7 @@ namespace WhatsappClone.Core.Features.Contacts.Queries.GetMyContacts
                     ContactUserId: raw.ContactId,
                     ContactName: raw.ContactName,
                     ProfilePicUrl: raw.RawProfilePicUrl.ResolveProfilePic(raw.PicPrivacyLevel, raw.AmIInHisContacts, raw.AmIExcludedFromPic),
-                    About: raw.RawAbout.CanViewLastSeen(raw.AboutPrivacyLevel, raw.AmIInHisContacts, raw.AmIExcludedFromAbout)
+                    About: raw.RawAbout.CanViewLastSeen(raw.AboutPrivacyLevel, raw.AmIInHisContacts, raw.AmIExcludedFromAbout) ? raw.RawAbout : null
                    ))
                     .ToList();
 
