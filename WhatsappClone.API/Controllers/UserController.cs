@@ -7,6 +7,7 @@ using WhatsappClone.Core.Features.Users.Commands.BlockUser;
 using WhatsappClone.Core.Features.Users.Commands.UnblockUser;
 using WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings;
 using WhatsappClone.Core.Features.Users.Queries;
+using WhatsappClone.Core.Features.Users.Queries.GetBlockedUsers;
 using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.API.Controllers
@@ -58,13 +59,12 @@ namespace WhatsappClone.API.Controllers
         }
 
 
-        //[HttpGet("Me")]
-        //[Authorize]
-        //public async Task<IActionResult> GetMe()
-        //{
-        //    var result = await mediator.Send(new GetMeQuery());
-        //    return ResponseResult(result);
-        //}
+        [HttpGet("get-blocked-users")]
+        public async Task<IActionResult> GetBlockedUsers(GetBlockedUsersQuery query)
+        {
+            var result = await mediator.Send(query);
+            return ResponseResult(result);
+        }
 
 
         //[HttpPut("Me")]

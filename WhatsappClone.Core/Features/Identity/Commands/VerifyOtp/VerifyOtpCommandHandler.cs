@@ -48,7 +48,6 @@ namespace WhatsappClone.Core.Features.Identity.Commands
   
             var user = await userManager.FindByEmailAsync(request.Email);
 
-            bool isNewUser = false;
             var (cleanCountryCode, cleanNationalNumber) = phoneNumberService.CleanPhoneNumber(request.CountryCode, request.PhoneNumber);
 
             if (user == null)
@@ -68,10 +67,9 @@ namespace WhatsappClone.Core.Features.Identity.Commands
                     return BadRequest<VerifyOtpResult>("Registeration Failed");
                }
 
-               isNewUser = true;
             }
             var tokens = await authenticationService.GetTokenAfterLogin(user);
-            return Success(new VerifyOtpResult { tokens = tokens , IsNewUser = isNewUser , Name = user.Name , ProfilePic = user.ProfilePicUrl},"Verified");
+            return Success(new VerifyOtpResult { tokens = tokens , Name = user.Name , ProfilePic = user.ProfilePicUrl},"Verified");
 
            
             

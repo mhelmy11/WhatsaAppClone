@@ -20,22 +20,14 @@ namespace WhatsappClone.Core.Features.Users.Queries
 {
     public class GetProfileQueryHandler : ResponseHandler, IRequestHandler<GetProfileQuery, Response<GetProfileResult>>
     {
-        private readonly UserManager<User> userManager;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly PhoneNumberService phoneNumberService;
         private readonly SqlDBContext dBContext;
         private readonly ICurrentUserService currentUserService;
 
         public GetProfileQueryHandler(
-            UserManager<User> userManager,
-            IHttpContextAccessor httpContextAccessor,
             SqlDBContext dBContext,
             ICurrentUserService currentUserService
-
             )
         {
-            this.userManager = userManager;
-            this.httpContextAccessor = httpContextAccessor;
             this.dBContext = dBContext;
             this.currentUserService = currentUserService;
         }
@@ -98,58 +90,6 @@ namespace WhatsappClone.Core.Features.Users.Queries
             };
 
             return Success(result);
-
-
-
-
-
-
-
-            //var currentUser = await userManager.GetCurrentUser(httpContextAccessor);
-
-            //if (currentUser.Id == long.Parse(request.UserId))
-            //{
-            //    return Success(new GetProfileResult() { Name = "me(You)" , ProfilePic = currentUser.ProfilePicUrl });
-            //}
-            //var targetUser = await dBContext.Users.Include(c => c.PrivacySettings).ThenInclude(p => p.PrivacyExceptions).FirstOrDefaultAsync(u => u.Id == long.Parse(request.UserId)); 
-            //if (targetUser == null)
-            //{
-            //    return BadRequest<GetProfileResult>("User is not found");
-            //}
-
-            //var getMyProfileResult = new GetProfileResult();
-            //getMyProfileResult.CountryCode = targetUser.CountryCode;
-            //getMyProfileResult.PhoneNumber = targetUser.PhoneNumber!;
-            //getMyProfileResult.About = targetUser.About;
-
-
-
-            ////check if targetUser exists as contact for currentUser
-            //var isTargetContactForCurrent = await dBContext.CheckContactExistsByIdAsync(currentUser.Id.ToString(), targetUser.Id.ToString(), cancellationToken);
-            //var isCurrentContactForTarget = await dBContext.CheckContactExistsByIdAsync(targetUser.Id.ToString(), currentUser.Id.ToString(), cancellationToken);
-            //if (!isTargetContactForCurrent)
-            //{
-            //    getMyProfileResult.IsContact = false;
-            //    getMyProfileResult.Name = targetUser.UserName!; // DisplayName
-
-            //}
-            //getMyProfileResult.Name = (await dBContext.Contacts.FirstOrDefaultAsync(c=> c.UserId == currentUser.Id && c.ContactUserId == targetUser.Id)).ContactName;
-            ////check profile pic privacy for targetUser either contact or not
-            //// show it only if privacy is (everyone | Contacts)
-            //var profilePicPrivacy = targetUser.PrivacySettings.ProfilePicPrivacy;
-            //getMyProfileResult.ProfilePic = profilePicPrivacy switch
-            //{
-            //    PrivacyLevel.Everyone => targetUser.ProfilePicUrl,
-            //    PrivacyLevel.MyContacts => isCurrentContactForTarget ? targetUser.ProfilePicUrl : "default",
-            //   PrivacyLevel.MyContactsExcept => isCurrentContactForTarget && !targetUser.PrivacySettings.PrivacyExceptions.Any(p => long.Parse(p.ExcludedContactId) == currentUser.Id) ? targetUser.ProfilePicUrl : "default"  ,
-            //    _ => "default"
-            //};
-
-            //return Success(getMyProfileResult);
-
-
-
-
         }
     }
 }

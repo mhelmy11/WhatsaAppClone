@@ -9,8 +9,6 @@ namespace WhatsappClone.Core.Features.Identity.Commands
 {
     public class VerifyOtpResult
     {
-        public bool IsNewUser { get; set; }
-
         public string? Name { get; set; }
 
         public string? ProfilePic { get; set; }
