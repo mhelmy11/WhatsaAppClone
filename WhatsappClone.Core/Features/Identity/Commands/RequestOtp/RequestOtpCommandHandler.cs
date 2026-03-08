@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using PhoneNumbers;
 using System;
@@ -23,13 +24,14 @@ namespace WhatsappClone.Core.Features.Identity.Commands
         private readonly IEmailService emailService;
         private readonly IIdGenerator<long> idGenerator;
         private readonly PhoneNumberService phoneNumberService;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IMemoryCache memoryCache;
 
         public RequestOtpCommandHandler(UserManager<User> userManager,
             ILogger<RequestOtpCommandHandler> logger,
             IEmailService emailService,
             IIdGenerator<long> idGenerator,
-            PhoneNumberService phoneNumberService
+            PhoneNumberService phoneNumberService,
+            IMemoryCache memoryCache
             )
         {
             _userManager = userManager;
@@ -37,34 +39,15 @@ namespace WhatsappClone.Core.Features.Identity.Commands
             this.emailService = emailService;
             this.idGenerator = idGenerator;
             this.phoneNumberService = phoneNumberService;
+            this.memoryCache = memoryCache;
         }
         public async Task<Response<string>> Handle(RequestOtpCommand request, CancellationToken ct)
         {
 
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null) //new user
-            {
-
-                var (cleanCountryCode, cleanNationalNumber) = phoneNumberService.CleanPhoneNumber(request.CountryCode, request.PhoneNumber);
-                user = new User()
-                {
-                    Id = idGenerator.CreateId(),
-                    Email = request.Email,
-                    PhoneNumber = cleanNationalNumber,
-                    UserName = cleanNationalNumber,
-                    CountryCode = cleanCountryCode,
-                };
-
-                var result = await _userManager.CreateAsync(user);
-                if (!result.Succeeded)
-                {
-
-                    return BadRequest<string>("Registeration Failed");
-
-                }
-            }
             //generate otp
-            var otp = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
+            string otp = new Random().Next(100000, 999999).ToString();
+            memoryCache.Set($"{request.Email}", otp, TimeSpan.FromMinutes(5));
+
 
             //send it via email service
             await emailService.SendEmailAsync(request.Email, "OTP Verification", $"Your code is {otp}");

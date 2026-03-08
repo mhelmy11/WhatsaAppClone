@@ -58,11 +58,12 @@ namespace WhatsappClone.API
                 builder.Services.AddCoreDependencies();
                 builder.Services.AddModuleInfrastructureDependencies(builder.Configuration);
                 builder.Services.AddModuleServiceDependencies((builder.Configuration));
+                builder.Services.AddMemoryCache();
                 builder.Services.AddAuthorization(options =>
                 {
                     options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                           .RequireAuthenticatedUser() // هذا هو الشرط الافتراضي الأصلي، يجب إبقاؤه
-                           .AddRequirements(new SessionNotRevokedRequirement()) // نضيف شرطنا المخصص إليه
+                           .RequireAuthenticatedUser() 
+                           .AddRequirements(new SessionNotRevokedRequirement()) 
                            .Build();
                 });
                 builder.Services.AddCors(options =>

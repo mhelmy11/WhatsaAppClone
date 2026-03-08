@@ -46,7 +46,6 @@
 		<Folder Include="Features\Stories\Commands\MarkStoryAsSeen\" />
 		<Folder Include="Features\Stories\Queries\GetRecentStories\" />
 		<Folder Include="Features\Stories\Queries\GetStoryViewers\" />
-		<Folder Include="Features\Users\Commands\UpdateProfile\" />
 		<Folder Include="Mapping\" />
 	</ItemGroup>
 

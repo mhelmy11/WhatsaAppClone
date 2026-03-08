@@ -10,6 +10,8 @@ namespace WhatsappClone.Data.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; } 
+
+        public string? Name { get; set; }
         public string CountryCode { get; set; }
         public string ProfilePicUrl { get; set; } = "https://example.com/default-profile-pic.jpg";
         public string About { get; set; }= "Hey there! I am using WhatsApp.";

@@ -23,7 +23,7 @@ namespace WhatsappClone.Service
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<PhoneNumberService>();
             services.AddScoped<ITransactionService, TransactionService>();
-            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.Configure<SendGridSettings>(configuration.GetSection("SendGridSettings"));//then we can inject IOptions<SendGridSettings> to get the settings values
 
             var SendGridSettings = configuration.GetSection("SendGridSettings").Get<SendGridSettings>();
