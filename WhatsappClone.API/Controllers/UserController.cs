@@ -6,6 +6,7 @@ using WhatsappClone.API.Base;
 using WhatsappClone.Core.Features.Users.Commands.BlockUser;
 using WhatsappClone.Core.Features.Users.Commands.UnblockUser;
 using WhatsappClone.Core.Features.Users.Commands.UpdatePrivacySettings;
+using WhatsappClone.Core.Features.Users.Commands.UpdateProfile;
 using WhatsappClone.Core.Features.Users.Queries;
 using WhatsappClone.Core.Features.Users.Queries.GetBlockedUsers;
 using WhatsappClone.Service.Abstract;
@@ -53,6 +54,14 @@ namespace WhatsappClone.API.Controllers
 
         [HttpPut("update-privacy-settings")]
         public async Task<IActionResult> UpdatePrivacySettings(UpdatePrivacySettingsCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+        [HttpPut("update-profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileCommand command)
         {
             var result = await mediator.Send(command);
             return ResponseResult(result);

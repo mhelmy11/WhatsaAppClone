@@ -21,14 +21,14 @@ namespace WhatsappClone.Core.Features.Identity.Commands
     {
         private readonly UserManager<User> _userManager;
         private readonly ILogger<RequestOtpCommandHandler> _logger;
-        private readonly IEmailService emailService;
+        private readonly INotificationFactoryService notificationFactory;
         private readonly IIdGenerator<long> idGenerator;
         private readonly PhoneNumberService phoneNumberService;
         private readonly IMemoryCache memoryCache;
 
         public RequestOtpCommandHandler(UserManager<User> userManager,
             ILogger<RequestOtpCommandHandler> logger,
-            IEmailService emailService,
+            INotificationFactoryService notificationFactory ,
             IIdGenerator<long> idGenerator,
             PhoneNumberService phoneNumberService,
             IMemoryCache memoryCache
@@ -36,7 +36,7 @@ namespace WhatsappClone.Core.Features.Identity.Commands
         {
             _userManager = userManager;
             _logger = logger;
-            this.emailService = emailService;
+            this.notificationFactory = notificationFactory;
             this.idGenerator = idGenerator;
             this.phoneNumberService = phoneNumberService;
             this.memoryCache = memoryCache;
@@ -49,10 +49,13 @@ namespace WhatsappClone.Core.Features.Identity.Commands
             memoryCache.Set($"{request.Email}", otp, TimeSpan.FromMinutes(5));
 
 
-            //send it via email service
-            await emailService.SendEmailAsync(request.Email, "OTP Verification", $"Your code is {otp}");
+            var notificationTarget = notificationFactory.GetService(NotificationType.Email);
 
-            return Success("OTP Send Successfully");
+            //send it via email service
+            var status = await notificationTarget.SendMessageAsync(request.Email, "OTP Verification", $"Your code is {otp}");
+
+            _logger.Log(LogLevel.Information, $"Your code is {otp}");
+           return status ?  Success("OTP Send Successfully") : BadRequest<string>("An error occurred while sending the email");
         }
     }
 }

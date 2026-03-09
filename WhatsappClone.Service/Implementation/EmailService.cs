@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
-using SendGrid.Helpers.Mail;
 using SendGrid;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsappClone.Data.Helpers;
@@ -11,7 +13,7 @@ using WhatsappClone.Service.Abstract;
 
 namespace WhatsappClone.Service.Implementation
 {
-    public class EmailService : IEmailService
+    public class EmailService : INotificationService
     {
         private readonly SendGridSettings _settings;
         public EmailService(IOptions<SendGridSettings> settings)
@@ -20,7 +22,7 @@ namespace WhatsappClone.Service.Implementation
 
         }
 
-        public async Task<string> SendEmailAsync(string toEmail, string subject, string htmlContent)
+        public async Task<bool> SendMessageAsync(string toEmail, string htmlContent, string? subject = null)
         {
             var apiKey = _settings.ApiKey;
             if (string.IsNullOrEmpty(apiKey))
@@ -45,7 +47,11 @@ namespace WhatsappClone.Service.Implementation
 
             }
 
-            return "Email sent successfully.";
+
+            return true;
+
         }
+
+        
     }
 }
