@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,13 @@ namespace WhatsappClone.Infrastructure
         {
 
             #region MongoDB
+            var conventionPack = new ConventionPack
+            {
+                new IgnoreIfNullConvention(true)
+            };
+            ConventionRegistry.Register("IgnoreNulls", conventionPack, type => true);
+
+
             services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));//then we can inject IOptions<MongoDbSettings> to get the settings values
             var MongoDBSettings = configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
 

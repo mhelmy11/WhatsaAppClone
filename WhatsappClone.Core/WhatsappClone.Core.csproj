@@ -33,10 +33,7 @@
 		<Folder Include="Features\Messages\Commands\DeleteMessage\" />
 		<Folder Include="Features\Messages\Commands\MarkAsDelivered\" />
 		<Folder Include="Features\Messages\Commands\MarkAsRead\" />
-		<Folder Include="Features\Messages\Commands\ReplyToMessage\" />
 		<Folder Include="Features\Messages\Commands\ReactToMessage\" />
-		<Folder Include="Features\Messages\Commands\SendMessage\" />
-		<Folder Include="Features\Messages\Queries\" />
 		<Folder Include="Features\Presence\Commands\SendTypingIndicator\" />
 		<Folder Include="Features\Presence\Commands\UpdateOnlineStatus\" />
 		<Folder Include="Features\Presence\Queries\" />
@@ -54,6 +51,9 @@
 		<PackageReference Include="EFCore.BulkExtensions" Version="9.0.2" />
 		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+		<PackageReference Include="Hangfire" Version="1.8.23" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
+		<PackageReference Include="Hangfire.SqlServer" Version="1.8.23" />
 		<PackageReference Include="IdGen" Version="3.0.7" />
 		<PackageReference Include="IdGen.Configuration" Version="3.0.7" />
 		<PackageReference Include="IdGen.DependencyInjection" Version="3.0.7" />

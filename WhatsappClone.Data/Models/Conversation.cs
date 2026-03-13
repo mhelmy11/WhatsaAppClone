@@ -22,4 +22,10 @@ namespace WhatsappClone.Data.Models
         [BsonElement("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
+
+    public static class ConversationType
+    {
+        public const string Individual = "Individual";
+        public const string Group = "Group";
+    }
 }

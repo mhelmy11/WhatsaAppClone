@@ -1,4 +1,5 @@
 ﻿
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -55,7 +56,7 @@ namespace WhatsappClone.API
                 builder.Services.AddSignalR();
                 // builder.Services.AddTransient<IAuthorizationHandler, SessionNotRevokedHandler>();
                 builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
-                builder.Services.AddCoreDependencies();
+                builder.Services.AddCoreDependencies(builder.Configuration);
                 builder.Services.AddModuleInfrastructureDependencies(builder.Configuration);
                 builder.Services.AddModuleServiceDependencies((builder.Configuration));
                 builder.Services.AddMemoryCache();
@@ -119,6 +120,8 @@ namespace WhatsappClone.API
                     context.Database.ExecuteSqlRaw("DELETE FROM UserConnections");
                     Console.WriteLine("Table UserConnections cleared before shutdown.");
                 });
+                app.UseHangfireDashboard(); 
+
                 app.Run();
             }
             catch (Exception ex)

@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
+using Hangfire;
 using IdGen.DependencyInjection;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MoMediatoR;
 using System.Reflection;
@@ -14,7 +16,7 @@ namespace WhatsappClone.Core
     public static class ModuleCoreDependencies
     {
 
-        public static IServiceCollection AddCoreDependencies(this IServiceCollection services)
+        public static IServiceCollection AddCoreDependencies(this IServiceCollection services , IConfiguration configuration)
         {
             // Register MediatR
 
@@ -37,6 +39,9 @@ namespace WhatsappClone.Core
             {
                 options.TokenLifespan = TimeSpan.FromMinutes(5); // OTP is revoked after 5 min
             });
+            services.AddHangfire(config =>
+                config.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+            services.AddHangfireServer();
 
             return services;
         }

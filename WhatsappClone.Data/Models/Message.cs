@@ -90,7 +90,7 @@ namespace WhatsappClone.Data.Models
 
         [BsonElement("mentions")]
         [BsonRepresentation(BsonType.Int64)]
-        public List<long>? Mentions { get; set; } = new();// user_ids
+        public List<long>? Mentions { get; set; } = null;// user_ids
 
     }
 
@@ -121,9 +121,6 @@ namespace WhatsappClone.Data.Models
 
         // Poll
         public Poll? Poll { get; set; }
-
-        // Payment
-        public Payment? Payment { get; set; }
 
         // Sticker/GIF
         public string? StickerId { get; set; }
@@ -240,9 +237,25 @@ namespace WhatsappClone.Data.Models
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string MessageId { get; set; }
-        public string? UserId { get; set; }
+        public long? UserId { get; set; }
         public string? Preview { get; set; }
         public DateTime? Timestamp { get; set; }
+    }
+
+    public static class MessageType
+    {
+        public const string System = "System";
+        public const string Text = "Text";
+        public const string Video = "Video";
+        public const string Image = "Image";
+        public const string Audio = "Audio";
+        public const string File = "File";
+        public const string Document = "Document";
+        public const string Sticker = "Sticker";
+        public const string Gif = "Gif";
+        public const string Contact = "Contact";
+        public const string Poll = "Poll";
+        public const string Location = "Location";
     }
 
 }
