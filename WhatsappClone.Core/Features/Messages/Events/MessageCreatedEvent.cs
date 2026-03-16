@@ -11,13 +11,15 @@ namespace WhatsappClone.Core.Features.Messages.Events
      string MessageId,
      long ChatId,
      long SenderId,
-     long PeerId,
+     long? PeerId,
      string ConversationType,
      string MessageType,
      string? TextContent,
+     int MediaCount,
      string? Caption,
      List<long> Participants, 
      List<long>? Mentions, 
-     DateTime SentAt
+     DateTime SentAt,
+     bool IsNewChat
  ) : INotification;
 }

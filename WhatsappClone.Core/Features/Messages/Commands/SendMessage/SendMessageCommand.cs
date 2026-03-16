@@ -12,10 +12,10 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
     {
         public long? ChatId { get; set; }
         public long? RecipientId { get; set; }
-        public string MessageType { get; set; }
+        public required string MessageType { get; set; }
         public string? RecipientType { get; set; }
 
-        public MessageContentDto Content { get; set; }
+        public required MessageContentDto Content { get; set; }
         public List<RepliesDto>? Replies { get; set; }
 
         public List<long>? Mentions { get; set; }
@@ -34,19 +34,14 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
     {
         // Text
         public string? Text { get; set; }
+        public string? Caption { get; set; }
         public List<FormattedTextDto>? FormattedText { get; set; }
         public SystemEventDto? SystemEvent { get; set; }
 
         // Media
-        public string? MediaUrl { get; set; }
-        public string? MediaKey { get; set; }
-        public string? ThumbnailUrl { get; set; }
-        public string? FileName { get; set; }
-        public int? FileSize { get; set; }
-        public string? MimeType { get; set; }
-        public int? Duration { get; set; }
-        public int? Width { get; set; }
-        public int? Height { get; set; }
+       public List<MediaMessageDto>? MediaDto { get; set; }
+
+       public int MediaCount { get; set; } = 0;
 
         // Location
         public LocationDto? Location { get; set; }
@@ -58,15 +53,7 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
         public PollDto? Poll { get; set; }
 
 
-        // Sticker/GIF
-        public string? StickerId { get; set; }
-        public string? GifUrl { get; set; }
 
-        // Caption
-        public string? Caption { get; set; }
-
-        // Link preview
-        public string? Preview { get; set; }
     }
 
     public class SystemEventDto
@@ -112,6 +99,25 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
     public class PollOptionDto
     {
         public string? Text { get; set; }
+    }
+
+    public class MediaMessageDto
+    {
+        public string? MediaUrl { get; set; }
+        public string? MediaKey { get; set; }
+        public string? ThumbnailUrl { get; set; }
+        public string? FileName { get; set; }
+        public int? FileSize { get; set; }
+        public string? MimeType { get; set; }
+        public int? Duration { get; set; }
+        public int? Width { get; set; }
+        public int? Height { get; set; }
+
+        // Sticker/GIF
+        public string? StickerId { get; set; }
+        public string? GifUrl { get; set; }
+        // Link preview
+        public string? Preview { get; set; }
     }
      
 }

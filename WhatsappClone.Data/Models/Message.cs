@@ -7,8 +7,8 @@ namespace WhatsappClone.Data.Models
 
     [BsonCollection("messages")]
     public class Message : MongoBaseModel
-    { 
-       
+    {
+
 
         [BsonElement("chat_id")]
         [BsonRepresentation(BsonType.Int64)]
@@ -20,15 +20,12 @@ namespace WhatsappClone.Data.Models
 
         public long SenderId { get; set; }
 
-        [BsonElement("sender_device_id")]
-        public string? SenderDeviceId { get; set; }
 
         [BsonElement("recipient_type")]
-        public string RecipientType { get; set; } // "user", "group", "broadcast"
+        public string RecipientType { get; set; } // "individual", "group", "broadcast"
 
         [BsonElement("recipient_id")]
         [BsonRepresentation(BsonType.Int64)]
-
         public long? RecipientId { get; set; }
 
         [BsonElement("message_type")]
@@ -43,27 +40,14 @@ namespace WhatsappClone.Data.Models
         [BsonElement("is_edited")]
         public bool? IsEdited { get; set; }
 
-        [BsonElement("edited_at")]
-        public DateTime? EditedAt { get; set; }
-
-        [BsonElement("edited_by")]
-        [BsonRepresentation(BsonType.Int64)]
-        public long? EditedBy { get; set; }
-
-        [BsonElement("is_deleted")]
-        public bool? IsDeleted { get; set; } //deleted for everyone
+        [BsonElement("is_deleted_forEveryone")]
+        public bool? IsDeletedForEveryone { get; set; } = false;
 
         [BsonElement("deleted_at")]
         public DateTime? DeletedAt { get; set; }
 
-        [BsonElement("deleted_by")]
-        public long? DeletedBy { get; set; } // for group's Admin
-
-        [BsonElement("delete_message_text")]
-        public string? DeleteMessageText { get; set; }
-
         [BsonElement("delete_for")]
-        public List<long>? DeletedFor { get; set; }
+        public List<long>? DeletedFor { get; set; } // delete for me option
 
         [BsonElement("starred_for")]
         public List<long>? StarredFor { get; set; }
@@ -74,71 +58,62 @@ namespace WhatsappClone.Data.Models
         [BsonElement("reactions")]
         public List<Reaction>? Reactions { get; set; } = new();
 
-        [BsonElement("replies")]
-        public List<Reply>? Replies { get; set; } = new();
-
         [BsonElement("reply_message_id")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? ReplyMessageId { get; set; }
 
-        [BsonElement("disappear_duration")]
-        public int? DisappearDuration { get; set; } // seconds
-
-        [BsonElement("disappear_at")]
-        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-        public DateTime? DisappearAt { get; set; }
-
-        [BsonElement("mentions")]
-        [BsonRepresentation(BsonType.Int64)]
-        public List<long>? Mentions { get; set; } = null;// user_ids
+        
 
     }
 
     public class MessageContent
     {
         // Text
+        [BsonElement("text")]
         public string? Text { get; set; }
+
+        [BsonElement("caption")]
+
+        public string? Caption { get; set; }
+
+
+        // For Mentions and  Bold,Italic Text 
+        [BsonElement("sormatted_text")]
+
         public List<FormattedText>? FormattedText { get; set; }
+
+
+        //for system Messages (you added ahmed , this message was deleted by.. ,  you created this group , you removed ahmed ,....)
+        [BsonElement("system_event")]
 
         public SystemEvent? SystemEvent { get; set; }
 
         // Media
-        public string? MediaUrl { get; set; }
-        public string? MediaKey { get; set; }
-        public string? ThumbnailUrl { get; set; }
-        public string? FileName { get; set; }
-        public int? FileSize { get; set; }
-        public string? MimeType { get; set; }
-        public int? Duration { get; set; }
-        public int? Width { get; set; }
-        public int? Height { get; set; }
+        [BsonElement("media")]
+
+        public List<MediaMessage>? Media { get; set; } = new();
 
         // Location
+        [BsonElement("location")]
+
         public Location? Location { get; set; }
 
         // Contact
+        [BsonElement("contact")]
+
         public ContactInfo? Contact { get; set; }
 
         // Poll
+        [BsonElement("poll")]
+
         public Poll? Poll { get; set; }
 
-        // Sticker/GIF
-        public string? StickerId { get; set; }
-        public string? GifUrl { get; set; }
 
-        // Caption
-        public string? Caption { get; set; }
-
-        // Link preview
-        public string? Preview { get; set; }
     }
     public class SystemEvent
     {
         [BsonElement("event_type")]
-        public string EventType { get; set; } // "member_added", "member_left", 
-                                              // "group_created", "group_renamed",
-                                              // "group_pic_changed", "admin_promoted",
-                                              // "admin_demoted", "group_settings_changed"
+        public string EventType { get; set; } 
 
         [BsonElement("actor_id")]
         [BsonRepresentation(BsonType.Int64)]
@@ -161,87 +136,180 @@ namespace WhatsappClone.Data.Models
 
     public class FormattedText
     {
+        [BsonElement("type")]
         public string? Type { get; set; } // "mention", "bold", "italic"
+
+        [BsonElement("user_id")]
+        [BsonRepresentation(BsonType.Int64)]
         public long? UserId { get; set; } // for mention
+
+        [BsonElement("offset")]
+
         public int? Offset { get; set; }
+
+        [BsonElement("length")]
+
         public int? Length { get; set; }
     }
 
     public class Location
     {
+        [BsonElement("lat")]
+
         public double? Lat { get; set; }
+        [BsonElement("lng")]
+
         public double? Lng { get; set; }
+        [BsonElement("name")]
+
         public string? Name { get; set; }
+        [BsonElement("address")]
+
         public string? Address { get; set; }
     }
 
     public class ContactInfo
     {
+        [BsonElement("name")]
+
         public string? Name { get; set; }
+        [BsonElement("phone")]
+
         public string? Phone { get; set; }
-        public string? Vcard { get; set; }
+
     }
 
     public class Poll
     {
+        [BsonElement("question")]
+
         public string? Question { get; set; }
+        [BsonElement("options")]
+
         public List<PollOption>? Options { get; set; }
+        [BsonElement("multiple_choice")]
+
         public bool? MultipleChoice { get; set; }
+        [BsonElement("end_time")]
+
         public DateTime? EndTime { get; set; }
+        [BsonElement("total_votes")]
+
         public int? TotalVotes { get; set; }
+        [BsonElement("voted_users")]
+        [BsonRepresentation(BsonType.Int64)]
+
         public List<long>? VotedUsers { get; set; }
     }
 
     public class PollOption
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
+        [BsonElement("text")]
         public string? Text { get; set; }
+        [BsonElement("votes_count")]
+
         public int? Votes { get; set; }
     }
 
-    public class Payment
+     public class MessageStatus
     {
-        public decimal? Amount { get; set; }
-        public string? Currency { get; set; }
-        public string? Status { get; set; }
-        public string? TransactionId { get; set; }
-    }
 
-    public class MessageStatus
-    {
+        [BsonElement("sent_at")]
+
         public DateTime? SentAt { get; set; }
+        [BsonElement("delivered_to")]
+
         public List<Receipt>? DeliveredTo { get; set; } = new();
-        public List<Receipt>? ReadBy { get; set; } = new();
+        [BsonElement("read_by")]
+
+        public List<Receipt>? ReadBy { get; set; } = new(); 
+        [BsonElement("played_by")]
+
         public List<Receipt>? PlayedBy { get; set; } = new();
-        public int? ForwardedCount { get; set; }
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string ForwardedFrom { get; set; }
     }
 
     public class Receipt
     {
-        public string? UserId { get; set; }
-        public string? DeviceId { get; set; }
+        [BsonElement("user_id")]
+        [BsonRepresentation(BsonType.Int64)]
+        public long? UserId { get; set; }
+        [BsonElement("timestamp")]
+
         public DateTime? Timestamp { get; set; }
     }
 
     public class Reaction
     {
-        public string? UserId { get; set; }
+        [BsonElement("user_id")]
+        [BsonRepresentation(BsonType.Int64)]
+        public long? UserId { get; set; }
+
+        [BsonElement("reaction_emoji")]
         public string? ReactionEmoji { get; set; }
+
+
+        [BsonElement("timestamp")]
         public DateTime? Timestamp { get; set; }
-        public bool? Removed { get; set; }
+
     }
 
     public class Reply
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string MessageId { get; set; }
+        [BsonElement("user_id")]
+        [BsonRepresentation(BsonType.Int64)]
         public long? UserId { get; set; }
+        [BsonElement("preview")]
         public string? Preview { get; set; }
+        [BsonElement("timestamp")]
+
         public DateTime? Timestamp { get; set; }
     }
+    public class MediaMessage
+    {
+        [BsonElement("media_url")]
 
+        public string? MediaUrl { get; set; }
+        [BsonElement("thumbnail")]
+
+        public string? ThumbnailUrl { get; set; }
+        [BsonElement("file_name")]
+
+        public string? FileName { get; set; }
+        [BsonElement("file_size")]
+
+        public int? FileSize { get; set; }
+        [BsonElement("mime_type")]
+
+        public string? MimeType { get; set; }
+        [BsonElement("duration")]
+
+        public int? Duration { get; set; }
+        [BsonElement("width")]
+
+        public int? Width { get; set; }
+        [BsonElement("height")]
+
+        public int? Height { get; set; }
+
+        // Sticker/GIF   (Webp)
+        [BsonElement("sticker")]
+
+        public string? StickerId { get; set; }
+        [BsonElement("gif")]
+
+        public string? GifUrl { get; set; }
+
+
+        // Link preview
+        [BsonElement("preview")]
+
+        public string? Preview { get; set; }
+    }
     public static class MessageType
     {
         public const string System = "System";
@@ -256,6 +324,24 @@ namespace WhatsappClone.Data.Models
         public const string Contact = "Contact";
         public const string Poll = "Poll";
         public const string Location = "Location";
+    }
+    public static class SystemEventType
+    {
+        public const string AddMember = "AddMember";
+        public const string RemoveMember = "RemoveMember";
+        public const string LeftGroup = "LeftGroup";
+        public const string EditGroupSettings = "EditGroupSettings";
+        public const string SendNewMessages = "SendNewMessages";
+        public const string AddOtherMembers = "AddOtherMembers";
+
+    }
+
+    public static class FormattedTextType
+    {
+        public const string Bold = "Bold";
+        public const string Italic = "Italic";
+        public const string Mention = "Mention";
+        public const string Strikethrough = "Strikethrough";
     }
 
 }

@@ -16,24 +16,23 @@ namespace WhatsappClone.Data.Models
         public long ChatId { get; set; }
 
         [BsonElement("conversation_type")]
-        public string ConversationType { get; set; }
+        public string ConversationType { get; set; }   // individual | group
 
         [BsonElement("peer_id")]
-        public long PeerId { get; set; }
+        public long PeerId { get; set; } // if PeerId == null -> group     else -> individual
 
 
-        [BsonElement("participants_cache")]
-        public Dictionary<long, string> ParticipantsCache { get; set; } = new();
+        //[BsonElement("participants_cache")]
+        //public Dictionary<long, string> ParticipantsCache { get; set; } = new();
 
         [BsonElement("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Denormalized display info
         [BsonElement("display_name")]
-        public string DisplayName { get; set; }
+        public string DisplayName { get; set; } // groupName | (ContactName | PhoneNumber)
 
         [BsonElement("profile_pic_url")]
-        public string ProfilePicUrl { get; set; }
+        public string ProfilePicUrl { get; set; } = "default_avatar";
 
 
         // Last message preview
@@ -52,7 +51,7 @@ namespace WhatsappClone.Data.Models
         public string? LastReadMessageId { get; set; }
 
         [BsonElement("last_read_timestamp")]
-        public DateTime? LastReadTimestamp { get; set; } = DateTime.UtcNow;
+        public DateTime? LastReadTimestamp { get; set; }
 
         [BsonElement("last_received_message_id")]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -81,13 +80,10 @@ namespace WhatsappClone.Data.Models
         [BsonElement("archived_at")]
         public DateTime? ArchivedAt { get; set; }
 
-  
-        // Sync
+        //for Ordering
         [BsonElement("updated_at")]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        [BsonElement("sync_version")]
-        public int SyncVersion { get; set; } = 1;   
     }
 
     public class LastMessage
@@ -95,11 +91,12 @@ namespace WhatsappClone.Data.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string MessageId { get; set; }
         public LastMessageContent Content { get; set; }
+        public string MessageType { get; set; }
         public long? SenderId { get; set; }
-        public string? SenderName { get; set; }
         public DateTime Timestamp { get; set; }
-        public bool IsDeleted { get; set; }
-        public bool IsMedia { get; set; }
+        public bool? IsDeleted { get; set; }
+        public string? MessageStatus { get; set; }
+        public bool? IsMedia { get; set; }
     }
 
     public class LastMessageContent
@@ -111,10 +108,33 @@ namespace WhatsappClone.Data.Models
         public string? MediaType { get; set; }
 
         [BsonElement("is_media")]
-        public bool IsMedia { get; set; }
+        public bool? IsMedia { get; set; }
+
+        [BsonElement("media_count")]
+        public int? MediaCount { get; set; } = 0;
 
         [BsonElement("caption")]
         public string? Caption { get; set; }
+
+        [BsonElement("system_message")]
+
+        public SystemMessage? SystemMessage { get; set; }
+    }
+
+    public class SystemMessage
+    {
+        [BsonElement("actor_id")]
+        [BsonRepresentation(BsonType.Int64)]
+        public long ActorId { get; set; }
+
+        public string Type { get; set; } = SystemEventType.AddMember;
+    }
+
+    public static class LastMessageStatus
+    {
+        public const string Sent = "Sent";
+        public const string Delivered = "Delivered";
+        public const string Read = "Read";
     }
 }
 

@@ -23,7 +23,7 @@ public class GroupMember
 
   
 
-    public byte Status { get; set; } = 1; // 1=active, 0=left, 2=removed, 3=banned
+    public string Status { get; set; }  = MemberStatus.Active; // 1=active, 0=left, 2=removed
 
     public DateTime? LeftAt { get; set; }
 
@@ -33,4 +33,10 @@ public static class MemberRole
 {
     public const string Member = "Member";
     public const string Admin = "Admin";
+}
+public static class MemberStatus
+{
+    public const string Active = "Active";
+    public const string Left = "Left";
+    public const string Removed = "Removed";
 }

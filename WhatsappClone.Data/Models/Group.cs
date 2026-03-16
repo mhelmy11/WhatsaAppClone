@@ -5,14 +5,15 @@ namespace WhatsappClone.Data.Models
 {
     public class Group
     {
-
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; } //snowflakeId
 
         public string Name { get; set; }
 
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
-        public string ProfilePicUrl { get; set; }
+        public string ProfilePicUrl { get; set; } = "default_group_avatar";
 
         public long CreatedBy { get; set; }
         [ForeignKey(nameof(CreatedBy))]

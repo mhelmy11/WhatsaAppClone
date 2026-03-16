@@ -20,9 +20,7 @@
 		<Folder Include="Features\Conversations\Commands\ClearChat\" />
 		<Folder Include="Features\Conversations\Commands\DeleteChat\" />
 		<Folder Include="Features\Conversations\Commands\PinChat\" />
-		<Folder Include="Features\Groups\Commands\CreateGroup\" />
 		<Folder Include="Features\Groups\Commands\AddGroupMembers\" />
-		<Folder Include="Features\Groups\Commands\CreateInviteLink\" />
 		<Folder Include="Features\Groups\Commands\PromoteToAdmin\" />
 		<Folder Include="Features\Groups\Commands\RemoveGroupMember\" />
 		<Folder Include="Features\Groups\Commands\UpdateGroupInfo\" />

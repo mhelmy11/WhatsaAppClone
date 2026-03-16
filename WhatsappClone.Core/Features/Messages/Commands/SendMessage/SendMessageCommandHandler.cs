@@ -26,10 +26,10 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
         private readonly SqlDBContext dBContext;
 
         public SendMessageCommandHandler(
-            ICurrentUserService currentUserService ,
-            IMongoDBFactory mongoDBFactory ,
-            IIdGenerator<long> idGenerator ,
-            IMediator mediator ,
+            ICurrentUserService currentUserService,
+            IMongoDBFactory mongoDBFactory,
+            IIdGenerator<long> idGenerator,
+            IMediator mediator,
             SqlDBContext dBContext
             )
         {
@@ -45,8 +45,8 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
             var messageCollection = mongoDBFactory.GetCollection<Message>();
             var conversationCollection = mongoDBFactory.GetCollection<Conversation>();
             long ChatId = 0;
-            long PeerId = 0;
-
+            long? PeerId;
+            bool isNewChat = false;
             string ConversationType = string.Empty;
             List<long> chatParticipants = new();
             List<long> extractedMentions = new();
@@ -63,13 +63,13 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
                 ConversationType = exisitingconversation.Type;
 
                 chatParticipants = exisitingconversation.Participants.ToList() ?? new();
-                if(ConversationType == WhatsappClone.Data.Models.ConversationType.Group)
+                if (ConversationType == WhatsappClone.Data.Models.ConversationType.Group)
                 {
                     //check if sender in the group
-                    var isGroupMember = dBContext.GroupMembers.Any(gm=> gm.GroupId == ChatId && gm.UserId == currentUserId);
+                    var isGroupMember = dBContext.GroupMembers.Any(gm => gm.GroupId == ChatId && gm.UserId == currentUserId);
 
                     var isAdmin =
-                        dBContext.GroupMembers.Any(gm=>gm.GroupId ==  ChatId && gm.UserId == currentUserId && gm.Role == MemberRole.Admin) ;
+                        dBContext.GroupMembers.Any(gm => gm.GroupId == ChatId && gm.UserId == currentUserId && gm.Role == MemberRole.Admin);
 
                     var isSendMessagesIsNotAllowed =
                         dBContext.Groups.Any(g => g.Id == ChatId && g.AllowMessagesForMembers == false);
@@ -79,59 +79,42 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
                     {
                         return BadRequest<SendMessageResult>("You are not allowed to send messages to this group");
                     }
-                    if(!(isAdmin && isSendMessagesIsNotAllowed))
+                    if (isSendMessagesIsNotAllowed && !isAdmin)
                     {
                         return BadRequest<SendMessageResult>("You are not allowed to send messages to this group");
                     }
 
                     if (request.Content.FormattedText is not null)
                     {
-                        extractedMentions =  request.Content.FormattedText.Where(c => c.Type == "mention").Select(c => c.UserId.Value).Distinct().ToList();
+                        extractedMentions = request.Content.FormattedText.Where(c => c.Type == "mention").Select(c => c.UserId.Value).Distinct().ToList();
                     }
 
-                    PeerId = ChatId;
+                    PeerId = null;
+                }
+                else // existing Individual Conversation
+                {
+                    PeerId = request.RecipientId;
                 }
 
 
-
             }
-            else if (request.RecipientId.HasValue && request.RecipientId > 0)
+            else if (request.RecipientId.HasValue && request.RecipientId > 0) // so ChatId == null -> new individual Conversaion
             {
-                var targetUserId = request.RecipientId.Value;
                 ConversationType = WhatsappClone.Data.Models.ConversationType.Individual;
-                PeerId = targetUserId;
-                var existingChat = await conversationCollection.Find(c =>
-                    c.Type == ConversationType &&
-                    c.Participants.Contains(currentUserId) &&
-                    c.Participants.Contains(targetUserId)
-                ).FirstOrDefaultAsync(cancellationToken);
-
-                if (existingChat != null)
+                PeerId = request.RecipientId.Value;
+                ChatId = idGenerator.CreateId();
+                var newChat = new Conversation
                 {
-                    ChatId = existingChat.ChatId;
-                    chatParticipants = existingChat.Participants;
-                }
-                else //new individual conversation
-                {
-                    ChatId = idGenerator.CreateId();
-
-
-                    var newChat = new Conversation
-                    {
-                        ChatId = ChatId,
-                        Type = WhatsappClone.Data.Models.ConversationType.Individual,
-                        Participants = new List<long> { Math.Min(currentUserId, targetUserId), Math.Max(currentUserId, targetUserId) },
-                        CreatedAt = DateTime.UtcNow,
-                    };
-                    ConversationType = newChat.Type;
-
-                    await conversationCollection.InsertOneAsync(newChat, cancellationToken: cancellationToken);
-
-                    chatParticipants = newChat.Participants;
-                }
-
+                    ChatId = ChatId,
+                    Type = ConversationType,
+                    Participants = new List<long> { Math.Min(currentUserId, PeerId.Value), Math.Max(currentUserId, PeerId.Value) },
+                    CreatedAt = DateTime.UtcNow,
+                };
+                await conversationCollection.InsertOneAsync(newChat, cancellationToken: cancellationToken);
+                isNewChat = true;
+                chatParticipants = newChat.Participants;
             }
-            else 
+            else
             {
                 return BadRequest<SendMessageResult>("Somethin went wrong");
             }
@@ -140,25 +123,36 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
             {
                 ChatId = ChatId,
                 SenderId = currentUserId,
-                RecipientType = request.RecipientType,
-                RecipientId = request.RecipientId,
+                RecipientType = ConversationType,
+                RecipientId = PeerId,
                 MessageType = request.MessageType,
                 Timestamp = DateTime.UtcNow,
                 Status = new MessageStatus
                 {
-                    SentAt = DateTime.UtcNow
+                    SentAt = DateTime.UtcNow,
                 },
                 ReplyMessageId = request.ReplyToMessageId,
-                Mentions = request.Mentions,
 
                 Content = new MessageContent
                 {
                     Text = request.Content.Text,
-                    MediaUrl = request.Content.MediaUrl,
-                    FileName = request.Content.FileName,
-                    FileSize = request.Content.FileSize,
-                    MimeType = request.Content.MimeType,
-                    Duration = request.Content.Duration,
+                    Caption = request.Content.Caption,
+                    Media = request.Content.MediaDto is not null ? request.Content.MediaDto.Select(md => new MediaMessage
+                    {
+                        MediaUrl = md.MediaUrl,
+                        FileName = md.FileName,
+                        FileSize = md.FileSize,
+                        MimeType = md.MimeType,
+                        Duration = md.Duration,
+                        ThumbnailUrl = md.ThumbnailUrl,
+                        StickerId = md.StickerId,
+                        GifUrl = md.GifUrl,
+                        Height = md.Height,
+                        Preview = md.Preview,
+                        Width = md.Width
+
+                    }).ToList() : null,
+
                     FormattedText = request.Content.FormattedText is not null ? request.Content.FormattedText.Select(ft => new FormattedText
                     {
                         Length = ft.Length,
@@ -166,28 +160,12 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
                         Type = ft.Type,
                         UserId = ft.UserId,
                     }).ToList() : null,
-                    Contact = request.Content.Contact is not null ? new ContactInfo {
+                    Contact = request.Content.Contact is not null ? new ContactInfo
+                    {
                         Name = request.Content.Contact.Name,
                         Phone = request.Content.Contact.Phone,
-                        Vcard = request.Content.Contact.Vcard
                     } : null,
 
-                    ThumbnailUrl = request.Content.ThumbnailUrl,
-                    StickerId = request.Content.StickerId,
-                    SystemEvent = request.Content.SystemEvent is not null ? new SystemEvent {
-                        ActorId = currentUserId,
-                        EventType = request.Content.SystemEvent.EventType,
-                        NewValue = request.Content.SystemEvent.NewValue,
-                        OldValue = request.Content.SystemEvent.OldValue,
-                        TargetGroupId = request.Content.SystemEvent.TargetGroupId,
-                        TargetIds = request.Content.SystemEvent.TargetIds
-                    } : null,
-                    Caption = request.Content.Caption,
-                    GifUrl = request.Content.GifUrl,
-                    Height = request.Content.Height,
-                    MediaKey = request.Content.MediaKey,
-                    Preview = request.Content.Preview,
-                    Width = request.Content.Width,
                     Location = request.Content.Location is not null ? new Location
                     {
                         Address = request.Content.Location.Address,
@@ -204,16 +182,12 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
                         {
                             Text = o.Text,
 
-                        }).ToList() ,
+                        }).ToList(),
 
-                    }: null
-                    
+                    } : null
+
                 },
-                Replies = request.Replies is not null && request.ReplyToMessageId is not null ? request.Replies.Select(r=> new Reply 
-                { 
-                    MessageId = request.ReplyToMessageId , UserId = request.ReplyToUserId 
-                }).ToList()
-                : null,
+
             };
 
             await messageCollection.InsertOneAsync(newMessage, cancellationToken: cancellationToken);
@@ -233,12 +207,15 @@ namespace WhatsappClone.Core.Features.Messages.Commands.SendMessage
                 MessageType: request.MessageType, // "image", "audio", "text"
                 TextContent: request.Content?.Text,
                 SentAt: newMessage.Timestamp,
-                Mentions: extractedMentions
+                Mentions: extractedMentions,
+                MediaCount: request.Content.MediaCount,
+                IsNewChat: isNewChat
             ), cancellationToken);
             request.ChatId = ChatId;
             request.RecipientType = ConversationType;
+            request.RecipientId = PeerId;
 
-            return Success(new SendMessageResult { MessageId = newId  , Message = request});
+            return Success(new SendMessageResult { MessageId = newId, Message = request });
         }
     }
 }

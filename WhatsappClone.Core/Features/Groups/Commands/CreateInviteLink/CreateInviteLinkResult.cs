@@ -4,13 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WhatsappClone.Data.Enums
+namespace WhatsappClone.Core.Features.Groups.Commands.CreateInviteLink
 {
-    public enum ChatOrderingEnum
+    internal class CreateInviteLinkResult
     {
-        ChatId = 0,
-        Name = 1,
-        LastMessageTime = 2,
-
     }
 }

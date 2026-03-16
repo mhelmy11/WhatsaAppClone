@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WhatsappClone.API.Base;
+using WhatsappClone.Core.Features.Groups.Commands.CreateGroup;
 
 namespace WhatsappClone.API.Controllers
 {
@@ -13,14 +14,14 @@ namespace WhatsappClone.API.Controllers
 
 
 
-        //[HttpPost("create-group")]
+        [HttpPost("create-group")]
 
-        //[Authorize]
-        //public async Task<IActionResult> CreateGroup([FromForm] CreateGroupCommand command)
-        //{
-        //    var result = await mediator.Send(command);
-        //    return ResponseResult(result);
-        //}
+        [Authorize]
+        public async Task<IActionResult> CreateGroup( CreateGroupCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
         //[HttpPost("generate-invite-group")]
         //[Authorize]
         //public async Task<IActionResult> GenerateInviteGroupLink([FromForm] CreateInviteLinkCommand command)

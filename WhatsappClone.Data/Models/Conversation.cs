@@ -8,7 +8,7 @@ namespace WhatsappClone.Data.Models
     [BsonCollection("conversations")]
     public class Conversation : MongoBaseModel
     {
-      
+        [BsonElement("chat_id")]
         [BsonRepresentation(BsonType.Int64)]
         public long ChatId { get; set; }         
 
@@ -16,7 +16,6 @@ namespace WhatsappClone.Data.Models
         public string Type { get; set; }          // "individual", "group"
 
         [BsonElement("participants")]
-        [BsonRepresentation(BsonType.Int64)]
         public List<long> Participants { get; set; } = new(); // UserIds
 
         [BsonElement("created_at")]
