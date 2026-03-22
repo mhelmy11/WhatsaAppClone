@@ -120,7 +120,7 @@ namespace WhatsappClone.API
                     context.Database.ExecuteSqlRaw("DELETE FROM UserConnections");
                     Console.WriteLine("Table UserConnections cleared before shutdown.");
                 });
-                app.UseHangfireDashboard(); 
+                //app.UseHangfireDashboard(); 
 
                 app.Run();
             }

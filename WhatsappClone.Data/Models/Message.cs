@@ -332,6 +332,7 @@ namespace WhatsappClone.Data.Models
         public const string LeftGroup = "LeftGroup";
         public const string EditGroupSettings = "EditGroupSettings";
         public const string SendNewMessages = "SendNewMessages";
+        public const string PromoteToAdmin = "PromoteToAdmin";
         public const string AddOtherMembers = "AddOtherMembers";
 
     }
