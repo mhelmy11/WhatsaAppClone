@@ -52,6 +52,7 @@
 		<PackageReference Include="Hangfire" Version="1.8.23" />
 		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
 		<PackageReference Include="Hangfire.SqlServer" Version="1.8.23" />
+		<PackageReference Include="Hashids.net" Version="1.7.0" />
 		<PackageReference Include="IdGen" Version="3.0.7" />
 		<PackageReference Include="IdGen.Configuration" Version="3.0.7" />
 		<PackageReference Include="IdGen.DependencyInjection" Version="3.0.7" />

@@ -1,4 +1,5 @@
 ﻿using Base62;
+using HashidsNet;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,12 +15,12 @@ namespace WhatsappClone.Core.Features.Groups.Commands.CreateInviteLink
     public class CreateInviteLinkCommandHandler : ResponseHandler, IRequestHandler<CreateInviteLinkCommand, Response<CreateInviteLinkResult>>
     {
         private readonly SqlDBContext dBContext;
-        private readonly Base62Converter base62Converter;
+        private readonly IHashids _hashids;
 
-        public CreateInviteLinkCommandHandler(SqlDBContext dBContext , Base62Converter base62Converter)
+        public CreateInviteLinkCommandHandler(SqlDBContext dBContext , IHashids hashids)
         {
             this.dBContext = dBContext;
-            this.base62Converter = base62Converter;
+            _hashids = hashids;
         }
         public async Task<Response<CreateInviteLinkResult>> Handle(CreateInviteLinkCommand request, CancellationToken cancellationToken)
         {
@@ -29,16 +30,17 @@ namespace WhatsappClone.Core.Features.Groups.Commands.CreateInviteLink
                 return BadRequest<CreateInviteLinkResult>("This group is not exisiting");
             }
 
-            var decodedCode = $"{request.GroupId}+{DateTime.UtcNow}";
 
-            var encodedCode = base62Converter.Encode(decodedCode);
+            long currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var hash = _hashids.EncodeLong(request.GroupId , currentTimestamp);
+
+
             //add it to group table
-
-            group.InviteLink = encodedCode;
+            group.InviteLink = hash;
             group.InviteLinkExpiry = DateTime.UtcNow.AddDays(7);
             await dBContext.SaveChangesAsync();
 
-            return Success<CreateInviteLinkResult>(new CreateInviteLinkResult { InviteCode = encodedCode });
+            return Success<CreateInviteLinkResult>(new CreateInviteLinkResult { InviteCode = hash });
 
         }
     }

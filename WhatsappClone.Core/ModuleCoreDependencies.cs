@@ -1,5 +1,7 @@
-﻿using FluentValidation;
+﻿using Base62;
+using FluentValidation;
 using Hangfire;
+using HashidsNet;
 using IdGen.DependencyInjection;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +12,6 @@ using System.Reflection;
 using WhatsappClone.Core.Behaviours;
 using WhatsappClone.Core.Filters;
 using WhatsappClone.Core.RequirementsHandlers;
-using Base62;
 
 namespace WhatsappClone.Core
 {
@@ -25,7 +26,10 @@ namespace WhatsappClone.Core
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
 
             services.AddIdGen(1);
-            services.AddScoped<Base62Converter>();
+
+            var hashidsSalt = configuration["HashidsSettings:Salt"];
+
+           services.AddSingleton<IHashids>(new Hashids(hashidsSalt, minHashLength: 8));
 
             // Register AutoMapper
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -41,9 +45,9 @@ namespace WhatsappClone.Core
             {
                 options.TokenLifespan = TimeSpan.FromMinutes(5); // OTP is revoked after 5 min
             });
-            services.AddHangfire(config =>
-                config.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
-            services.AddHangfireServer();
+            //services.AddHangfire(config =>
+            //    config.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+            //services.AddHangfireServer();
 
             return services;
         }
