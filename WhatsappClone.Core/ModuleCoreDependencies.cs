@@ -10,6 +10,7 @@ using System.Reflection;
 using WhatsappClone.Core.Behaviours;
 using WhatsappClone.Core.Filters;
 using WhatsappClone.Core.RequirementsHandlers;
+using Base62;
 
 namespace WhatsappClone.Core
 {
@@ -24,6 +25,7 @@ namespace WhatsappClone.Core
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
 
             services.AddIdGen(1);
+            services.AddScoped<Base62Converter>();
 
             // Register AutoMapper
             services.AddAutoMapper(Assembly.GetExecutingAssembly());

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace WhatsappClone.Core.Features.Groups.Commands.CreateInviteLink
 {
-    internal class CreateInviteLinkResult
+    public class CreateInviteLinkResult
     {
+        public string InviteCode { get; set; }
     }
 }

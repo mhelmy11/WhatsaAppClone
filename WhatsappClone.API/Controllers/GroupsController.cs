@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WhatsappClone.API.Base;
+using WhatsappClone.Core.Features.Groups.Commands.AddGroupMembers;
 using WhatsappClone.Core.Features.Groups.Commands.CreateGroup;
+using WhatsappClone.Core.Features.Groups.Commands.CreateInviteLink;
 
 namespace WhatsappClone.API.Controllers
 {
@@ -22,20 +24,16 @@ namespace WhatsappClone.API.Controllers
             var result = await mediator.Send(command);
             return ResponseResult(result);
         }
-        //[HttpPost("generate-invite-group")]
+        [HttpPost("generate-invite-group")]
         //[Authorize]
-        //public async Task<IActionResult> GenerateInviteGroupLink([FromForm] CreateInviteLinkCommand command)
-        //{
-        //    var result = await mediator.Send(command);
-        //    return ResponseResult(result);
-        //}
-        //[HttpPost("reset-invite-link")]
-        //[Authorize]
-        //public async Task<IActionResult> ResetInviteGroupLink([FromForm] CreateInviteLinkCommand command)
-        //{
-        //    var result = await mediator.Send(command);
-        //    return ResponseResult(result);
-        //}
+        public async Task<IActionResult> GenerateInviteGroupLink (CreateInviteLinkCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
+
+
+
         //[HttpPost("join-group-via-link")]
         //[Authorize]
         //public async Task<IActionResult> JoinGroupViaLink([FromForm] JoinGroupViaLinkCommand command)
@@ -45,13 +43,13 @@ namespace WhatsappClone.API.Controllers
         //}
 
 
-        //[HttpPost("add-member-list")]
-        //[Authorize]
-        //public async Task<IActionResult> AddMembersList([FromForm] AddListOfMembersCommand command)
-        //{
-        //    var result = await mediator.Send(command);
-        //    return ResponseResult(result);
-        //}
+        [HttpPost("add-members")]
+        [Authorize]
+        public async Task<IActionResult> AddMembersList(AddGroupMembersCommand command)
+        {
+            var result = await mediator.Send(command);
+            return ResponseResult(result);
+        }
 
 
         //[HttpGet("group-invite-info/{inviteCode}")]

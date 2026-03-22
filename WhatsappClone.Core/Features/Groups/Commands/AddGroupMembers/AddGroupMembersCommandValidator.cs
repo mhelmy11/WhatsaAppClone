@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WhatsappClone.Core.Features.Groups.Commands.CreateInviteLink
+namespace WhatsappClone.Core.Features.Groups.Commands.AddGroupMembers
 {
-    public class CreateInviteLinkCommandValidator
+    public class AddGroupMembersCommandValidator
     {
     }
 }

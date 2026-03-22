@@ -20,7 +20,6 @@
 		<Folder Include="Features\Conversations\Commands\ClearChat\" />
 		<Folder Include="Features\Conversations\Commands\DeleteChat\" />
 		<Folder Include="Features\Conversations\Commands\PinChat\" />
-		<Folder Include="Features\Groups\Commands\AddGroupMembers\" />
 		<Folder Include="Features\Groups\Commands\PromoteToAdmin\" />
 		<Folder Include="Features\Groups\Commands\RemoveGroupMember\" />
 		<Folder Include="Features\Groups\Commands\UpdateGroupInfo\" />
@@ -46,6 +45,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="Base62" Version="1.3.0" />
 		<PackageReference Include="EFCore.BulkExtensions" Version="9.0.2" />
 		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
