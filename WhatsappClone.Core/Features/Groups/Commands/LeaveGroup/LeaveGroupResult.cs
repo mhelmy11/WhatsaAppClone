@@ -6,7 +6,5 @@ using System.Threading.Tasks;
 
 namespace WhatsappClone.Core.Features.Groups.Commands.LeaveGroup
 {
-    public class LeaveGroupResult
-    {
-    }
+    public record LeaveGroupResult(long ActorUserId);
 }
