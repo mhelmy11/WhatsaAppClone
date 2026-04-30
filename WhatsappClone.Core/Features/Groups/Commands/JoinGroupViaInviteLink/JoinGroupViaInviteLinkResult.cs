@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace WhatsappClone.Core.Features.Groups.Commands.JoinGroupViaInviteLink
 {
-    internal class JoinGroupViaInviteLinkResult
-    {
-    }
+    public record JoinGroupViaInviteLinkResult(long JoinedMember , long GroupId);
+    
 }
