@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace WhatsappClone.Core.Features.Groups.Commands.RemoveGroupMember
 {
-    internal class RemoveGroupMemberResult
-    {
-    }
+    public record RemoveGroupMemberResult(long RemovedUserId);
+
 }
