@@ -20,7 +20,6 @@
 		<Folder Include="Features\Conversations\Commands\ClearChat\" />
 		<Folder Include="Features\Conversations\Commands\DeleteChat\" />
 		<Folder Include="Features\Conversations\Commands\PinChat\" />
-		<Folder Include="Features\Groups\Queries\" />
 		<Folder Include="Features\Media\Commands\UploadMedia\" />
 		<Folder Include="Features\Media\Queries\" />
 		<Folder Include="Features\Messages\Commands\EditMessage\" />
