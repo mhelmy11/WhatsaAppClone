@@ -16,7 +16,6 @@ namespace WhatsappClone.Core.Features.Groups.Commands.UpdateGroupInfo
     {
         private readonly CurrentUserService currentUserService;
         private readonly SqlDBContext dBContext;
-        private readonly IMediator mediator;
         private readonly IMongoDBFactory mongoDBFactory;
 
         public UpdateGroupInfoCommandHandler(
@@ -27,7 +26,6 @@ namespace WhatsappClone.Core.Features.Groups.Commands.UpdateGroupInfo
         {
             this.currentUserService = currentUserService;
             this.dBContext = dBContext;
-            this.mediator = mediator;
             this.mongoDBFactory = mongoDBFactory;
         }
         public async Task<Response<UpdateGroupInfoResult>> Handle(UpdateGroupInfoCommand request, CancellationToken cancellationToken)
