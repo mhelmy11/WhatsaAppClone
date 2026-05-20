@@ -6,7 +6,5 @@ using System.Threading.Tasks;
 
 namespace WhatsappClone.Core.Features.Groups.Commands.UpdateGroupInfo
 {
-    internal class UpdateGroupInfoResult
-    {
-    }
+    public record UpdateGroupInfoResult(long GroupId);
 }

@@ -26,7 +26,7 @@ namespace WhatsappClone.Data.Models
         public bool AllowMessagesForMembers { get; set; } = false;
 
         public bool ApprovalRequiredToJoin { get; set; } = false;
-        public bool EditGroupDescription { get; set; } = true;
+        public bool EditGroupSettings { get; set; } = true;
 
 
         public bool IsCommunity { get; set; } = false;

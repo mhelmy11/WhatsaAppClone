@@ -328,6 +328,8 @@ namespace WhatsappClone.Data.Models
     public static class SystemEventType
     {
         public const string AddMember = "AddMember";
+        public const string EditGroupName = "EditGroupName";
+        public const string EditGroupPic = "EditGroupPic";
         public const string RemoveMember = "RemoveMember";
         public const string LeftGroup = "LeftGroup";
         public const string EditGroupSettings = "EditGroupSettings";
